@@ -87,9 +87,9 @@ public class EventMapFragment
     private SiteViewModel siteViewModel;
     private User currentUser;
     
-    private List<Site> userRegisteredSite;
-    private List<Site> userVolunteerSite;
-    private List<Site> userHostedSite;
+    private List<Site> userRegisteredSite = new ArrayList<>();
+    private List<Site> userVolunteerSite = new ArrayList<>();
+    private Site userHostedSite;
     
     // Google map API
     private GeoApiContext mapGeoAPIContext;
@@ -104,8 +104,8 @@ public class EventMapFragment
     private ClusterManager<CustomAdvancedMarker> customManager;
     private MarkerSetter markerRenderer;
     
-    private List<CustomAdvancedMarker> customAdvancedMarkers;
-    private List<Marker> locationMarkers;
+    private List<CustomAdvancedMarker> customAdvancedMarkers = new ArrayList<>();
+    private List<Marker> locationMarkers = new ArrayList<>();
     
     // Polylines
     private List<MapPolyline> listOfMapPolyline = new ArrayList<>();
@@ -126,10 +126,10 @@ public class EventMapFragment
                 userViewModel.getUserDataById(
                         userViewModel.getCurrentUserId()
                 ).getValue();
-        
-        if (currentUser == null) {
-            Toast.makeText(requireContext(), "USER: currentUser is null", Toast.LENGTH_SHORT).show();
-        }
+//
+//        if (currentUser == null) {
+//            Toast.makeText(requireContext(), "USER: currentUser is null", Toast.LENGTH_SHORT).show();
+//        }
         
         userViewModel
                 .getUserDataById(userViewModel.getCurrentUserId())
@@ -167,10 +167,8 @@ public class EventMapFragment
                 .getUserHostedSite(userViewModel.getCurrentUserId())
                 .observe(this, sites -> {
                     if (sites != null) {
-                        userHostedSite.clear();
-                        userHostedSite.addAll(sites);
-                        
-                        markAllSiteFromList(map, userHostedSite);
+                        userHostedSite = sites;
+                        markAllSiteFromList(map, List.of(userHostedSite));
                     } else {
                         Log.d("MAP", "Failed to get hosted site!");
                     }

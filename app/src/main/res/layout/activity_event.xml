@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer"
         android:layout_width="match_parent"
@@ -23,41 +24,40 @@
             android:id="@+id/main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".views.EventActivity"
-            android:orientation="vertical">
-
+            android:orientation="vertical"
+            tools:context=".views.EventActivity">
             <include
                 android:id="@+id/toolbarId"
                 layout="@layout/toolbar"
                 android:layout_height="60dp"
                 android:layout_width="match_parent" />
 
-            <SearchView
-                android:id="@+id/searchView"
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/custom_search_text"
-                android:iconifiedByDefault="false"
-                android:queryHint="Search Events..."
-                android:searchIcon="@drawable/ic_search_icon"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_height="wrap_content"
+                app:tabIndicatorColor="@color/black"
+                app:tabRippleColor="@color/pink"
+                app:tabSelectedTextColor="@color/black"
+                app:tabTextAppearance="@style/TabText">
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/siteRecyclerView"
+                <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="match_parent"
+                    android:text="General" />
 
-            </ScrollView>
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Map" />
+            </com.google.android.material.tabs.TabLayout>
 
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/pageContent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never" />
         </LinearLayout>
 
     </androidx.drawerlayout.widget.DrawerLayout>

@@ -20,10 +20,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.tabs.TabLayout;
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.EventSiteAdapter;
+import com.sontung.blood.adapter.EventTabAdapter;
 import com.sontung.blood.databinding.ActivityEventBinding;
 import com.sontung.blood.model.Site;
 import com.sontung.blood.viewmodel.SiteViewModel;
@@ -35,22 +38,13 @@ import java.util.List;
 public class EventActivity extends AppCompatActivity {
     
     private ActivityEventBinding binding;
-    
+
     private UserViewModel userViewModel;
-    private SiteViewModel siteViewModel;
-    
-    // Sites
-    private RecyclerView siteRecyclerView;
-    private EventSiteAdapter siteAdapter;
-    private List<Site> siteList;
-    
-    // Search and Filter
-    private SearchView searchView;
-    
     // Navbar
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,59 +53,48 @@ public class EventActivity extends AppCompatActivity {
         
         binding = DataBindingUtil.setContentView(this, R.layout.activity_event);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        
+
+        EventTabAdapter eventTabAdapter = new EventTabAdapter(getSupportFragmentManager());
+        binding.pageContent.setAdapter(eventTabAdapter);
+        binding.pageContent.addOnPageChangeListener(
+                new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(
+                            int position, float positionOffset, int positionOffsetPixels) {}
+
+                    @Override
+                    public void onPageSelected(int position) {
+                        binding.tabLayout.getTabAt(position).select();
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {}
+                });
+
+        binding.tabLayout.addOnTabSelectedListener(
+                new TabLayout.OnTabSelectedListener() {
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        binding.pageContent.setCurrentItem(tab.getPosition());
+                    }
+
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {}
+
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {}
+                });
+
+
         setUpDrawer();
-        
-        searchView = binding.searchView;
-        setUpSiteRecyclerView();
-        
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
     }
-    
-    // Setting up Site Recycler View
-    private void setUpSiteRecyclerView() {
-        siteRecyclerView = binding.siteRecyclerView;
-        siteRecyclerView.setLayoutManager(
-                new LinearLayoutManager(
-                        this,
-                        LinearLayoutManager.VERTICAL,
-                        false)
-        );
-        siteRecyclerView.hasFixedSize();
-        siteList = new ArrayList<>();
-        
-        siteViewModel.getAllSiteData().observe(this, this::setUpSiteToViews);
-    }
-    
-    // Setting up the search engine
-    @SuppressLint("NotifyDataSetChanged")
-    private void setUpSiteToViews(List<Site> sites) {
-        siteList.clear();
-        siteList.addAll(sites);
-     
-        siteAdapter = new EventSiteAdapter(getApplicationContext(), siteList);
-        siteRecyclerView.setAdapter(siteAdapter);
-        siteAdapter.notifyDataSetChanged();
-        
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-            
-            @Override
-            public boolean onQueryTextChange(String query) {
-                siteAdapter.getFilter().filter(query);
-                return false;
-            }
-        });
-    }
-    
+
+
     @SuppressLint("SetTextI18n")
     private void generalDrawerSetUp() {
         drawerLayout = binding.drawer;

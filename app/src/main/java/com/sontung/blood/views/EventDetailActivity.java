@@ -50,7 +50,7 @@ public class EventDetailActivity extends AppCompatActivity {
     
     private ActivityEventDetailBinding binding;
     private String siteId;
-    
+
     private SupportMapFragment mapFragment;
     private View mapPanel;
     
@@ -136,10 +136,10 @@ public class EventDetailActivity extends AppCompatActivity {
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         
         if (mapFragment == null) {
-//            if (mapPanel == null || mapPanel.getVisibility() == View.GONE) {
-//                mapPanel = ((ViewStub) findViewById(R.id.stub_map)).inflate();
-//            }
-//
+            if (mapPanel == null || mapPanel.getVisibility() == View.GONE) {
+                mapPanel = ((ViewStub) findViewById(R.id.stub_map)).inflate();
+            }
+
             GoogleMapOptions options = new GoogleMapOptions();
             options.mapToolbarEnabled(false);
             

@@ -35,7 +35,7 @@ public class SiteRepository {
     
     private MutableLiveData<List<Site>> userRegisteredSite;
     private MutableLiveData<List<Site>> userVolunteerSite;
-    private MutableLiveData<List<Site>> userHostedSite;
+    private MutableLiveData<Site> userHostedSite;
     
     public SiteRepository(Context context) {
         this.context = context;
@@ -183,41 +183,29 @@ public class SiteRepository {
                 });
         return userVolunteerSite;
     }
-    
-    public MutableLiveData<List<Site>> getUserHostedSite(String userId) {
+
+    public MutableLiveData<Site> getUserHostedSite(String userId) {
         userCollection
                 .document(userId)
                 .get()
                 .addOnSuccessListener(userDocumentSnapshot -> {
-                    List<Site> hostedSite = new ArrayList<>();
-                    
                     if (userDocumentSnapshot.exists()) {
                         User currentUser = userDocumentSnapshot.toObject(User.class);
-                        
+
                         if (currentUser != null) {
-                            List<String> listOfHostedSite = currentUser.getListOfHostedSites();
-                            
-                            for (String siteId: listOfHostedSite) {
-                                siteCollection
-                                        .document(siteId)
-                                        .get()
-                                        .addOnSuccessListener(siteDocumentSnapshot -> {
-                                            Site site;
-                                            
-                                            if (siteDocumentSnapshot.exists()) {
-                                                site = siteDocumentSnapshot.toObject(Site.class);
-                                                hostedSite.add(site);
-                                            } else {
-                                                Log.d("SITE", "Document not found!");
-                                            }
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Log.d("SITE: Host Site Fetch Error", Objects.requireNonNull(e.getMessage()));
-                                            
-                                        });
-                            }
-                            userHostedSite.postValue(hostedSite);
-                            
+                            String siteId = currentUser.getHostedSite();
+
+                            siteCollection
+                                    .document(siteId)
+                                    .get()
+                                    .addOnSuccessListener(siteDocumentSnapshot -> {
+                                        Site hostedSite = null;
+                                        if (siteDocumentSnapshot.exists()) {
+                                            hostedSite = siteDocumentSnapshot.toObject(Site.class);
+                                        }
+
+                                        userHostedSite.postValue(hostedSite);
+                                    });
                         } else {
                             Log.d("USER", "User is null");
                         }

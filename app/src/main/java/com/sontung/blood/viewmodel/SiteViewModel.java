@@ -35,7 +35,7 @@ public class SiteViewModel extends AndroidViewModel {
         return siteRepository.getUserVolunteerSite(userId);
     }
     
-    public MutableLiveData<List<Site>> getUserHostedSite(String userId) {
+    public MutableLiveData<Site> getUserHostedSite(String userId) {
         return siteRepository.getUserHostedSite(userId);
     }
 }

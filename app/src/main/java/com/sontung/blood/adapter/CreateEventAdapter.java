@@ -16,10 +16,10 @@ public class CreateEventAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         switch (position) {
-            case 1:
-                return new CreateReportFragment();
-            case 2:
-                return new ViewReportFragment();
+//            case 1:
+//                return new CreateReportFragment();
+//            case 2:
+//                return new ViewReportFragment();
             default:
                 return new CreateEventFragment();
         }
