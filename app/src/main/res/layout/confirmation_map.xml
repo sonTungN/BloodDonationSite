@@ -1,0 +1,18 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/tools"
+    android:id="@+id/map_panel_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <fragment
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:id="@+id/confirmation_map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        map:uiZoomControls="true"
+        map:uiRotateGestures="true"
+        map:cameraTilt="30" />
+    <!-- [END maps_solutions_android_autocomplete_map_fragment] -->
+
+</LinearLayout>

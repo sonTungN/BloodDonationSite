@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:openDrawer="end">
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigationView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="false"
+            app:headerLayout="@layout/navigation_header"
+            app:menu="@menu/general_menu" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+
+            <include
+                android:id="@+id/toolbarId"
+                layout="@layout/toolbar"
+                android:layout_height="60dp"
+                android:layout_width="match_parent" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabIndicatorColor="@color/pink"
+                app:tabRippleColor="@color/mainBackgroundColor"
+                app:tabTextAppearance="@style/TabText"
+                app:tabSelectedTextColor="@color/black">
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="CREATE SITE"
+
+                    tools:ignore="HardcodedText"/>
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="CREATE REPORT"
+                    tools:ignore="HardcodedText"/>
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="VIEW REPORTS"
+                    tools:ignore="HardcodedText"/>
+            </com.google.android.material.tabs.TabLayout>
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/pageContent" />
+        </LinearLayout>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+</layout>
+

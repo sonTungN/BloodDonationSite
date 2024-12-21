@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/mainBackgroundColor"
+        tools:context=".views.OnBoardingActivity">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="100dp"
+            android:layout_marginBottom="40dp"
+            app:layout_constraintBottom_toTopOf="@+id/dots_indicator"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+            android:id="@+id/dots_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:dotsColor="@color/softGrayishBlue"
+            app:dotsCornerRadius="8dp"
+            app:dotsSize="10dp"
+            app:dotsSpacing="4dp"
+            app:dotsWidthFactor="2.5"
+            app:layout_constraintBottom_toTopOf="@+id/beginBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:progressMode="true"
+            app:selectedDotColor="@color/pink" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/beginBtn"
+            android:layout_width="190dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="130dp"
+            android:background="@drawable/custom_btn_pink"
+            android:text="Let's Begin"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="HardcodedText" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/skipBtn"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@android:color/transparent"
+            android:text="Skip now"
+            android:textColor="@color/softGrayishBlue"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/beginBtn"
+            tools:ignore="HardcodedText" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

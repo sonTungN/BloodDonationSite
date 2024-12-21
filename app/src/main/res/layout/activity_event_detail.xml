@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="site"
+            type="com.sontung.blood.model.Site" />
+    </data>
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:openDrawer="end">
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigationView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="false"
+            app:headerLayout="@layout/navigation_header"
+            app:menu="@menu/general_menu" />
+
+        <LinearLayout
+            android:id="@+id/main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/mainBackgroundColor"
+            tools:context=".view.LessonActivity">
+
+            <include
+                android:id="@+id/toolbarId"
+                layout="@layout/toolbar"
+                android:layout_height="60dp"
+                android:layout_width="match_parent" />
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scrollView2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/viewPager2"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp" />
+
+                    <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+                        android:id="@+id/dots_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        app:dotsColor="@color/softGrayishBlue"
+                        app:dotsCornerRadius="8dp"
+                        app:dotsSize="10dp"
+                        app:dotsSpacing="4dp"
+                        app:dotsWidthFactor="2.5"
+                        app:progressMode="true"
+                        app:selectedDotColor="@color/pink"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/viewPager2"
+                        android:layout_gravity="center" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@{site.siteName}"
+                            android:textColor="@color/black"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="5dp"
+                            tools:ignore="UseCompoundDrawables">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_location_icon" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="2dp"
+                                android:gravity="center_vertical"
+                                android:text="Location:"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:textStyle="bold"
+                                app:layout_constraintStart_toStartOf="parent" />
+
+                            <TextView
+                                android:id="@+id/site_address"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="2dp"
+                                android:gravity="center_vertical"
+                                android:text="@{site.siteAddress}"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                app:layout_constraintStart_toStartOf="parent" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="10dp"
+                            tools:ignore="UseCompoundDrawables">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_calendar_icon" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="2dp"
+                                android:gravity="center_vertical"
+                                android:text="Event date:"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:textStyle="bold"
+                                app:layout_constraintStart_toStartOf="parent" />
+
+                            <TextView
+                                android:id="@+id/site_date"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="2dp"
+                                android:gravity="center_vertical"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                app:layout_constraintStart_toStartOf="parent" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="10dp"
+                            tools:ignore="UseCompoundDrawables">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:src="@drawable/ic_admin_icon" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="2dp"
+                                android:gravity="center_vertical"
+                                android:text="Host:"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:textStyle="bold"
+                                app:layout_constraintStart_toStartOf="parent" />
+
+                            <TextView
+                                android:id="@+id/site_host"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="2dp"
+                                android:gravity="center_vertical"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                app:layout_constraintStart_toStartOf="parent" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="80dp"
+                                android:layout_height="36dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@drawable/custom_edittext"
+                                android:gravity="center"
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:src="@drawable/ic_bloodtype_icon" />
+
+                                <TextView
+                                    android:id="@+id/site_blood_type"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="3dp"
+                                    android:gravity="center_vertical"
+                                    android:text="@{site.requiredBloodType}"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintStart_toStartOf="parent" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="100dp"
+                                android:layout_height="36dp"
+                                android:layout_marginEnd="10dp"
+                                android:background="@drawable/custom_edittext"
+                                android:gravity="center"
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="22dp"
+                                    android:src="@drawable/ic_donor_icon" />
+
+                                <TextView
+                                    android:id="@+id/site_current_donor"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="5dp"
+                                    android:text="@{String.valueOf(site.listOfDonors.size())}"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintStart_toStartOf="parent" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="/"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintStart_toStartOf="parent" />
+
+                                <TextView
+                                    android:id="@+id/site_max_donor"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@{String.valueOf(site.donorMaxCapacity)}"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintStart_toStartOf="parent" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="100dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/custom_edittext"
+                                android:gravity="center"
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="22dp"
+                                    android:src="@drawable/ic_volunteer_icon" />
+
+                                <TextView
+                                    android:id="@+id/site_current_volunteer"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="5dp"
+                                    android:text="@{String.valueOf(site.listOfVolunteers.size())}"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintStart_toStartOf="parent" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="/"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintStart_toStartOf="parent" />
+
+                                <TextView
+                                    android:id="@+id/site_max_volunteer"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@{String.valueOf(site.volunteerMaxCapacity)}"
+                                    android:textColor="@color/black"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    app:layout_constraintStart_toStartOf="parent" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Descriptions"
+                            android:textColor="@color/black"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@{site.siteDesc}"
+                            android:textSize="14sp"
+                            android:textColor="@color/black" />
+                    </LinearLayout>
+
+<!--                    <ViewStub-->
+<!--                        android:id="@+id/stub_map"-->
+<!--                        android:inflatedId="@+id/panel_map"-->
+<!--                        android:layout="@layout/confirmation_map"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="200dp"-->
+<!--                        android:layout_gravity="bottom" />-->
+
+                    <FrameLayout
+                        android:id="@+id/progressBarHolder"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="16dp"
+                        android:animateLayoutChanges="true"
+                        android:background="@color/mainBackgroundColor">
+
+                        <ProgressBar
+                            style="?android:attr/progressBarStyleLarge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:indeterminate="true" />
+                    </FrameLayout>
+
+                </LinearLayout>
+
+
+            </androidx.core.widget.NestedScrollView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="30dp"
+                android:orientation="horizontal"
+                app:flow_horizontalGap="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/submit_donor"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/custom_btn_pink"
+                    android:text="Donor apply"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/submit_volunteer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/custom_btn_pink"
+                    android:text="Volunteer Apply"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+
+
+</layout>

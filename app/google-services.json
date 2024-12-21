@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "8271012157",
+    "project_id": "blooddonation-8e878",
+    "storage_bucket": "blooddonation-8e878.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:8271012157:android:a35994d73d7513edfe2554",
+        "android_client_info": {
+          "package_name": "com.sontung.blood"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbv2gHMgGedVFids1ZNpRTTShzhp8MBVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

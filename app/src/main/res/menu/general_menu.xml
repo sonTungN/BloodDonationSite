@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home_icon"
+            android:title="Home"
+            tools:ignore="HardcodedText" />
+        <item
+            android:id="@+id/nav_event"
+            android:icon="@drawable/ic_book_icon"
+            android:title="Events"
+            tools:ignore="HardcodedText" />
+
+        <item
+            android:id="@+id/nav_create"
+            android:icon="@drawable/ic_create_icon"
+            android:title="Create Event"
+            tools:ignore="HardcodedText" />
+
+        <item android:id="@+id/nav_notification"
+            android:icon="@drawable/ic_alert_icon"
+            android:title="Notification"
+            tools:ignore="HardcodedText" />
+
+        <item
+            android:id="@+id/nav_request"
+            android:icon="@drawable/ic_notification_icon"
+            android:title="Request"
+            tools:ignore="HardcodedText" />
+
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/ic_profile_icon"
+            android:title="Profile"
+            tools:ignore="HardcodedText" />
+
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_logout_icon"
+            android:title="Logout"
+            tools:ignore="HardcodedText" />
+    </group>
+</menu>

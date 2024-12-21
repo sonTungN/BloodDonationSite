@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".views.CreateEventActivity">
+<!--    tools:context=".fragments.CreateEventFragment"-->
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="3dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Your Site"
+        style="@style/CardHeading1" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="5dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/CardHeading2"
+                android:text="Add your site images"
+                tools:ignore="HardcodedText" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="3dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_image_icon" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/addImageButtonId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:text="Add Image"
+                    android:background="@drawable/custom_btn_pink"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/imageNumberId"
+                    android:layout_marginStart="5sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:text="0/8" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/noImageSelected"
+                    android:visibility="invisible"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/no_image" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/imagesSelectedId"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:spanCount="4" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_marginTop="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="3dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/CardHeading2"
+                        android:text="Name" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/siteName"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/custom_edittext"
+                    android:hint="Site's name..."
+                    android:padding="10dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black"
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    tools:ignore="UselessParent">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            style="@style/CardHeading2"
+                            android:text="Maximum Volunteers" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/volunNumId"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@drawable/custom_edittext"
+                        android:hint="Maximum Volunteer"
+                        android:padding="10dp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/black"
+                        android:textSize="16sp"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginTop="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="3dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/CardHeading2"
+                        android:text="Maximum Donors" />
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/donorNumId"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:background="@drawable/custom_edittext"
+                    android:hint="Maximum Donors"
+                    android:padding="10dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black"
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/categoryLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Blood Type"
+                        style="@style/CardHeading2" />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="120dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/custom_edittext">
+
+                    <Spinner
+                        android:id="@+id/bloodCate"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerVertical="true"
+                        android:background="@android:color/transparent"
+                        android:gravity="center"
+                        android:spinnerMode="dropdown" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/CardHeading2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Description"
+                        tools:ignore="HardcodedText" />
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/description"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:background="@drawable/custom_edittext"
+                    android:hint="Description"
+                    android:padding="10dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@color/black"
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Site Address"
+                    style="@style/CardHeading2" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/autoCompleteContainer"
+                    android:background="@drawable/custom_edittext">
+
+                    <fragment
+                        android:id="@+id/autoCompleteAddress"
+                        android:layout_width="300dp"
+                        android:layout_height="40dp"
+                        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment" />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="bottom">
+
+                    <TextView
+                        android:id="@+id/addressDisplay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/CardDesc2" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <ViewStub
+                android:id="@+id/stub_map"
+                android:inflatedId="@+id/panel_map"
+                android:layout="@layout/confirmation_map"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_gravity="bottom" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/createSiteButton"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="CREATE SITE"
+                android:background="@drawable/custom_btn_pink"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>
+
+<FrameLayout
+    android:id="@+id/progressBarHolder"
+    android:animateLayoutChanges="true"
+    android:alpha="0.4"
+    android:background="#000000"
+    android:visibility="invisible"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:layout_gravity="center" />
+</FrameLayout>
+
+
+</RelativeLayout>
