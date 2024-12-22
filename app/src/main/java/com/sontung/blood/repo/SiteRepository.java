@@ -228,7 +228,20 @@ public class SiteRepository {
                     String siteId = documentReference.getId();
                     site.setSiteId(siteId);
                     
-                    userViewModel.updateUserHostSiteId(siteId);
+                    userCollection
+                            .document(site.getHost())
+                            .update("hostedSite", siteId)
+                            .addOnCompleteListener(task -> {
+                                if (!task.isSuccessful()) {
+                                    Toast.makeText(context, "Can not update user ID when create site", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(context, "Can not update user ID when create site", Toast.LENGTH_SHORT).show();
+                                Log.d("CREATE: Cant update user ID, Error: " + e.getMessage(), e.getMessage() != null ? e.getMessage() : "Error");
+                            });
+                    
+//                    userViewModel.updateUserHostSiteId(siteId);
                 })
                 .addOnFailureListener(e -> {
                     Log.d("CREATE", "Create Site failed!");

@@ -91,16 +91,17 @@
                         android:visibility="invisible">
 
                         <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="180dp"
+                            android:layout_width="250dp"
+                            android:layout_height="150dp"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/icon_no_image" />
+                            android:layout_gravity="center"
+                            android:src="@drawable/img_default_image" />
                     </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/image_recycler_view"
                         android:layout_width="match_parent"
-                        android:layout_height="180dp"
+                        android:layout_height="wrap_content"
                         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
                         app:spanCount="4" />
                 </RelativeLayout>
@@ -136,7 +137,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Between 6 and 15 characters"
-                        android:visibility="gone"
                         tools:ignore="HardcodedText" />
                 </LinearLayout>
 
@@ -159,7 +159,7 @@
                         android:layout_height="140dp"
                         android:background="@drawable/custom_edittext"
                         android:gravity="top"
-                        android:hint="Site Description"
+                        android:hint="Enter site description"
                         android:padding="10dp"
                         android:textColor="@color/black"
                         android:textColorHint="@color/black"
@@ -171,9 +171,9 @@
                         style="@style/ErrorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Maximum 20 characters"
-                        android:visibility="gone"
+                        android:text="Between 10 and 25 characters"
                         tools:ignore="HardcodedText" />
+
                 </LinearLayout>
 
                 <LinearLayout
@@ -186,14 +186,14 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0.28"
                         android:orientation="vertical">
 
                         <TextView
                             style="@style/CardHeading2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Donor"
+                            android:text="Donor Capacity"
                             tools:ignore="HardcodedText" />
 
                         <EditText
@@ -201,7 +201,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:background="@drawable/custom_edittext"
-                            android:hint="Capacity"
+                            android:hint="1-20"
                             android:inputType="number"
                             android:padding="10dp"
                             android:textColor="@color/black"
@@ -215,7 +215,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Between 1 and 20"
-                            android:visibility="gone"
                             tools:ignore="HardcodedText" />
                     </LinearLayout>
 
@@ -224,14 +223,14 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
+                        android:layout_weight="0.25"
                         android:orientation="vertical">
 
                         <TextView
                             style="@style/CardHeading2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Volunteer"
+                            android:text="Volunteer Capacity"
                             tools:ignore="HardcodedText" />
 
                         <EditText
@@ -239,7 +238,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
                             android:background="@drawable/custom_edittext"
-                            android:hint="Capacity"
+                            android:hint="1-20"
                             android:inputType="number"
                             android:padding="10dp"
                             android:textColor="@color/black"
@@ -253,14 +252,13 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Between 1 and 20"
-                            android:visibility="gone"
                             tools:ignore="HardcodedText" />
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0.3"
                         android:orientation="vertical">
 
                         <TextView
@@ -319,7 +317,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="*Required"
-                        android:visibility="gone"
                         tools:ignore="HardcodedText" />
 
                     <RelativeLayout
@@ -379,4 +376,5 @@
             android:layout_gravity="center"
             android:indeterminate="true" />
     </FrameLayout>
+
 </RelativeLayout>

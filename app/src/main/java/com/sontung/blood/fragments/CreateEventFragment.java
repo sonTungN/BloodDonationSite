@@ -3,8 +3,6 @@ package com.sontung.blood.fragments;
 import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
 
-import static java.util.Arrays.asList;
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
@@ -26,7 +24,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -37,7 +34,6 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -61,7 +57,7 @@ import com.sontung.blood.viewmodel.UserViewModel;
 import com.sontung.blood.views.EventDetailActivity;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -115,11 +111,20 @@ public class CreateEventFragment
         setUpButtonClickHandler();
     }
     
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+//        fragmentCreateSiteBinding = FragmentCreateEventBinding.inflate(inflater, container, false);
+        inflater.inflate(R.layout.fragment_create_event, container, false);
+        setUpInitialState();
+        return fragmentCreateSiteBinding.getRoot();
+    }
+    
     private void setupDonorView() {
         fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.GONE);
         fragmentCreateSiteBinding.createEventLayout.setVisibility(View.VISIBLE);
         
-        initialSetUp();
+//        initialSetUp();
     }
     
     //----------------------------------------SET UP MAP VIEWS-------------------------------------
@@ -136,10 +141,16 @@ public class CreateEventFragment
                 .commit();
 
         autoCompleteFragment.setActivityMode(AutocompleteActivityMode.FULLSCREEN);
-        autoCompleteFragment.setPlaceFields(asList(
+        autoCompleteFragment.setPlaceFields(Arrays.asList(
+                Place.Field.ID,
+                Place.Field.NAME,
                 Place.Field.ADDRESS,
-                Place.Field.LAT_LNG
+                Place.Field.LAT_LNG,
+                Place.Field.ADDRESS_COMPONENTS
         ));
+        autoCompleteFragment.setHint("Enter address");
+        autoCompleteFragment.setCountry("VN");
+        
         autoCompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
@@ -217,31 +228,28 @@ public class CreateEventFragment
     }
     
     private void setUpButtonClickHandler() {
-        fragmentCreateSiteBinding.addImageBtn.setOnClickListener(view -> openFile());
-        fragmentCreateSiteBinding.createSiteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createSite();
-            }
-        });
+        fragmentCreateSiteBinding.addImageBtn.setOnClickListener(v-> openFile());
+        fragmentCreateSiteBinding.createSiteButton.setOnClickListener(v -> createSite());
     }
     
     //----------------------------------------SET UP CREATE SITE------------------------------------
     private boolean isSiteInputValid() {
         clearErrorMessage();
         int invalidCount = 0;
+        
+        // Get input values
         String siteName = fragmentCreateSiteBinding.createSiteName.getText().toString();
         String siteDesc = fragmentCreateSiteBinding.createSiteDesc.getText().toString();
         String siteAddress = fragmentCreateSiteBinding.addressDisplay.getText().toString();
-        int volunteerCap = Integer.parseInt(fragmentCreateSiteBinding.volunteerCap.getText().toString());
-        int donorCap = Integer.parseInt(fragmentCreateSiteBinding.donorCap.getText().toString());
+        String volunteerCapText = fragmentCreateSiteBinding.volunteerCap.getText().toString();
+        String donorCapText = fragmentCreateSiteBinding.donorCap.getText().toString();
         
         if (!FieldValidation.isValidStringInRange(siteName, 6, 15)) {
             turnOnErrorMessage(fragmentCreateSiteBinding.createSiteNameError, true);
             invalidCount++;
         }
         
-        if (!FieldValidation.isValidStringInRange(siteDesc, 0, 20)) {
+        if (!FieldValidation.isValidStringInRange(siteDesc, 10, 25)) {
             turnOnErrorMessage(fragmentCreateSiteBinding.createSiteDescErr, true);
             invalidCount++;
         }
@@ -251,13 +259,30 @@ public class CreateEventFragment
             invalidCount++;
         }
         
-        if (!FieldValidation.isValidNumberInRange(volunteerCap, 1, 10)){
-            turnOnErrorMessage(fragmentCreateSiteBinding.createVolunteerCapErr, true);
-            invalidCount++;
-        }
-        
-        if (!FieldValidation.isValidNumberInRange(donorCap, 1, 10)){
-            turnOnErrorMessage(fragmentCreateSiteBinding.createDonorCapErr, true);
+        try {
+            if (volunteerCapText.isEmpty()) {
+                turnOnErrorMessage(fragmentCreateSiteBinding.createVolunteerCapErr, true);
+                invalidCount++;
+            } else {
+                int volunteerCap = Integer.parseInt(volunteerCapText);
+                if (!FieldValidation.isValidNumberInRange(volunteerCap, 1, 10)) {
+                    turnOnErrorMessage(fragmentCreateSiteBinding.createVolunteerCapErr, true);
+                    invalidCount++;
+                }
+            }
+            
+            if (donorCapText.isEmpty()) {
+                turnOnErrorMessage(fragmentCreateSiteBinding.createDonorCapErr, true);
+                invalidCount++;
+            } else {
+                int donorCap = Integer.parseInt(donorCapText);
+                if (!FieldValidation.isValidNumberInRange(donorCap, 1, 10)) {
+                    turnOnErrorMessage(fragmentCreateSiteBinding.createDonorCapErr, true);
+                    invalidCount++;
+                }
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(requireContext(), "Please enter valid numbers for capacity", Toast.LENGTH_SHORT).show();
             invalidCount++;
         }
         
@@ -374,7 +399,7 @@ public class CreateEventFragment
     });
     
     //----------------------------------------SET UP TOOLS FUNCTION---------------------------------
-    private void initialSetUp() {
+    private void setUpInitialState() {
         fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.VISIBLE);
         clearErrorMessage();
     }
@@ -395,15 +420,6 @@ public class CreateEventFragment
         }
     }
     //----------------------------------------DONE -------------------------------------------------
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        inflater.inflate(R.layout.fragment_create_event, container, false);
-
-        return fragmentCreateSiteBinding.getRoot();
-    }
     
     @SuppressLint("SetTextI18n")
     @Override
@@ -411,9 +427,9 @@ public class CreateEventFragment
         fragmentCreateSiteBinding.imageCount.setText(leftNum + "/3");
         
         if (imageUriList.isEmpty()) {
-            fragmentCreateSiteBinding.imageCount.setVisibility(View.VISIBLE);
+            fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.VISIBLE);
         } else {
-            fragmentCreateSiteBinding.imageCount.setVisibility(View.INVISIBLE);
+            fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.INVISIBLE);
         }
     }
     
