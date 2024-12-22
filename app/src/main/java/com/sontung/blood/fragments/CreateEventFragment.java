@@ -45,6 +45,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.sontung.blood.BuildConfig;
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.ImageAdapter;
@@ -107,7 +110,7 @@ public class CreateEventFragment
             }
         }
         
-//        setUpAutoCompleteAddress();
+        setUpAutoCompleteAddress();
         setUpBloodTypeSpinner();
         setUpButtonClickHandler();
     }
@@ -120,84 +123,84 @@ public class CreateEventFragment
     }
     
     //----------------------------------------SET UP MAP VIEWS-------------------------------------
-//    private void setUpAutoCompleteAddress() {
-//        Places.initialize(requireContext(), BuildConfig.MAPS_API_KEY);
-//        Places.createClient(requireContext());
-//
-//        AutocompleteSupportFragment autoCompleteFragment =
-//                (AutocompleteSupportFragment)
-//                        getChildFragmentManager().findFragmentById(R.id.auto_complete_address);
-//        //    AutocompleteSessionToken.newInstance();
-//        assert autoCompleteFragment != null;
-//        autoCompleteFragment.setActivityMode(AutocompleteActivityMode.FULLSCREEN);
-//        autoCompleteFragment
-//                .setPlaceFields(
-//                        asList(
-//                                Place.Field.ADDRESS,
-//                                Place.Field.LAT_LNG
-//                        ));
-//
-//        autoCompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-//            @Override
-//            public void onPlaceSelected(@NonNull Place place) {
-//                fragmentCreateSiteBinding.addressDisplay.setText(place.getAddress());
-//                coordinates = place.getLatLng();
-//                showLocationOnMap(place);
-//            }
-//
-//            @Override
-//            public void onError(@NonNull Status status) {
-//                Log.i("ADDRESS", "An error occurred: " + status);
-//            }
-//        });
-//    }
-//
-//    private void showLocationOnMap(Place place) {
-//        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-//
-//        if (mapFragment == null) {
-//            mapPanel = fragmentCreateSiteBinding.stubMap.inflate();
-//
-//            GoogleMapOptions options = new GoogleMapOptions();
-//            options.mapToolbarEnabled(false);
-//
-//            mapFragment = SupportMapFragment.newInstance(options);
-//            getChildFragmentManager()
-//                    .beginTransaction()
-//                    .add(R.id.confirmation_map, mapFragment, "MAP")
-//                    .commitNow();
-//            mapFragment.getMapAsync(googleMap -> {
-//                map = googleMap;
-//                map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-//                try {
-//                    boolean isSuccess =
-//                            map.setMapStyle(
-//                                    MapStyleOptions.loadRawResourceStyle(
-//                                            requireContext(),
-//                                            R.raw.style_raw));
-//                    if (!isSuccess) {
-//                        Log.e(TAG, "STYLE: Style parsing Error");
-//                    }
-//                } catch (Resources.NotFoundException e) {
-//                    Log.e(TAG, "STYLE: Style not found", e);
-//                }
-//
-//                map.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f));
-//                marker = map.addMarker(new MarkerOptions().position(coordinates));
-//            });
-//        } else {
-//            updateMapWithCoordinates(coordinates);
-//        }
-//    }
-//
-//    private void updateMapWithCoordinates(LatLng cor) {
-//        marker.setPosition(cor);
-//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(cor, 18f));
-//        if (mapPanel.getVisibility() == View.GONE) {
-//            mapPanel.setVisibility(View.VISIBLE);
-//        }
-//    }
-    
+    private void setUpAutoCompleteAddress() {
+        Places.initialize(requireContext(), BuildConfig.MAPS_API_KEY);
+        Places.createClient(requireContext());
+
+        AutocompleteSupportFragment autoCompleteFragment = AutocompleteSupportFragment.newInstance();
+
+        // Add it to the container using childFragmentManager
+        getChildFragmentManager()
+                .beginTransaction()
+                .replace(R.id.autocomplete_fragment, autoCompleteFragment)
+                .commit();
+
+        autoCompleteFragment.setActivityMode(AutocompleteActivityMode.FULLSCREEN);
+        autoCompleteFragment.setPlaceFields(asList(
+                Place.Field.ADDRESS,
+                Place.Field.LAT_LNG
+        ));
+        autoCompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                fragmentCreateSiteBinding.addressDisplay.setText(place.getAddress());
+                coordinates = place.getLatLng();
+                showLocationOnMap(place);
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+                Log.i("ADDRESS", "An error occurred: " + status);
+            }
+        });
+    }
+
+    private void showLocationOnMap(Place place) {
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+
+        if (mapFragment == null) {
+            mapPanel = fragmentCreateSiteBinding.stubMap.inflate();
+
+            GoogleMapOptions options = new GoogleMapOptions();
+            options.mapToolbarEnabled(false);
+
+            mapFragment = SupportMapFragment.newInstance(options);
+            getChildFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.confirmation_map, mapFragment, "MAP")
+                    .commitNow();
+            mapFragment.getMapAsync(googleMap -> {
+                map = googleMap;
+                map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                try {
+                    boolean isSuccess =
+                            map.setMapStyle(
+                                    MapStyleOptions.loadRawResourceStyle(
+                                            requireContext(),
+                                            R.raw.style_raw));
+                    if (!isSuccess) {
+                        Log.e(TAG, "STYLE: Style parsing Error");
+                    }
+                } catch (Resources.NotFoundException e) {
+                    Log.e(TAG, "STYLE: Style not found", e);
+                }
+
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f));
+                marker = map.addMarker(new MarkerOptions().position(coordinates));
+            });
+        } else {
+            updateMapWithCoordinates(coordinates);
+        }
+    }
+
+    private void updateMapWithCoordinates(LatLng cor) {
+        marker.setPosition(cor);
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(cor, 18f));
+        if (mapPanel.getVisibility() == View.GONE) {
+            mapPanel.setVisibility(View.VISIBLE);
+        }
+    }
+
     //----------------------------------------SET UP VIEWS------------------------------------------
     private void setUpBloodTypeSpinner() {
         // Spinner
@@ -215,7 +218,12 @@ public class CreateEventFragment
     
     private void setUpButtonClickHandler() {
         fragmentCreateSiteBinding.addImageBtn.setOnClickListener(view -> openFile());
-        fragmentCreateSiteBinding.createSiteButton.setOnClickListener(view -> createSite());
+        fragmentCreateSiteBinding.createSiteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createSite();
+            }
+        });
     }
     
     //----------------------------------------SET UP CREATE SITE------------------------------------
@@ -369,7 +377,6 @@ public class CreateEventFragment
     private void initialSetUp() {
         fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.VISIBLE);
         clearErrorMessage();
-        enableCreateButton(false);
     }
     
     private void clearErrorMessage() {
@@ -379,11 +386,7 @@ public class CreateEventFragment
         turnOnErrorMessage(fragmentCreateSiteBinding.createDonorCapErr, false);
         turnOnErrorMessage(fragmentCreateSiteBinding.createSiteAddressErr, false);
     }
-    
-    private void enableCreateButton(boolean isEnable){
-        fragmentCreateSiteBinding.createSiteButton.setEnabled(isEnable);
-    }
-    
+
     private void turnOnErrorMessage(View view, Boolean isError) {
         if (isError) {
             view.setVisibility(View.VISIBLE);
@@ -398,6 +401,7 @@ public class CreateEventFragment
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         inflater.inflate(R.layout.fragment_create_event, container, false);
+
         return fragmentCreateSiteBinding.getRoot();
     }
     

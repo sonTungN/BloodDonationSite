@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:id="@+id/relative"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relative"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -11,27 +10,27 @@
 
     <TextView
         android:id="@+id/site_displaying_text"
-        android:visibility="gone"
+        style="@style/CardDesc1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="You have already created a site!"
-        style="@style/CardDesc1"
+        android:visibility="gone"
         tools:ignore="HardcodedText" />
 
     <LinearLayout
         android:id="@+id/create_event_layout"
-        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="3sp">
+        android:padding="3sp"
+        android:visibility="visible">
 
         <TextView
+            style="@style/CardHeading1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="CREATE NEW SITE"
             android:gravity="center"
-            style="@style/CardHeading1" />
+            android:text="CREATE NEW SITE" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -44,18 +43,18 @@
                 android:orientation="vertical">
 
                 <TextView
+                    style="@style/CardHeading2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/CardHeading2"
                     android:text="Add your site image"
                     tools:ignore="HardcodedText" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_marginBottom="3dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="40dp"
@@ -87,9 +86,9 @@
 
                     <LinearLayout
                         android:id="@+id/default_image_layout"
-                        android:visibility="invisible"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible">
 
                         <ImageView
                             android:layout_width="match_parent"
@@ -107,15 +106,15 @@
                 </RelativeLayout>
 
                 <LinearLayout
-                    android:layout_marginTop="3dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
                     android:orientation="vertical">
 
                     <TextView
+                        style="@style/CardHeading2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        style="@style/CardHeading2"
                         android:text="Site Name"
                         tools:ignore="HardcodedText" />
 
@@ -133,10 +132,11 @@
 
                     <TextView
                         android:id="@+id/create_site_name_error"
+                        style="@style/ErrorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Between 6 and 15 characters"
-                        style="@style/ErrorText"
+                        android:visibility="gone"
                         tools:ignore="HardcodedText" />
                 </LinearLayout>
 
@@ -145,23 +145,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="3dp"
                     android:orientation="vertical">
-
-                    <FrameLayout
-                        android:id="@+id/progressBarHolder"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:alpha="0.4"
-                        android:animateLayoutChanges="true"
-                        android:background="#000000"
-                        android:visibility="invisible">
-
-                        <ProgressBar
-                            style="?android:attr/progressBarStyleLarge"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:indeterminate="true" />
-                    </FrameLayout>
 
                     <TextView
                         style="@style/CardHeading2"
@@ -185,10 +168,11 @@
 
                     <TextView
                         android:id="@+id/create_site_desc_err"
+                        style="@style/ErrorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Maximum 20 characters"
-                        style="@style/ErrorText"
+                        android:visibility="gone"
                         tools:ignore="HardcodedText" />
                 </LinearLayout>
 
@@ -206,9 +190,9 @@
                         android:orientation="vertical">
 
                         <TextView
+                            style="@style/CardHeading2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            style="@style/CardHeading2"
                             android:text="Donor"
                             tools:ignore="HardcodedText" />
 
@@ -216,9 +200,9 @@
                             android:id="@+id/donor_cap"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
-                            android:inputType="number"
                             android:background="@drawable/custom_edittext"
                             android:hint="Capacity"
+                            android:inputType="number"
                             android:padding="10dp"
                             android:textColor="@color/black"
                             android:textColorHint="@color/black"
@@ -227,25 +211,26 @@
 
                         <TextView
                             android:id="@+id/create_donor_cap_err"
+                            style="@style/ErrorText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Between 1 and 20"
-                            style="@style/ErrorText"
+                            android:visibility="gone"
                             tools:ignore="HardcodedText" />
                     </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="5dp"
+                        android:layout_weight="1"
                         android:orientation="vertical">
 
                         <TextView
+                            style="@style/CardHeading2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            style="@style/CardHeading2"
                             android:text="Volunteer"
                             tools:ignore="HardcodedText" />
 
@@ -253,9 +238,9 @@
                             android:id="@+id/volunteer_cap"
                             android:layout_width="match_parent"
                             android:layout_height="40dp"
-                            android:inputType="number"
                             android:background="@drawable/custom_edittext"
                             android:hint="Capacity"
+                            android:inputType="number"
                             android:padding="10dp"
                             android:textColor="@color/black"
                             android:textColorHint="@color/black"
@@ -264,10 +249,11 @@
 
                         <TextView
                             android:id="@+id/create_volunteer_cap_err"
+                            style="@style/ErrorText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Between 1 and 20"
-                            style="@style/ErrorText"
+                            android:visibility="gone"
                             tools:ignore="HardcodedText" />
                     </LinearLayout>
 
@@ -278,9 +264,9 @@
                         android:orientation="vertical">
 
                         <TextView
+                            style="@style/CardHeading2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            style="@style/CardHeading2"
                             android:text="Blood Type"
                             tools:ignore="HardcodedText" />
 
@@ -308,10 +294,10 @@
                     android:orientation="vertical">
 
                     <TextView
+                        style="@style/CardHeading2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Site Address"
-                        style="@style/CardHeading2"
                         tools:ignore="HardcodedText" />
 
                     <LinearLayout
@@ -320,19 +306,20 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/custom_edittext">
 
-                        <fragment android:id="@+id/autocomplete_fragment"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                        <FrameLayout
+                            android:id="@+id/autocomplete_fragment"
                             android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-                            />
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
                     </LinearLayout>
 
                     <TextView
                         android:id="@+id/create_site_address_err"
+                        style="@style/ErrorText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="*Required"
-                        style="@style/ErrorText"
+                        android:visibility="gone"
                         tools:ignore="HardcodedText" />
 
                     <RelativeLayout
@@ -342,39 +329,54 @@
 
                         <TextView
                             android:id="@+id/address_display"
+                            style="@style/CardDesc2"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            style="@style/CardDesc2" />
+                            android:layout_height="wrap_content" />
                     </RelativeLayout>
                 </LinearLayout>
 
                 <ViewStub
                     android:id="@+id/stub_map"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_gravity="bottom"
                     android:inflatedId="@+id/panel_map"
-                    android:layout="@layout/displaying_map"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_gravity="bottom" />
-
-                <ViewStub
-                    android:id="@+id/mapStub"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
                     android:layout="@layout/displaying_map" />
+
+                <!--                <ViewStub-->
+                <!--                    android:id="@+id/mapStub"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="200dp"-->
+                <!--                    android:layout="@layout/displaying_map" />-->
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/createSiteButton"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
-                    android:text="CREATE SITE"
                     android:background="@drawable/custom_btn_pink"
+                    android:text="CREATE SITE"
+                    android:textColor="@color/black"
                     android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/black" />
+                    android:textStyle="bold" />
 
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/progressBarHolder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.4"
+        android:animateLayoutChanges="true"
+        android:background="#000000"
+        android:visibility="invisible">
 
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true" />
+    </FrameLayout>
 </RelativeLayout>
