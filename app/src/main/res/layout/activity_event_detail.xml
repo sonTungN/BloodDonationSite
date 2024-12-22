@@ -343,7 +343,7 @@
                     <ViewStub
                         android:id="@+id/stub_map"
                         android:inflatedId="@+id/panel_map"
-                        android:layout="@layout/confirmation_map"
+                        android:layout="@layout/displaying_map"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
                         android:layout_gravity="bottom" />
@@ -406,8 +406,6 @@
                     tools:ignore="HardcodedText" />
 
             </LinearLayout>
-
-
 
         </LinearLayout>
 

@@ -5,6 +5,7 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.MutableLiveData;
 
 import com.sontung.blood.repo.ImageRepository;
 
@@ -15,10 +16,10 @@ public class ImageViewModel extends AndroidViewModel {
     
     public ImageViewModel(@NonNull Application application) {
         super(application);
-        imageRepository = new ImageRepository();
+        imageRepository = new ImageRepository(getApplication());
     }
     
-    public void updateImage(List<Uri> images, String parent) {
-        imageRepository.uploadImageToStorage(images, parent);
+    public MutableLiveData<List<String>> uploadImageToStorage(List<Uri> images, String parent) {
+        return imageRepository.uploadImageToStorage(images, parent);
     }
 }

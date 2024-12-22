@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.sontung.blood.model.User;
 import com.sontung.blood.shared.Paths;
@@ -19,7 +20,6 @@ import com.sontung.blood.views.HomeActivity;
 import com.sontung.blood.views.SignInActivity;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class UserRepository {
     private final Context context;
@@ -142,9 +142,45 @@ public class UserRepository {
         
        return userData;
     }
+
+    public MutableLiveData<User> getUserDataByIdLiveData(String userId) {
+        MutableLiveData<User> liveData = new MutableLiveData<>();
+        collection
+            .document(userId)
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+                User targetUser = null;
+                if (documentSnapshot.exists()) {
+                    targetUser = documentSnapshot.toObject(User.class);
+                } else {
+                    Log.d("USER: FETCH ERROR", "Document not found!");
+                }
+                liveData.postValue(targetUser);
+            })
+            .addOnFailureListener(e -> {
+                Log.d("USER: FETCH ERROR", Objects.requireNonNull(e.getMessage()));
+                Toast.makeText(context, "USERS DOCUMENT: ERROR", Toast.LENGTH_SHORT).show();
+            });
+        return liveData;
+    }
     
-    public User convertUserMutableLiveDataToModelClass(String userId) {
-        return  getUserDataById(userId).getValue();
+    public void updateUserHostSiteId(String siteId) {
+        collection
+                .document(getCurrentUserId())
+                .update("hostedSite", siteId)
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(context, "Can not update user ID when create site", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(context, "Can not update user ID when create site", Toast.LENGTH_SHORT).show();
+                    Log.d("CREATE: Cant update user ID, Error: " + e.getMessage(), e.getMessage() != null ? e.getMessage() : "Error");
+                });
+    }
+    
+    public User getCurrentUserClass() {
+        return getUserDataById(getCurrentUserId()).getValue();
     }
     
     public String getCurrentUserId() {

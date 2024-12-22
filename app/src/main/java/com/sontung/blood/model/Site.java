@@ -30,7 +30,7 @@ public class Site {
     private String latitude;
     private String longitude;
     
-    private String siteStatus;
+    @Builder.Default private String siteStatus = null;
     
     @Builder.Default private List<String> listOfDonors = new ArrayList<>();
     @Builder.Default private List<String> listOfVolunteers = new ArrayList<>();

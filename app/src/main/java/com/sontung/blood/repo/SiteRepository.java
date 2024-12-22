@@ -9,7 +9,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -18,7 +17,6 @@ import com.sontung.blood.model.User;
 import com.sontung.blood.shared.Paths;
 import com.sontung.blood.viewmodel.UserViewModel;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -33,9 +31,11 @@ public class SiteRepository {
     private final MutableLiveData<Site> siteData;
     private final MutableLiveData<List<Site>> allSiteListData;
     
-    private MutableLiveData<List<Site>> userRegisteredSite;
-    private MutableLiveData<List<Site>> userVolunteerSite;
-    private MutableLiveData<Site> userHostedSite;
+    private final MutableLiveData<List<Site>> userRegisteredSite;
+    private final MutableLiveData<List<Site>> userVolunteerSite;
+    private final MutableLiveData<Site> userHostedSite;
+    
+    private UserViewModel userViewModel = null;
     
     public SiteRepository(Context context) {
         this.context = context;
@@ -49,6 +49,10 @@ public class SiteRepository {
         this.userRegisteredSite = new MutableLiveData<>();
         this.userVolunteerSite = new MutableLiveData<>();
         this.userHostedSite = new MutableLiveData<>();
+    }
+    
+    public void setUserViewModel(UserViewModel owner) {
+        this.userViewModel = owner;
     }
     
     public MutableLiveData<List<Site>> getAllSiteData() {
@@ -183,7 +187,7 @@ public class SiteRepository {
                 });
         return userVolunteerSite;
     }
-
+    
     public MutableLiveData<Site> getUserHostedSite(String userId) {
         userCollection
                 .document(userId)
@@ -194,7 +198,7 @@ public class SiteRepository {
 
                         if (currentUser != null) {
                             String siteId = currentUser.getHostedSite();
-
+                            
                             siteCollection
                                     .document(siteId)
                                     .get()
@@ -203,7 +207,7 @@ public class SiteRepository {
                                         if (siteDocumentSnapshot.exists()) {
                                             hostedSite = siteDocumentSnapshot.toObject(Site.class);
                                         }
-
+                                        
                                         userHostedSite.postValue(hostedSite);
                                     });
                         } else {
@@ -215,5 +219,33 @@ public class SiteRepository {
                     Log.e("USER: Host Site Fetch Error", Objects.requireNonNull(e.getMessage()));
                 });
         return userHostedSite;
+    }
+    
+    public void createNewSite(Site site) {
+        siteCollection
+                .add(site)
+                .addOnSuccessListener(documentReference -> {
+                    String siteId = documentReference.getId();
+                    site.setSiteId(siteId);
+                    
+                    userViewModel.updateUserHostSiteId(siteId);
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("CREATE", "Create Site failed!");
+                    Toast.makeText(context, "Failed to create new site", Toast.LENGTH_SHORT).show();
+                });
+    }
+    
+    public void updateSiteImages(String siteId, Site updatedSite) {
+        siteCollection
+                .document(siteId)
+                .update("siteImageUrl", updatedSite.getSiteImageUrl())
+                .addOnSuccessListener(e -> {
+                    Toast.makeText(context, "Site images updated successfully", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("SITE: UPDATE ERROR", Objects.requireNonNull(e.getMessage()));
+                    Toast.makeText(context, "Failed to update site images", Toast.LENGTH_SHORT).show();
+                });
     }
 }

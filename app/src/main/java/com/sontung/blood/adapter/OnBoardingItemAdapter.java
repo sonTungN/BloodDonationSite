@@ -1,6 +1,5 @@
 package com.sontung.blood.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +53,7 @@ public class OnBoardingItemAdapter extends RecyclerView.Adapter<OnBoardingItemAd
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
             title = itemView.findViewById(R.id.title);
-            description = itemView.findViewById(R.id.description);
+            description = itemView.findViewById(R.id.create_site_desc);
         }
     }
 }

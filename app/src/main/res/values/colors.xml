@@ -8,6 +8,10 @@
     <color name="mainBackgroundColor">#F4F8FB</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="primary_200">#25A55F</color>
+    <color name="primary_100">#9BDF46</color>
+    <color name="primary_dark">#346473</color>
+    <color name="error">#F05941</color>
 
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>

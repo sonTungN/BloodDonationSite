@@ -34,4 +34,10 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="ErrorText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/error</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
 </resources>

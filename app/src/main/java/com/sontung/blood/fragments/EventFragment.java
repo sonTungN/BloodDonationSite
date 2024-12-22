@@ -99,6 +99,6 @@ public class EventFragment extends Fragment {
         siteRecyclerView.hasFixedSize();
         siteList = new ArrayList<>();
 
-        siteViewModel.getAllSiteData().observe(this, this::setUpSiteToViews);
+        siteViewModel.getAllSiteData().observe(getViewLifecycleOwner(), this::setUpSiteToViews);
     }
 }

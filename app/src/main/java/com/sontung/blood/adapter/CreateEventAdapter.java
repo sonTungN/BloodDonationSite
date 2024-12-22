@@ -17,8 +17,10 @@ public class CreateEventAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
 //            case 1:
-//                return new CreateReportFragment();
+//                return new EditEventFragment();
 //            case 2:
+//                return new CreateReportFragment();
+//            case 3:
 //                return new ViewReportFragment();
             default:
                 return new CreateEventFragment();
@@ -27,6 +29,6 @@ public class CreateEventAdapter extends FragmentStateAdapter {
     
     @Override
     public int getItemCount() {
-        return 3;
+        return 1;
     }
 }

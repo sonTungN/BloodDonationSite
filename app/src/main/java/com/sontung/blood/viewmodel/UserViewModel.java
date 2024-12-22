@@ -36,9 +36,17 @@ public class UserViewModel extends AndroidViewModel {
     public MutableLiveData<User> getUserDataById(String userId) {
         return userRepository.getUserDataById(userId);
     }
+
+    public MutableLiveData<User> getUserDataByIdLiveData(String userId) {
+        return userRepository.getUserDataByIdLiveData(userId);
+    }
     
-    public User convertUserMutableLiveDataToModelClass(String userId) {
-        return userRepository.convertUserMutableLiveDataToModelClass(userId);
+    public void updateUserHostSiteId (String siteId) {
+        userRepository.updateUserHostSiteId(siteId);
+    }
+    
+    public User getCurrentUserClass() {
+        return userRepository.getCurrentUserClass();
     }
     
     public String getCurrentUserId() {

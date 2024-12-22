@@ -19,6 +19,10 @@ public class SiteViewModel extends AndroidViewModel {
         this.siteRepository = new SiteRepository(getApplication());
     }
     
+    public void setUserViewModel(UserViewModel userViewModel) {
+        siteRepository.setUserViewModel(userViewModel);
+    }
+    
     public MutableLiveData<List<Site>> getAllSiteData() {
         return siteRepository.getAllSiteData();
     }
@@ -37,5 +41,13 @@ public class SiteViewModel extends AndroidViewModel {
     
     public MutableLiveData<Site> getUserHostedSite(String userId) {
         return siteRepository.getUserHostedSite(userId);
+    }
+    
+    public void createNewSite(Site site) {
+        siteRepository.createNewSite(site);
+    }
+    
+    public void updateSiteImages(String siteId, Site site) {
+        siteRepository.updateSiteImages(siteId, site);
     }
 }

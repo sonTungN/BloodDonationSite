@@ -72,7 +72,6 @@ public class EventDetailActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        fetchSiteDetailIntoViews(siteId);
     }
     
     @Override
@@ -93,7 +92,7 @@ public class EventDetailActivity extends AppCompatActivity {
         
         setUpDrawer();
         
-//        fetchSiteDetailIntoViews(siteId);
+        fetchSiteDetailIntoViews(siteId);
         
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
