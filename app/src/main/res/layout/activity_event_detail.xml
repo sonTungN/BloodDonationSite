@@ -348,6 +348,7 @@
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginEnd="12dp"
+                        android:layout_marginBottom="40dp"
                         android:layout_height="200dp"
                         android:layout_gravity="bottom" />
 
@@ -369,51 +370,49 @@
                             android:indeterminate="true" />
                     </FrameLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginBottom="30dp"
+                        android:orientation="horizontal"
+                        app:flow_horizontalGap="10dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent">
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/donor_apply_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:layout_marginEnd="8dp"
+                            android:background="@drawable/custom_btn_pink_2"
+                            android:text="Donor apply"
+                            android:textStyle="bold"
+                            tools:ignore="HardcodedText" />
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/volunteer_apply_btn"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/custom_btn_pink_2"
+                            android:text="Volunteer Apply"
+                            android:textStyle="bold"
+                            tools:ignore="HardcodedText" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
 
             </androidx.core.widget.NestedScrollView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="30dp"
-                android:orientation="horizontal"
-                app:flow_horizontalGap="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent">
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/submit_donor"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/custom_btn_pink"
-                    android:text="Donor apply"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/submit_volunteer"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/custom_btn_pink"
-                    android:text="Volunteer Apply"
-                    android:textStyle="bold"
-                    tools:ignore="HardcodedText" />
-
-            </LinearLayout>
-
         </LinearLayout>
 
     </androidx.drawerlayout.widget.DrawerLayout>
-
-
 
 </layout>

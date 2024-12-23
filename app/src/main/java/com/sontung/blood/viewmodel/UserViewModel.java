@@ -1,14 +1,19 @@
 package com.sontung.blood.viewmodel;
 
 import android.app.Application;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.firebase.firestore.FieldValue;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.model.User;
 import com.sontung.blood.repo.UserRepository;
+
+import java.util.Objects;
 
 public class UserViewModel extends AndroidViewModel {
     private final UserRepository userRepository;
@@ -46,8 +51,12 @@ public class UserViewModel extends AndroidViewModel {
         return userRepository.getUserDataById(userId);
     }
     
-    public void updateUserHostSiteId(String siteId) {
-        userRepository.updateUserHostSiteId(siteId);
+    public void addCurrentUserRegisteredSite(String siteId, FirebaseCallback<Boolean> callback) {
+        userRepository.addCurrentUserRegisteredSite(siteId, callback);
+    }
+    
+    public void addCurrentUserVolunteerSite(String siteId, FirebaseCallback<Boolean> callback) {
+        userRepository.addCurrentUserVolunteerSite(siteId, callback);
     }
     
     public void signOut() {

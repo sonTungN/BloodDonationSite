@@ -25,6 +25,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -40,11 +41,16 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.MultipleImageAdapter;
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityEventDetailBinding;
+import com.sontung.blood.model.Site;
 import com.sontung.blood.utils.DateFormatter;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
+
+import java.util.List;
+import java.util.Objects;
 
 public class EventDetailActivity extends AppCompatActivity {
     
@@ -91,14 +97,176 @@ public class EventDetailActivity extends AppCompatActivity {
         indicator = binding.dotsIndicator;
         
         setUpDrawer();
-        
+        setUpInitialStage();
         fetchSiteDetailIntoViews(siteId);
+        setUpOnButtonClickListener();
         
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+    private void setUpOnButtonClickListener() {
+        binding.donorApplyBtn.setOnClickListener(view -> donorApply());
+        binding.volunteerApplyBtn.setOnClickListener(view -> volunteerApply());
+    }
+    
+    private void donorApply() {
+        String currentUserId = userViewModel.getCurrentUserId();
+        
+        siteViewModel.getSiteDataById(siteId).observe(this, site -> {
+            
+            userViewModel.getUserDataById(currentUserId).observe(this, user -> {
+                if (!site.getRequiredBloodType().equals(user.getBloodType())) {
+                    Toast.makeText(this, "Your blood type does not match the requirement!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                siteViewModel.addUserIntoSiteRegisteredList(currentUserId, site.getSiteId(), new FirebaseCallback<>() {
+                    @Override
+                    public void onSuccess(List<Boolean> t) {
+                    
+                    }
+                    
+                    @Override
+                    public void onSuccess(Boolean aBoolean) {
+                        userViewModel.addCurrentUserRegisteredSite(site.getSiteId(), new FirebaseCallback<>() {
+                            @Override
+                            public void onSuccess(List<Boolean> t) {
+                            
+                            }
+                            
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onSuccess(Boolean aBoolean) {
+                                Toast.makeText(EventDetailActivity.this, "Successfully registered as donor", Toast.LENGTH_SHORT).show();
+                                setApplyButtonState(binding.donorApplyBtn, false);
+                                binding.donorApplyBtn.setText("Already Donor");
+                            }
+                            
+                            @Override
+                            public void onFailure(List<Boolean> t) {
+                            
+                            }
+                            
+                            @Override
+                            public void onFailure(Boolean aBoolean) {
+                                Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    
+                    @Override
+                    public void onFailure(List<Boolean> t) {
+                    
+                    }
+                    
+                    @Override
+                    public void onFailure(Boolean aBoolean) {
+                        Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+        });
+    }
+    
+    private void volunteerApply() {
+        String currentUserId = userViewModel.getCurrentUserId();
+        
+        siteViewModel.getSiteDataById(siteId).observe(this, site -> {
+            userViewModel.getUserDataById(currentUserId).observe(this, user -> {
+                siteViewModel.addUserIntoSiteVolunteerList(currentUserId, site.getSiteId(), new FirebaseCallback<>() {
+                    @Override
+                    public void onSuccess(List<Boolean> t) {
+                    
+                    }
+                    
+                    @Override
+                    public void onSuccess(Boolean aBoolean) {
+                        userViewModel.addCurrentUserVolunteerSite(site.getSiteId(), new FirebaseCallback<>() {
+                            @Override
+                            public void onSuccess(List<Boolean> t) {
+                            
+                            }
+                            
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onSuccess(Boolean aBoolean) {
+                                Toast.makeText(EventDetailActivity.this, "Successfully registered as volunteer", Toast.LENGTH_SHORT).show();
+                                setApplyButtonState(binding.volunteerApplyBtn, false);
+                                binding.volunteerApplyBtn.setText("Already Volunteer");
+                            }
+                            
+                            @Override
+                            public void onFailure(List<Boolean> t) {
+                            
+                            }
+                            
+                            @Override
+                            public void onFailure(Boolean aBoolean) {
+                                Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                    
+                    @Override
+                    public void onFailure(List<Boolean> t) {
+                    
+                    }
+                    
+                    @Override
+                    public void onFailure(Boolean aBoolean) {
+                        Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+        });
+    }
+    
+    @SuppressLint("SetTextI18n")
+    private void setUpInitialStage() {
+        String currentUserId = userViewModel.getCurrentUserId();
+        
+        setApplyButtonState(binding.donorApplyBtn, true);
+        setApplyButtonState(binding.volunteerApplyBtn, true);
+        binding.donorApplyBtn.setText("Donor Apply");
+        binding.volunteerApplyBtn.setText("Volunteer Apply");
+        
+        siteViewModel.getSiteDataById(siteId).observe(this, site -> {
+            if (Objects.equals(site.getHost(), currentUserId)) {
+                setApplyButtonState(binding.donorApplyBtn, false);
+                binding.donorApplyBtn.setText("You are Host");
+                return;
+            }
+            
+            if (site.getListOfDonors().contains(currentUserId)) {
+                setApplyButtonState(binding.donorApplyBtn, false);
+                binding.donorApplyBtn.setText("Already Donor");
+                
+            } else {
+                boolean isMaxDonor = site.getListOfDonors().size() >= site.getDonorMaxCapacity();
+                if (isMaxDonor) {
+                    setApplyButtonState(binding.donorApplyBtn, false);
+                    binding.donorApplyBtn.setText("Donor at max");
+                }
+            }
+            
+            if (site.getListOfVolunteers().contains(currentUserId)) {
+                setApplyButtonState(binding.volunteerApplyBtn, false);
+                binding.volunteerApplyBtn.setText("Already Volunteer");
+            } else {
+                boolean isMaxVolunteer = site.getListOfVolunteers().size() >= site.getVolunteerMaxCapacity();
+                if (isMaxVolunteer) {
+                    setApplyButtonState(binding.volunteerApplyBtn, false);
+                    binding.volunteerApplyBtn.setText("Volunteer at max");
+                }
+            }
+        });
+    }
+    
+    private void setApplyButtonState(View view, boolean isEnable) {
+        view.setEnabled(isEnable);
     }
     
     private void fetchSiteDetailIntoViews(String siteId) {

@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,6 +18,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.model.User;
@@ -167,18 +169,25 @@ public class UserRepository {
        return userData;
     }
     
-    public void updateUserHostSiteId(String siteId) {
+    public void addCurrentUserRegisteredSite(String siteId, FirebaseCallback<Boolean> callback) {
         collection
                 .document(getCurrentUserId())
-                .update("hostedSite", siteId)
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Toast.makeText(context, "Can not update user ID when create site", Toast.LENGTH_SHORT).show();
-                    }
-                })
+                .update("listOfRegisteredSites", FieldValue.arrayUnion(siteId))
+                .addOnSuccessListener(unused -> callback.onSuccess(true))
                 .addOnFailureListener(e -> {
-                    Toast.makeText(context, "Can not update user ID when create site", Toast.LENGTH_SHORT).show();
-                    Log.d("CREATE: Cant update user ID, Error: " + e.getMessage(), e.getMessage() != null ? e.getMessage() : "Error");
+                    Toast.makeText(context, "SiteId can't add into User registered list!", Toast.LENGTH_SHORT).show();
+                    callback.onFailure(true);
+                });
+    }
+    
+    public void addCurrentUserVolunteerSite(String siteId, FirebaseCallback<Boolean> callback) {
+        collection
+                .document(getCurrentUserId())
+                .update("listOfVolunteerSites", FieldValue.arrayUnion(siteId))
+                .addOnSuccessListener(unused -> callback.onSuccess(true))
+                .addOnFailureListener(e -> {
+                    Toast.makeText(context, "SiteId can't add into User volunteer list!", Toast.LENGTH_SHORT).show();
+                    callback.onFailure(true);
                 });
     }
     

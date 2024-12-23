@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelStoreOwner;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.sontung.blood.callback.FirebaseCallback;
@@ -195,6 +196,11 @@ public class SiteRepository {
                         if (currentUser != null) {
                             String siteId = currentUser.getHostedSite();
                             
+                            if (siteId == null || siteId.isEmpty()) {
+                                userHostedSite.postValue(null);
+                                return;
+                            }
+                            
                             siteCollection
                                     .document(siteId)
                                     .get()
@@ -268,6 +274,28 @@ public class SiteRepository {
                 .addOnFailureListener(e -> {
                     Log.d("SITE: UPDATE ERROR", Objects.requireNonNull(e.getMessage()));
                     Toast.makeText(context, "Failed to update site images", Toast.LENGTH_SHORT).show();
+                });
+    }
+    
+    public void addUserIntoSiteRegisteredList(String userId, String siteId, FirebaseCallback<Boolean> callback) {
+        siteCollection
+                .document(siteId)
+                .update("listOfDonors", FieldValue.arrayUnion(userId))
+                .addOnSuccessListener(unused -> callback.onSuccess(true))
+                .addOnFailureListener(e -> {
+                    Log.e("UserId can't add into Site donor list.", Objects.requireNonNull(e.getMessage()));
+                    callback.onFailure(true);
+                });
+    }
+    
+    public void addUserIntoSiteVolunteerList(String userId, String siteId, FirebaseCallback<Boolean> callback) {
+        siteCollection
+                .document(siteId)
+                .update("listOfVolunteers", FieldValue.arrayUnion(userId))
+                .addOnSuccessListener(unused -> callback.onSuccess(true))
+                .addOnFailureListener(e -> {
+                    Log.e("UserId can't add into Site volunteer list.", Objects.requireNonNull(e.getMessage()));
+                    callback.onFailure(true);
                 });
     }
 }

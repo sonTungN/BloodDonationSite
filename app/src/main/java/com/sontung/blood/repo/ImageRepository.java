@@ -68,7 +68,10 @@ public class ImageRepository {
                             Log.d("LINK", String.valueOf(downloadUri));
                             
                             imageUrls.add(String.valueOf(downloadUri));
-                            callback.onSuccess(imageUrls);
+                            
+                            if (imageUrls.size() == images.size()){
+                                callback.onSuccess(imageUrls);
+                            }
                         } else {
                             Log.d(TAG, "The bug is that " + Objects.requireNonNull(task.getException()).getMessage());
                         }
