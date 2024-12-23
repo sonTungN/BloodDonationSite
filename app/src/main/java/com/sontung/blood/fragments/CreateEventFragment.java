@@ -16,14 +16,19 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -47,9 +52,12 @@ import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import com.sontung.blood.BuildConfig;
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.ImageAdapter;
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.FragmentCreateEventBinding;
+import com.sontung.blood.model.Address;
 import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
+import com.sontung.blood.shared.Coordinates;
 import com.sontung.blood.utils.FieldValidation;
 import com.sontung.blood.viewmodel.ImageViewModel;
 import com.sontung.blood.viewmodel.SiteViewModel;
@@ -71,7 +79,7 @@ public class CreateEventFragment
     private SiteViewModel siteViewModel;
     private ImageViewModel imageViewModel;
     
-    private User currentUser;
+    private User currentUser = new User();
     
     // Google Map displaying
     private View mapPanel;
@@ -81,7 +89,9 @@ public class CreateEventFragment
     
     private final List<Uri> imageUriList = new ArrayList<>();
     private ImageAdapter imageAdapter;
-
+    
+    private final List<Address> addressList = Coordinates.CREATE_ADDRESS_AVAILABLE;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,19 +104,56 @@ public class CreateEventFragment
         imageAdapter = new ImageAdapter(requireContext(), this, this);
         imageAdapter.setData(imageUriList);
         fragmentCreateSiteBinding.imageRecyclerView.setAdapter(imageAdapter);
+
+//        userViewModel.getCurrentUserData().observe(this, user ->
+//                currentUser = User.builder()
+//                    .userId(user.getUserId())
+//                    .username(user.getUsername())
+//                    .email(user.getEmail())
+//                    .bloodType(user.getBloodType())
+//                    .profileUrl(user.getProfileUrl())
+//                    .userRole(user.getUserRole())
+//                    .hostedSite(user.getHostedSite())
+//                    .listOfRegisteredSites(user.getListOfRegisteredSites())
+//                    .listOfVolunteerSites(user.getListOfVolunteerSites())
+//                    .build()
+//        );
+
+//        currentUser = userViewModel.getCurrentUserData();
+//        Toast.makeText(requireContext(), "ID: " + currentUser.getUserId() + ", Name: " + currentUser.getUsername(), Toast.LENGTH_SHORT).show();
+
+//        currentUser = userViewModel.getCurrentUserClass();
+//
         
-        currentUser = userViewModel.getCurrentUserClass();
-        if (currentUser != null) {
-            if (currentUser.getHostedSite() != null) {
-                fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.VISIBLE);
-                fragmentCreateSiteBinding.createEventLayout.setVisibility(View.GONE);
+        userViewModel.getCurrentUserData(new FirebaseCallback<User>() {
+            @Override
+            public void onSuccess(User user) {
+                currentUser = user;
+                if (currentUser != null) {
+                    if (currentUser.getHostedSite() != null) {
+                        fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.VISIBLE);
+                        fragmentCreateSiteBinding.createEventLayout.setVisibility(View.GONE);
+                        
+                    } else if (currentUser.getUserRole().equals("donor")) {
+                        setupDonorView();
+                    }
+//                    Toast.makeText(requireContext(), "Name: " + currentUser.getUsername(), Toast.LENGTH_SHORT).show();
                 
-            } else if (currentUser.getUserRole().equals("donor")) {
-                setupDonorView();
+                } else {
+                    Toast.makeText(requireContext(), "currentUser is NULL", Toast.LENGTH_SHORT).show();
+                }
             }
-        }
+            
+            @Override
+            public void onFailure(Exception e) {
+            
+            }
+        });
         
-        setUpAutoCompleteAddress();
+        Toast.makeText(requireContext(), "Name: " + currentUser.getUsername(), Toast.LENGTH_SHORT).show();
+
+//        setUpAutoCompleteAddress();
+        setUpAddressSpinner();
         setUpBloodTypeSpinner();
         setUpButtonClickHandler();
     }
@@ -123,11 +170,13 @@ public class CreateEventFragment
     private void setupDonorView() {
         fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.GONE);
         fragmentCreateSiteBinding.createEventLayout.setVisibility(View.VISIBLE);
-        
+
 //        initialSetUp();
     }
     
-    //----------------------------------------SET UP MAP VIEWS-------------------------------------
+    //----------------------------------------SET UP MAP VIEWS--------------------------------------
+    // SET UP AUTO COMPLETE ADDRESS
+    /*
     private void setUpAutoCompleteAddress() {
         Places.initialize(requireContext(), BuildConfig.MAPS_API_KEY);
         Places.createClient(requireContext());
@@ -150,7 +199,7 @@ public class CreateEventFragment
         ));
         autoCompleteFragment.setHint("Enter address");
         autoCompleteFragment.setCountry("VN");
-        
+
         autoCompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
@@ -165,7 +214,11 @@ public class CreateEventFragment
             }
         });
     }
-
+    
+     */
+    
+    // SHOW LOCATION ON MAP
+    /*
     private void showLocationOnMap(Place place) {
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
@@ -203,15 +256,62 @@ public class CreateEventFragment
             updateMapWithCoordinates(coordinates);
         }
     }
-
+     */
+    
     private void updateMapWithCoordinates(LatLng cor) {
+        if (map == null || marker == null) return;
+        
         marker.setPosition(cor);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(cor, 18f));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(cor, 15f));
         if (mapPanel.getVisibility() == View.GONE) {
             mapPanel.setVisibility(View.VISIBLE);
         }
     }
-
+    
+    //----------------------------------------NEW SET UP MAP SPINNER--------------------------------
+    private void setUpMapFragment(LatLng coordinates) {
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        
+        if (mapFragment == null) {
+            mapPanel = fragmentCreateSiteBinding.stubMap.inflate();
+            
+            GoogleMapOptions options = new GoogleMapOptions();
+            options.mapToolbarEnabled(false);
+            
+            mapFragment = SupportMapFragment.newInstance(options);
+            getChildFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.confirmation_map, mapFragment, "MAP")
+                    .commitNow();
+            
+            mapFragment.getMapAsync(googleMap -> {
+                this.map = googleMap;
+                map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                
+                if (map == null) {
+                    return;
+                }
+                
+                try {
+                    boolean success =
+                            map.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.style_raw));
+                    if (!success) {
+                        Log.e(TAG, "STYLE: Style parsing Error");
+                    }
+                } catch (Resources.NotFoundException e) {
+                    Log.e(TAG, "STYLE: Style not found", e);
+                }
+                
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 15f));
+                marker = map.addMarker(new MarkerOptions().position(coordinates));
+            });
+        } else {
+            if (map != null) {
+                updateMapWithCoordinates(coordinates);
+            }
+        }
+    }
+    
     //----------------------------------------SET UP VIEWS------------------------------------------
     private void setUpBloodTypeSpinner() {
         // Spinner
@@ -227,8 +327,42 @@ public class CreateEventFragment
         bloodTypeSpinner.setSelection(0);
     }
     
+    private void setUpAddressSpinner() {
+        Spinner addressSpinner = fragmentCreateSiteBinding.addressSpinner;
+        
+        ArrayAdapter<String> addressAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                addressList.stream().map(Address::getName).collect(Collectors.toList())
+        );
+        
+        addressAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        addressSpinner.setAdapter(addressAdapter);
+        
+        addressSpinner.setSelection(0);
+        
+        addressSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Address selectedAddress = addressList.get(position);
+                coordinates = selectedAddress.getCoordinates();
+                fragmentCreateSiteBinding.addressDisplay.setText(selectedAddress.getName());
+                
+                if (map != null) {
+                    updateMapWithCoordinates(coordinates);
+                } else {
+                    setUpMapFragment(coordinates);
+                }
+            }
+            
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+    
     private void setUpButtonClickHandler() {
-        fragmentCreateSiteBinding.addImageBtn.setOnClickListener(v-> openFile());
+        fragmentCreateSiteBinding.addImageBtn.setOnClickListener(v -> openFile());
         fragmentCreateSiteBinding.createSiteButton.setOnClickListener(v -> createSite());
     }
     
@@ -249,7 +383,7 @@ public class CreateEventFragment
             invalidCount++;
         }
         
-        if (!FieldValidation.isValidStringInRange(siteDesc, 10, 25)) {
+        if (!FieldValidation.isValidStringInRange(siteDesc, 0, 25)) {
             turnOnErrorMessage(fragmentCreateSiteBinding.createSiteDescErr, true);
             invalidCount++;
         }
@@ -265,7 +399,7 @@ public class CreateEventFragment
                 invalidCount++;
             } else {
                 int volunteerCap = Integer.parseInt(volunteerCapText);
-                if (!FieldValidation.isValidNumberInRange(volunteerCap, 1, 10)) {
+                if (!FieldValidation.isValidNumberInRange(volunteerCap, 1, 20)) {
                     turnOnErrorMessage(fragmentCreateSiteBinding.createVolunteerCapErr, true);
                     invalidCount++;
                 }
@@ -276,7 +410,7 @@ public class CreateEventFragment
                 invalidCount++;
             } else {
                 int donorCap = Integer.parseInt(donorCapText);
-                if (!FieldValidation.isValidNumberInRange(donorCap, 1, 10)) {
+                if (!FieldValidation.isValidNumberInRange(donorCap, 1, 20)) {
                     turnOnErrorMessage(fragmentCreateSiteBinding.createDonorCapErr, true);
                     invalidCount++;
                 }
@@ -290,11 +424,15 @@ public class CreateEventFragment
     }
     
     private void createSite() {
-        if(!isSiteInputValid()) {
+        if (!isSiteInputValid()) {
             Toast.makeText(requireContext(), "ERROR: Some input are invalid!", Toast.LENGTH_SHORT).show();
             return;
         }
-    
+        
+        if (currentUser == null) {
+            Toast.makeText(requireContext(), "Current User: NULL", Toast.LENGTH_SHORT).show();
+        }
+        
         Site pendingCreatedSite =
                 Site.builder()
                         .host(currentUser.getUserId())
@@ -307,8 +445,8 @@ public class CreateEventFragment
                         .latitude(String.valueOf(coordinates.latitude))
                         .longitude(String.valueOf(coordinates.longitude))
                         .build();
-        
-        siteViewModel.setUserViewModel(userViewModel);
+
+//        siteViewModel.setUserViewModel(userViewModel);
         siteViewModel.createNewSite(pendingCreatedSite);
         
         if (imageUriList.isEmpty()) {
@@ -317,9 +455,9 @@ public class CreateEventFragment
         
         Site createdSite = siteViewModel.getUserHostedSite(userViewModel.getCurrentUserId()).getValue();
         List<String> imageUriStringList = imageUriList
-                                            .stream()
-                                            .map(Uri::toString)
-                                            .collect(Collectors.toList());
+                .stream()
+                .map(Uri::toString)
+                .collect(Collectors.toList());
         
         if (createdSite == null) {
             Toast.makeText(requireContext(), "Created Site in createSite() null", Toast.LENGTH_SHORT).show();
@@ -357,46 +495,46 @@ public class CreateEventFragment
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
                     new ActivityResultCallback<ActivityResult>() {
-        @SuppressLint("SetTextI18n")
-        @Override
-        public void onActivityResult(ActivityResult activityResult) {
-            int resultCode = activityResult.getResultCode();
-            Intent intentData = activityResult.getData();
-            
-            if (resultCode == RESULT_OK && intentData != null) {
-                if (intentData.getClipData() != null) {
-                    int numOfImages = intentData.getClipData().getItemCount();
-                    
-                    for (int i = 0; i < numOfImages; i++) {
-                        Uri imageUri = intentData.getClipData().getItemAt(i).getUri();
-                        if (imageUriList.size() >= 3) {
-                            Toast.makeText(requireContext(), "EXCEED: Maximum 3 pictures!", Toast.LENGTH_SHORT).show();
-                            break;
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onActivityResult(ActivityResult activityResult) {
+                            int resultCode = activityResult.getResultCode();
+                            Intent intentData = activityResult.getData();
+                            
+                            if (resultCode == RESULT_OK && intentData != null) {
+                                if (intentData.getClipData() != null) {
+                                    int numOfImages = intentData.getClipData().getItemCount();
+                                    
+                                    for (int i = 0; i < numOfImages; i++) {
+                                        Uri imageUri = intentData.getClipData().getItemAt(i).getUri();
+                                        if (imageUriList.size() >= 3) {
+                                            Toast.makeText(requireContext(), "EXCEED: Maximum 3 pictures!", Toast.LENGTH_SHORT).show();
+                                            break;
+                                        }
+                                        imageUriList.add(imageUri);
+                                    }
+                                    
+                                } else if (intentData.getData() != null) {
+                                    if (imageUriList.size() < 3) {
+                                        Uri imageUri = intentData.getData();
+                                        imageUriList.add(imageUri);
+                                        
+                                    } else {
+                                        Toast.makeText(requireContext(), "EXCEED: Maximum 3 pictures!", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                
+                                imageAdapter.setData(imageUriList);
+                                if (!imageUriList.isEmpty()) {
+                                    fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.INVISIBLE);
+                                } else {
+                                    fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.VISIBLE);
+                                }
+                                
+                                fragmentCreateSiteBinding.imageCount.setText(imageUriList.size() + "/3");
+                            }
                         }
-                        imageUriList.add(imageUri);
-                    }
-                    
-                } else if (intentData.getData() != null) {
-                    if(imageUriList.size() < 3) {
-                        Uri imageUri = intentData.getData();
-                        imageUriList.add(imageUri);
-                        
-                    } else {
-                        Toast.makeText(requireContext(), "EXCEED: Maximum 3 pictures!", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                
-                imageAdapter.setData(imageUriList);
-                if (!imageUriList.isEmpty()) {
-                    fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.INVISIBLE);
-                } else {
-                    fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.VISIBLE);
-                }
-                
-            fragmentCreateSiteBinding.imageCount.setText(imageUriList.size() + "/3");
-            }
-        }
-    });
+                    });
     
     //----------------------------------------SET UP TOOLS FUNCTION---------------------------------
     private void setUpInitialState() {
@@ -411,7 +549,7 @@ public class CreateEventFragment
         turnOnErrorMessage(fragmentCreateSiteBinding.createDonorCapErr, false);
         turnOnErrorMessage(fragmentCreateSiteBinding.createSiteAddressErr, false);
     }
-
+    
     private void turnOnErrorMessage(View view, Boolean isError) {
         if (isError) {
             view.setVisibility(View.VISIBLE);
@@ -419,7 +557,7 @@ public class CreateEventFragment
             view.setVisibility(View.GONE);
         }
     }
-    //----------------------------------------DONE -------------------------------------------------
+    //----------------------------------------SET UP IMAGE ZOOM AND DELETE -------------------------
     
     @SuppressLint("SetTextI18n")
     @Override
