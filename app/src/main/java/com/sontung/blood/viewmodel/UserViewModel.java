@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.model.User;
 import com.sontung.blood.repo.UserRepository;
 
@@ -33,24 +34,20 @@ public class UserViewModel extends AndroidViewModel {
         userRepository.signInUserWithEmailAndPassword(email, password);
     }
     
-    public MutableLiveData<User> getUserDataById(String userId) {
-        return userRepository.getUserDataById(userId);
-    }
-
-    public MutableLiveData<User> getUserDataByIdLiveData(String userId) {
-        return userRepository.getUserDataByIdLiveData(userId);
-    }
-    
-    public void updateUserHostSiteId (String siteId) {
-        userRepository.updateUserHostSiteId(siteId);
-    }
-    
-    public User getCurrentUserClass() {
-        return userRepository.getCurrentUserClass();
+    public MutableLiveData<User> getCurrentUser() {
+        return userRepository.getCurrentUser();
     }
     
     public String getCurrentUserId() {
         return userRepository.getCurrentUserId();
+    }
+    
+    public MutableLiveData<User> getUserDataById(String userId) {
+        return userRepository.getUserDataById(userId);
+    }
+    
+    public void updateUserHostSiteId(String siteId) {
+        userRepository.updateUserHostSiteId(siteId);
     }
     
     public void signOut() {

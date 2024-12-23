@@ -106,7 +106,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="2dp"
                                 android:gravity="center_vertical"
-                                android:text="Location:"
+                                android:text="Location: "
                                 android:textSize="16sp"
                                 android:textColor="@color/black"
                                 android:textStyle="bold"
@@ -141,7 +141,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="2dp"
                                 android:gravity="center_vertical"
-                                android:text="Event date:"
+                                android:text="Event date: "
                                 android:textSize="16sp"
                                 android:textColor="@color/black"
                                 android:textStyle="bold"
@@ -175,7 +175,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="2dp"
                                 android:gravity="center_vertical"
-                                android:text="Host:"
+                                android:text="Host: "
                                 android:textSize="16sp"
                                 android:textColor="@color/black"
                                 android:textStyle="bold"
@@ -345,6 +345,9 @@
                         android:inflatedId="@+id/panel_map"
                         android:layout="@layout/displaying_map"
                         android:layout_width="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="12dp"
                         android:layout_height="200dp"
                         android:layout_gravity="bottom" />
 
@@ -352,9 +355,9 @@
                         android:id="@+id/progressBarHolder"
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="12dp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="12dp"
                         android:animateLayoutChanges="true"
                         android:background="@color/mainBackgroundColor">
 

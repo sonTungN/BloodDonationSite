@@ -6,41 +6,44 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.Timestamp;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.sontung.blood.callback.FirebaseCallback;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class ImageRepository {
     private Context context;
     
-    private final FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-    private StorageReference storageReference = firebaseStorage.getReference();
+    private final FirebaseStorage firebaseStorage;
+    private StorageReference storageReference;
+    
     private MutableLiveData<List<String>> imageUrlsFromCallback;
     
-    private final List<String> imageUrls = new ArrayList<>();
+    private final List<String> imageUrls;
     
     public ImageRepository(Context context) {
         this.context = context;
-        imageUrlsFromCallback = new MutableLiveData<>();
+        this.firebaseStorage = FirebaseStorage.getInstance();
+        this.storageReference = firebaseStorage.getReference();
+        
+        this.imageUrlsFromCallback = new MutableLiveData<>();
+        this.imageUrls = new ArrayList<>();
     }
     
-    public MutableLiveData<List<String>> uploadImageToStorage(List<Uri> images, String parent) {
+    public void uploadImageToStorage(
+            List<Uri> images,
+            String parent,
+            FirebaseCallback<String> callback
+    ) {
         if (images.isEmpty()) {
-            return new MutableLiveData<>();
+            return;
         }
         
         StorageReference childRef = storageReference.child(parent);
@@ -48,9 +51,10 @@ public class ImageRepository {
         imageUrls.clear();
         images.forEach(image -> {
             long index = new Date().getTime();
-            StorageReference imageRef = childRef.child(String.valueOf(index));
             
+            StorageReference imageRef = childRef.child(String.valueOf(index));
             UploadTask uploadTask = imageRef.putFile(image);
+            
             uploadTask
                     .continueWithTask(task -> {
                                 if (!task.isSuccessful()) {
@@ -64,13 +68,11 @@ public class ImageRepository {
                             Log.d("LINK", String.valueOf(downloadUri));
                             
                             imageUrls.add(String.valueOf(downloadUri));
-                            imageUrlsFromCallback.setValue(imageUrls);
+                            callback.onSuccess(imageUrls);
                         } else {
                             Log.d(TAG, "The bug is that " + Objects.requireNonNull(task.getException()).getMessage());
                         }
                     });
         });
-        
-        return imageUrlsFromCallback;
     }
 }

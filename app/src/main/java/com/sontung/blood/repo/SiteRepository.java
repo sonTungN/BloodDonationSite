@@ -9,11 +9,15 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
+import com.sontung.blood.preference.LocalStorageManager;
 import com.sontung.blood.shared.Paths;
 import com.sontung.blood.viewmodel.UserViewModel;
 
@@ -28,31 +32,23 @@ public class SiteRepository {
     private final CollectionReference siteCollection;
     private final CollectionReference userCollection;
     
-    private final MutableLiveData<Site> siteData;
-    private final MutableLiveData<List<Site>> allSiteListData;
+    private LocalStorageManager manager;
     
-    private final MutableLiveData<List<Site>> userRegisteredSite;
-    private final MutableLiveData<List<Site>> userVolunteerSite;
-    private final MutableLiveData<Site> userHostedSite;
+    private final MutableLiveData<Site> siteData = new MutableLiveData<>();
+    private final MutableLiveData<List<Site>> allSiteListData = new MutableLiveData<>();
     
-    private UserViewModel userViewModel = null;
+    private final MutableLiveData<List<Site>> userRegisteredSite = new MutableLiveData<>();
+    private final MutableLiveData<List<Site>> userVolunteerSite = new MutableLiveData<>();
+    private final MutableLiveData<Site> userHostedSite = new MutableLiveData<>();
     
     public SiteRepository(Context context) {
         this.context = context;
+        
         this.db = FirebaseFirestore.getInstance();
         this.siteCollection = db.collection(Paths.SITE_COLLECTION_PATH);
         this.userCollection = db.collection(Paths.USER_COLLECTION_PATH);
         
-        this.siteData = new MutableLiveData<>();
-        this.allSiteListData = new MutableLiveData<>();
-        
-        this.userRegisteredSite = new MutableLiveData<>();
-        this.userVolunteerSite = new MutableLiveData<>();
-        this.userHostedSite = new MutableLiveData<>();
-    }
-    
-    public void setUserViewModel(UserViewModel owner) {
-        this.userViewModel = owner;
+        this.manager = new LocalStorageManager(context);
     }
     
     public MutableLiveData<List<Site>> getAllSiteData() {
@@ -221,16 +217,18 @@ public class SiteRepository {
         return userHostedSite;
     }
     
-    public void createNewSite(Site site) {
+    public void createNewSite(Site site, FirebaseCallback<Site> callback) {
         siteCollection
                 .add(site)
                 .addOnSuccessListener(documentReference -> {
                     String siteId = documentReference.getId();
                     site.setSiteId(siteId);
+                    callback.onSuccess(site);
                     
                     userCollection
                             .document(site.getHost())
                             .update("hostedSite", siteId)
+                            
                             .addOnCompleteListener(task -> {
                                 if (!task.isSuccessful()) {
                                     Toast.makeText(context, "Can not update user ID when create site", Toast.LENGTH_SHORT).show();
@@ -240,12 +238,23 @@ public class SiteRepository {
                                 Toast.makeText(context, "Can not update user ID when create site", Toast.LENGTH_SHORT).show();
                                 Log.d("CREATE: Cant update user ID, Error: " + e.getMessage(), e.getMessage() != null ? e.getMessage() : "Error");
                             });
-                    
-//                    userViewModel.updateUserHostSiteId(siteId);
                 })
                 .addOnFailureListener(e -> {
                     Log.d("CREATE", "Create Site failed!");
                     Toast.makeText(context, "Failed to create new site", Toast.LENGTH_SHORT).show();
+                });
+    }
+    
+    public void updateSiteId(String siteId, Site updateSite) {
+        siteCollection
+                .document(siteId)
+                .update("siteId", updateSite.getSiteId())
+                .addOnSuccessListener(e -> {
+                    Toast.makeText(context, "Site images updated successfully", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("SITE: UPDATE ID ERROR", Objects.requireNonNull(e.getMessage()));
+                    Toast.makeText(context, "Failed to update site id", Toast.LENGTH_SHORT).show();
                 });
     }
     

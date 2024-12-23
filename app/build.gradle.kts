@@ -103,4 +103,9 @@ dependencies {
 
     implementation("com.intuit.sdp:sdp-android:1.0.6")
     implementation("com.intuit.ssp:ssp-android:1.0.6")
+
+    // GSON for SharedPreference
+    implementation("com.google.code.gson:gson:2.11.0")
+    // JSON & Server
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }

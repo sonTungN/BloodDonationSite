@@ -16,17 +16,13 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -35,7 +31,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
@@ -44,30 +39,23 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
-import com.sontung.blood.BuildConfig;
+import com.google.firebase.auth.FirebaseAuth;
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.ImageAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.FragmentCreateEventBinding;
 import com.sontung.blood.model.Address;
 import com.sontung.blood.model.Site;
-import com.sontung.blood.model.User;
 import com.sontung.blood.shared.Coordinates;
 import com.sontung.blood.utils.FieldValidation;
 import com.sontung.blood.viewmodel.ImageViewModel;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
+import com.sontung.blood.views.EventActivity;
 import com.sontung.blood.views.EventDetailActivity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CreateEventFragment
@@ -78,8 +66,6 @@ public class CreateEventFragment
     private UserViewModel userViewModel;
     private SiteViewModel siteViewModel;
     private ImageViewModel imageViewModel;
-    
-    private User currentUser = new User();
     
     // Google Map displaying
     private View mapPanel;
@@ -101,77 +87,46 @@ public class CreateEventFragment
         siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         imageViewModel = new ViewModelProvider(this).get(ImageViewModel.class);
         
-        imageAdapter = new ImageAdapter(requireContext(), this, this);
-        imageAdapter.setData(imageUriList);
-        fragmentCreateSiteBinding.imageRecyclerView.setAdapter(imageAdapter);
-
-//        userViewModel.getCurrentUserData().observe(this, user ->
-//                currentUser = User.builder()
-//                    .userId(user.getUserId())
-//                    .username(user.getUsername())
-//                    .email(user.getEmail())
-//                    .bloodType(user.getBloodType())
-//                    .profileUrl(user.getProfileUrl())
-//                    .userRole(user.getUserRole())
-//                    .hostedSite(user.getHostedSite())
-//                    .listOfRegisteredSites(user.getListOfRegisteredSites())
-//                    .listOfVolunteerSites(user.getListOfVolunteerSites())
-//                    .build()
-//        );
-
-//        currentUser = userViewModel.getCurrentUserData();
-//        Toast.makeText(requireContext(), "ID: " + currentUser.getUserId() + ", Name: " + currentUser.getUsername(), Toast.LENGTH_SHORT).show();
-
-//        currentUser = userViewModel.getCurrentUserClass();
-//
         
-        userViewModel.getCurrentUserData(new FirebaseCallback<User>() {
-            @Override
-            public void onSuccess(User user) {
-                currentUser = user;
-                if (currentUser != null) {
-                    if (currentUser.getHostedSite() != null) {
-                        fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.VISIBLE);
-                        fragmentCreateSiteBinding.createEventLayout.setVisibility(View.GONE);
-                        
-                    } else if (currentUser.getUserRole().equals("donor")) {
-                        setupDonorView();
-                    }
-//                    Toast.makeText(requireContext(), "Name: " + currentUser.getUsername(), Toast.LENGTH_SHORT).show();
-                
-                } else {
-                    Toast.makeText(requireContext(), "currentUser is NULL", Toast.LENGTH_SHORT).show();
-                }
-            }
-            
-            @Override
-            public void onFailure(Exception e) {
-            
-            }
-        });
-        
-        Toast.makeText(requireContext(), "Name: " + currentUser.getUsername(), Toast.LENGTH_SHORT).show();
-
-//        setUpAutoCompleteAddress();
-        setUpAddressSpinner();
-        setUpBloodTypeSpinner();
-        setUpButtonClickHandler();
     }
     
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-//        fragmentCreateSiteBinding = FragmentCreateEventBinding.inflate(inflater, container, false);
+        
         inflater.inflate(R.layout.fragment_create_event, container, false);
+        fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.GONE);
+        fragmentCreateSiteBinding.createEventLayout.setVisibility(View.GONE);
+
+//        setUpAutoCompleteAddress();
         setUpInitialState();
+        setUpAddressSpinner();
+        setUpBloodTypeSpinner();
+        setUpButtonClickHandler();
+        
+        imageAdapter = new ImageAdapter(requireContext(), this, this);
+        imageAdapter.setData(imageUriList);
+        fragmentCreateSiteBinding.imageRecyclerView.setAdapter(imageAdapter);
+        
+        userViewModel.getCurrentUser().observe(getViewLifecycleOwner(), user -> {
+            if (user != null) {
+                if (user.getHostedSite() != null) {
+                    fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.VISIBLE);
+                    fragmentCreateSiteBinding.createEventLayout.setVisibility(View.GONE);
+                    
+                    Toast.makeText(requireContext(), "Hosted site ID: " + user.getHostedSite(), Toast.LENGTH_SHORT).show();
+                } else if (user.getUserRole().equals("donor")) {
+                    setupDonorView();
+                }
+            }
+        });
+        
         return fragmentCreateSiteBinding.getRoot();
     }
     
     private void setupDonorView() {
         fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.GONE);
         fragmentCreateSiteBinding.createEventLayout.setVisibility(View.VISIBLE);
-
-//        initialSetUp();
     }
     
     //----------------------------------------SET UP MAP VIEWS--------------------------------------
@@ -429,13 +384,9 @@ public class CreateEventFragment
             return;
         }
         
-        if (currentUser == null) {
-            Toast.makeText(requireContext(), "Current User: NULL", Toast.LENGTH_SHORT).show();
-        }
-        
         Site pendingCreatedSite =
                 Site.builder()
-                        .host(currentUser.getUserId())
+                        .host(userViewModel.getCurrentUserId())
                         .siteName(fragmentCreateSiteBinding.createSiteName.getText().toString())
                         .siteDesc(fragmentCreateSiteBinding.createSiteDesc.getText().toString())
                         .siteAddress(fragmentCreateSiteBinding.addressDisplay.getText().toString())
@@ -445,42 +396,54 @@ public class CreateEventFragment
                         .latitude(String.valueOf(coordinates.latitude))
                         .longitude(String.valueOf(coordinates.longitude))
                         .build();
-
-//        siteViewModel.setUserViewModel(userViewModel);
-        siteViewModel.createNewSite(pendingCreatedSite);
         
-        if (imageUriList.isEmpty()) {
-            navigateToRecentSiteDetails();
-        }
-        
-        Site createdSite = siteViewModel.getUserHostedSite(userViewModel.getCurrentUserId()).getValue();
-        List<String> imageUriStringList = imageUriList
-                .stream()
-                .map(Uri::toString)
-                .collect(Collectors.toList());
-        
-        if (createdSite == null) {
-            Toast.makeText(requireContext(), "Created Site in createSite() null", Toast.LENGTH_SHORT).show();
+        siteViewModel.createNewSite(pendingCreatedSite, new FirebaseCallback<>() {
+            @Override
+            public void onSuccess(List<Site> t) {
             
-        } else {
-            createdSite.setSiteImageUrl(imageUriStringList);
-            imageViewModel.uploadImageToStorage(
-                    imageUriList,
-                    Objects.requireNonNull(siteViewModel.getUserHostedSite(userViewModel.getCurrentUserId()).getValue()).getSiteId()
-            );
+            }
             
-            siteViewModel.updateSiteImages(createdSite.getSiteId(), createdSite);
-            navigateToRecentSiteDetails();
-        }
+            @Override
+            public void onSuccess(Site site) {
+                if (site == null) {
+                    Toast.makeText(requireContext(), "Created Site in createSite() null", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
+                imageViewModel.uploadImageToStorage(imageUriList, site.getSiteId(), new FirebaseCallback<>() {
+                    @Override
+                    public void onSuccess(List<String> imageUrls) {
+                        site.setSiteImageUrl(imageUrls);
+                        siteViewModel.updateSiteImages(site.getSiteId(), site);
+                        
+                        Intent i = new Intent(requireContext(), EventActivity.class);
+                        startActivity(i);
+                    }
+                    
+                    @Override
+                    public void onSuccess(String imageUrl) {}
+                    
+                    @Override
+                    public void onFailure(List<String> imageUrls) {}
+                    
+                    @Override
+                    public void onFailure(String imageUrl) {}
+                });
+                
+                siteViewModel.updateSiteId(site.getSiteId(), site);
+            }
+            
+            @Override
+            public void onFailure(List<Site> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(Site site) {
+            
+            }
+        });
     }
-    
-    private void navigateToRecentSiteDetails() {
-        String siteId = Objects.requireNonNull(siteViewModel.getUserHostedSite(currentUser.getUserId()).getValue()).getSiteId();
-        Intent i = new Intent(requireContext(), EventDetailActivity.class)
-                .putExtra("SITE_ID", siteId);
-        startActivity(i);
-    }
-    
     //----------------------------------------SET UP IMAGE UPLOADING--------------------------------
     private void openFile() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
@@ -494,7 +457,7 @@ public class CreateEventFragment
     private final ActivityResultLauncher<Intent> chooseImageAction =
             registerForActivityResult(
                     new ActivityResultContracts.StartActivityForResult(),
-                    new ActivityResultCallback<ActivityResult>() {
+                    new ActivityResultCallback<>() {
                         @SuppressLint("SetTextI18n")
                         @Override
                         public void onActivityResult(ActivityResult activityResult) {

@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.model.Site;
 import com.sontung.blood.repo.SiteRepository;
 
@@ -17,10 +18,6 @@ public class SiteViewModel extends AndroidViewModel {
     public SiteViewModel(@NonNull Application application) {
         super(application);
         this.siteRepository = new SiteRepository(getApplication());
-    }
-    
-    public void setUserViewModel(UserViewModel userViewModel) {
-        siteRepository.setUserViewModel(userViewModel);
     }
     
     public MutableLiveData<List<Site>> getAllSiteData() {
@@ -43,8 +40,12 @@ public class SiteViewModel extends AndroidViewModel {
         return siteRepository.getUserHostedSite(userId);
     }
     
-    public void createNewSite(Site site) {
-        siteRepository.createNewSite(site);
+    public void createNewSite(Site site, FirebaseCallback<Site> callback) {
+        siteRepository.createNewSite(site, callback);
+    }
+    
+    public void updateSiteId(String siteId, Site site) {
+        siteRepository.updateSiteId(siteId, site);
     }
     
     public void updateSiteImages(String siteId, Site site) {

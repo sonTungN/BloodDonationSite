@@ -5,8 +5,8 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.MutableLiveData;
 
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.repo.ImageRepository;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class ImageViewModel extends AndroidViewModel {
         imageRepository = new ImageRepository(getApplication());
     }
     
-    public MutableLiveData<List<String>> uploadImageToStorage(List<Uri> images, String parent) {
-        return imageRepository.uploadImageToStorage(images, parent);
+    public void uploadImageToStorage(List<Uri> images, String parent, FirebaseCallback<String> callback) {
+        imageRepository.uploadImageToStorage(images, parent, callback);
     }
 }
