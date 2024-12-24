@@ -19,7 +19,11 @@ public class ImageViewModel extends AndroidViewModel {
         imageRepository = new ImageRepository(getApplication());
     }
     
-    public void uploadImageToStorage(List<Uri> images, String parent, FirebaseCallback<String> callback) {
-        imageRepository.uploadImageToStorage(images, parent, callback);
+    public void uploadSiteImageToStorage(List<Uri> images, String parent, FirebaseCallback<String> callback) {
+        imageRepository.uploadSiteImageToStorage(images, parent, callback);
+    }
+    
+    public void uploadUserAvatarToStorage(Uri imageUri, String parent, FirebaseCallback<String> callback) {
+        imageRepository.uploadUserAvatarToStorage(imageUri, parent, callback);
     }
 }

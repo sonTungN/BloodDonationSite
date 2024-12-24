@@ -11,7 +11,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.sontung.blood.R;
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.FragmentCreateReportBinding;
+import com.sontung.blood.model.Report;
+import com.sontung.blood.viewmodel.ReportViewModel;
+
+import java.util.List;
 
 public class CreateReportFragment extends DialogFragment {
     
@@ -19,6 +24,7 @@ public class CreateReportFragment extends DialogFragment {
     private static final String ARG_SITE_ID = "siteId";
     
     FragmentCreateReportBinding binding;
+    private ReportViewModel reportViewModel;
     private String userId;
     private String siteId;
     
@@ -42,17 +48,8 @@ public class CreateReportFragment extends DialogFragment {
             siteId = getArguments().getString(ARG_SITE_ID);
         }
         
-        binding.exitButton.setOnClickListener(view -> {
-            dismiss();
-        });
-        
-        binding.createReportBtn.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "CREATE REPORT", Toast.LENGTH_SHORT).show();
-            Toast.makeText(requireContext(), "userID: " + userId, Toast.LENGTH_SHORT).show();
-            Toast.makeText(requireContext(), "siteID: " + siteId, Toast.LENGTH_SHORT).show();
-//            dismiss();
-        });
-        
+        binding.exitButton.setOnClickListener(view -> dismiss());
+        binding.createReportBtn.setOnClickListener(v -> createReport());
     }
     
     @Override
@@ -61,5 +58,39 @@ public class CreateReportFragment extends DialogFragment {
         inflater.inflate(R.layout.fragment_create_report, container, false);
         // Inflate the layout for this fragment
         return binding.getRoot();
+    }
+    
+    private void createReport() {
+        Report pendingCreatedReport =
+                Report.builder()
+                        .userId(userId)
+                        .siteId(siteId)
+                        .bloodType(binding.userBloodType.getText().toString())
+                        .bloodVolume(String.valueOf(binding.userBloodAmount.getText()))
+                        .build();
+        
+        reportViewModel.createReport(pendingCreatedReport, new FirebaseCallback<Report>() {
+            @Override
+            public void onSuccess(List<Report> t) {
+            
+            }
+            
+            @Override
+            public void onSuccess(Report report) {
+                reportViewModel.updateReportId(report.getReportId(), report);
+                Toast.makeText(requireContext(), "Create Report Successfully!", Toast.LENGTH_SHORT).show();
+                dismiss();
+            }
+            
+            @Override
+            public void onFailure(List<Report> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(Report report) {
+            
+            }
+        });
     }
 }

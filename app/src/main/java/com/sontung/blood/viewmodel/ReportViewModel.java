@@ -25,4 +25,8 @@ public class ReportViewModel extends AndroidViewModel {
     public void createReport(Report report, FirebaseCallback<Report> callback) {
         reportRepository.createReport(report, callback);
     }
+    
+    public void updateReportId(String reportId, Report updateReport) {
+        reportRepository.updateReportId(reportId, updateReport);
+    }
 }

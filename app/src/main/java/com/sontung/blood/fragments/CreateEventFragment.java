@@ -39,7 +39,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.auth.FirebaseAuth;
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.ImageAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
@@ -52,7 +51,6 @@ import com.sontung.blood.viewmodel.ImageViewModel;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 import com.sontung.blood.views.EventActivity;
-import com.sontung.blood.views.EventDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,8 +84,7 @@ public class CreateEventFragment
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         imageViewModel = new ViewModelProvider(this).get(ImageViewModel.class);
-        
-        
+        imageViewModel = new ViewModelProvider(this).get(ImageViewModel.class);
     }
     
     @Override
@@ -405,12 +402,7 @@ public class CreateEventFragment
             
             @Override
             public void onSuccess(Site site) {
-                if (site == null) {
-                    Toast.makeText(requireContext(), "Created Site in createSite() null", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                
-                imageViewModel.uploadImageToStorage(imageUriList, site.getSiteId(), new FirebaseCallback<>() {
+                imageViewModel.uploadSiteImageToStorage(imageUriList, site.getSiteId(), new FirebaseCallback<>() {
                     @Override
                     public void onSuccess(List<String> imageUrls) {
                         site.setSiteImageUrl(imageUrls);

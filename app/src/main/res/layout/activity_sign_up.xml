@@ -62,14 +62,18 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:orientation="vertical"
                     android:background="@drawable/custom_edittext">
 
-                    <ImageView
+                    <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/signUp_avatar"
                         android:layout_width="120dp"
                         android:layout_height="120dp"
-                        android:scaleType="centerCrop" />
+                        android:layout_gravity="center"
+                        android:layout_margin="2dp"
+                        android:scaleType="centerCrop"
+                        app:shapeAppearanceOverlay="@style/searchRoundedExerciseImageView" />
 
                 </LinearLayout>
 
@@ -99,7 +103,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/custom_edittext"
-                    android:drawablePadding="12dp"
                     android:hint="Name"
                     android:padding="10dp"
                     android:textColor="@color/black"
@@ -130,7 +133,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/custom_edittext"
-                    android:drawablePadding="12dp"
                     android:hint="Email"
                     android:padding="10dp"
                     android:textColor="@color/black"
@@ -161,7 +163,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/custom_edittext"
-                    android:drawablePadding="12dp"
                     android:hint="Password"
                     android:padding="10dp"
                     android:textColor="@color/black"
@@ -191,7 +192,6 @@
                 android:layout_marginStart="24dp"
                 android:layout_marginEnd="24dp"
                 android:background="@drawable/custom_edittext"
-                android:padding="10dp"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"

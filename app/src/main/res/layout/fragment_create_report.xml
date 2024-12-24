@@ -72,10 +72,9 @@
                     android:layout_width="120dp"
                     android:layout_height="120dp"
                     android:layout_gravity="center"
-                    android:layout_margin="1dp"
+                    android:layout_margin="2dp"
                     android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/searchRoundedExerciseImageView"
-                    tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                    app:shapeAppearanceOverlay="@style/searchRoundedExerciseImageView" />
 
             </LinearLayout>
 
@@ -110,6 +109,7 @@
                         android:layout_height="30dp"
                         android:gravity="center_vertical"
                         android:text="sonTungNguyen"
+                        android:focusable="false"
                         tools:ignore="HardcodedText" />
                 </LinearLayout>
 
@@ -146,6 +146,7 @@
                         android:layout_height="30dp"
                         android:gravity="center_vertical"
                         android:text="tung@gmail.com"
+                        android:focusable="false"
                         tools:ignore="HardcodedText" />
                 </LinearLayout>
 
@@ -182,6 +183,7 @@
                         android:layout_height="30dp"
                         android:gravity="center_vertical"
                         android:text="A+"
+                        android:focusable="false"
                         tools:ignore="HardcodedText" />
                 </LinearLayout>
 
@@ -209,6 +211,7 @@
                     android:paddingStart="10dp"
                     android:background="@drawable/custom_edittext"
                     android:hint=""
+                    android:inputType="numberDecimal"
                     android:drawableEnd="@drawable/img_ml_volume"
                     android:paddingEnd="5dp"
                     style="@style/CardDesc1"

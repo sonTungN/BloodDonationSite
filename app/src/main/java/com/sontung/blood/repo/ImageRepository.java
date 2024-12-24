@@ -27,6 +27,7 @@ public class ImageRepository {
     private MutableLiveData<List<String>> imageUrlsFromCallback;
     
     private final List<String> imageUrls;
+    private String profileImgUrl;
     
     public ImageRepository(Context context) {
         this.context = context;
@@ -37,7 +38,7 @@ public class ImageRepository {
         this.imageUrls = new ArrayList<>();
     }
     
-    public void uploadImageToStorage(
+    public void uploadSiteImageToStorage(
             List<Uri> images,
             String parent,
             FirebaseCallback<String> callback
@@ -78,4 +79,40 @@ public class ImageRepository {
                     });
         });
     }
+    
+    public void uploadUserAvatarToStorage (
+            Uri imageUri,
+            String parent,
+            FirebaseCallback<String> callback
+    ) {
+        long index = new Date().getTime();
+        StorageReference imageRef =
+                storageReference
+                        .child(parent)
+                        .child(String.valueOf(index));
+        
+        UploadTask uploadTask = imageRef.putFile(imageUri);
+        
+        uploadTask
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) {
+                        throw Objects.requireNonNull(task.getException());
+                    }
+                    return imageRef.getDownloadUrl();
+                })
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        Log.d("LINK", String.valueOf(downloadUri));
+                        
+                        profileImgUrl = String.valueOf(downloadUri);
+                        callback.onSuccess(profileImgUrl);
+                        
+                    } else {
+                        Log.d(TAG, "The bug is that " + Objects.requireNonNull(task.getException()).getMessage());
+                    }
+                });
+    }
+    
+    
 }

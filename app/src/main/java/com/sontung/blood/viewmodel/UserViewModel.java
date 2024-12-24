@@ -23,6 +23,7 @@ public class UserViewModel extends AndroidViewModel {
         this.userRepository = new UserRepository(application.getApplicationContext());
     }
     
+    /*
     public void signUpUserWithEmailAndPassword(
             final String email,
             final String password,
@@ -31,12 +32,24 @@ public class UserViewModel extends AndroidViewModel {
     ) {
         userRepository.signUpUserWithEmailAndPassword(email, password, displayName, bloodType);
     }
+     */
+    public void signUpUser(User user, FirebaseCallback<User> callback) {
+        userRepository.signUpUser(user, callback);
+    }
 
     public void signInUserWithEmailAndPassword(
             final String email,
             final String password
     ) {
         userRepository.signInUserWithEmailAndPassword(email, password);
+    }
+    
+    public void updateUserId(String userId, User updateduser) {
+        userRepository.updateUserId(userId, updateduser);
+    }
+    
+    public void updateUserProfileAvatar(String userId, User updatedUser) {
+        userRepository.updateUserProfileAvatar(userId, updatedUser);
     }
     
     public MutableLiveData<User> getCurrentUser() {

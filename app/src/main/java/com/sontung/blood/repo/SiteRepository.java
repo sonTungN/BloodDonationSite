@@ -336,7 +336,7 @@ public class SiteRepository {
                 .document(siteId)
                 .update("siteId", updateSite.getSiteId())
                 .addOnSuccessListener(e -> {
-                    Toast.makeText(context, "Site images updated successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Site ID updated successfully", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     Log.d("SITE: UPDATE ID ERROR", Objects.requireNonNull(e.getMessage()));

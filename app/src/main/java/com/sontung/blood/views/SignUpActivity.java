@@ -1,13 +1,22 @@
 package com.sontung.blood.views;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -16,14 +25,29 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.sontung.blood.R;
+import com.sontung.blood.adapter.ImageAdapter;
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivitySignUpBinding;
+import com.sontung.blood.model.User;
+import com.sontung.blood.shared.Types;
 import com.sontung.blood.utils.FieldValidation;
+import com.sontung.blood.viewmodel.ImageViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 
-public class SignUpActivity extends AppCompatActivity {
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.List;
+
+public class SignUpActivity
+        extends AppCompatActivity
+        implements ImageAdapter.OnItemCountAfterDelete, ImageAdapter.OnItemZoom {
 
     private ActivitySignUpBinding binding;
     private UserViewModel userViewModel;
+    private ImageViewModel imageViewModel;
+    
+    // ImageUploading
+    private Uri profileAvatar;
 
     // Widget
     private Spinner bloodTypeSpinner;
@@ -36,10 +60,10 @@ public class SignUpActivity extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        imageViewModel = new ViewModelProvider(this).get(ImageViewModel.class);
         
         setUpBloodTypeSpinner();
         setUpInitialState();
-        
         setUpButtonClickHandlerEvent();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -48,7 +72,8 @@ public class SignUpActivity extends AppCompatActivity {
             return insets;
         });
     }
-
+    
+    //----------------------------------------SET UP VIEW LAYOUT------------------------------------
     private void setUpBloodTypeSpinner() {
         bloodTypeSpinner = binding.signupBloodType;
         // Create an ArrayAdapter from the resource
@@ -62,25 +87,115 @@ public class SignUpActivity extends AppCompatActivity {
     }
     
     private void setUpButtonClickHandlerEvent() {
-        binding.signupBtn.setOnClickListener(v -> {
-            if (!isSiteInputValid()) {
-                Toast.makeText(this, "Invalid input", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            
-            String email = binding.signupEmail.getText().toString().trim();
-            String password = binding.signupPassword.getText().toString().trim();
-            String displayName = binding.signupDisplayName.getText().toString().trim();
-            String bloodType = bloodTypeSpinner.getSelectedItem().toString();
-
-            userViewModel.signUpUserWithEmailAndPassword(email, password, displayName, bloodType);
-        });
+        binding.addAvatarBtn.setOnClickListener(v -> openFile());
+        
+        binding.signupBtn.setOnClickListener(v -> signUpUser());
 
         binding.signinCta.setOnClickListener(v -> {
             Intent intent = new Intent(this, SignInActivity.class);
             startActivity(intent);
         });
     }
+    
+    private void signUpUser() {
+        if (!isSiteInputValid()) {
+            Toast.makeText(this, "Invalid input", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        User pendingCreatedUser =
+                User.builder()
+                        .email(binding.signupEmail.getText().toString().trim())
+                        .password(binding.signupPassword.getText().toString().trim())
+                        .username(binding.signupDisplayName.getText().toString().trim())
+                        .bloodType(bloodTypeSpinner.getSelectedItem().toString())
+                        .userRole(Types.USER_PERMISSION)
+                        .build();
+        
+        userViewModel.signUpUser(pendingCreatedUser, new FirebaseCallback<User>() {
+            @Override
+            public void onSuccess(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onSuccess(User user) {
+                imageViewModel.uploadUserAvatarToStorage(profileAvatar, user.getUserId(), new FirebaseCallback<String>() {
+                    @Override
+                    public void onSuccess(List<String> t) {
+                    
+                    }
+                    
+                    @Override
+                    public void onSuccess(String imageUrl) {
+                        user.setProfileUrl(imageUrl);
+                        userViewModel.updateUserProfileAvatar(user.getUserId(), user);
+                        
+                        Intent i = new Intent(getApplicationContext(), SignInActivity.class);
+                        startActivity(i);
+                    }
+                    
+                    @Override
+                    public void onFailure(List<String> t) {
+                    
+                    }
+                    
+                    @Override
+                    public void onFailure(String s) {
+                    
+                    }
+                });
+            }
+            
+            @Override
+            public void onFailure(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(User user) {
+            
+            }
+        });
+    }
+    
+    //----------------------------------------SET UP IMAGE UPLOADING--------------------------------
+    private void openFile() {
+        Intent intent =
+                new Intent(
+                        Intent.ACTION_PICK,
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                )
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        
+        chooseImageAction.launch(intent);
+    }
+    
+    private final ActivityResultLauncher<Intent> chooseImageAction =
+            registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    new ActivityResultCallback<>() {
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onActivityResult(ActivityResult activityResult) {
+                            int resultCode = activityResult.getResultCode();
+                            Intent intentData = activityResult.getData();
+                            
+                            if (resultCode == RESULT_OK && intentData != null) {
+                                profileAvatar = intentData.getData();
+                                
+                                InputStream chooseProfileAvatar;
+                                try {
+                                    chooseProfileAvatar = getContentResolver().openInputStream(profileAvatar);
+                                    Bitmap bitmap = BitmapFactory.decodeStream(chooseProfileAvatar);
+                                    binding.signUpAvatar.setImageBitmap(bitmap);
+                                    
+                                } catch (FileNotFoundException e) {
+                                    Toast.makeText(SignUpActivity.this, "Error updating choosing image to view", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    });
     
     //----------------------------------------SET UP TOOLS FUNCTION---------------------------------
     private boolean isSiteInputValid() {
@@ -127,5 +242,15 @@ public class SignUpActivity extends AppCompatActivity {
         } else {
             view.setVisibility(View.GONE);
         }
+    }
+    
+    @Override
+    public void clickDelete(int leftNum) {
+    
+    }
+    
+    @Override
+    public void itemZoomClick(int position) {
+    
     }
 }

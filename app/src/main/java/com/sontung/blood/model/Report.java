@@ -19,7 +19,6 @@ public class Report {
     private String siteId;
     private String bloodType;
     private String bloodVolume;
-    private String note;
     
     @Builder.Default private Date createdDate = new Date();
 }
