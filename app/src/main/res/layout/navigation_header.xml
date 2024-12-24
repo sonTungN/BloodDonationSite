@@ -21,6 +21,7 @@
             android:id="@+id/profile_image"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:scaleType="centerCrop"
             android:src="@drawable/icon_profile_sample"
             app:shapeAppearanceOverlay="@style/roundedImageViewRounded" />
 
@@ -28,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginStart="12dp">
+            android:layout_marginStart="10dp">
 
             <TextView
                 android:id="@+id/nav_name"
@@ -36,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:text="@{user.username}"
                 android:textColor="@color/white"
-                android:textSize="17sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -47,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{user.email}"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:textColor="@color/white"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/nav_name"

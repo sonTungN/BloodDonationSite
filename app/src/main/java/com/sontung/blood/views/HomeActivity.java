@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.sontung.blood.R;
 import com.sontung.blood.databinding.ActivityHomeBinding;
@@ -62,6 +64,7 @@ public class HomeActivity extends AppCompatActivity {
         View headerView = binding.navigationView.getHeaderView(0);
         TextView navName = headerView.findViewById(R.id.nav_name);
         TextView navEmail = headerView.findViewById(R.id.nav_email);
+        ImageView navProfileImg = headerView.findViewById(R.id.profile_image);
         drawerLayout.closeDrawer(GravityCompat.START);
         
         navigationView.bringToFront();
@@ -72,6 +75,10 @@ public class HomeActivity extends AppCompatActivity {
                 .observe(this, user -> {
             navName.setText(user.getUsername());
             navEmail.setText(user.getEmail());
+            
+            Glide.with(getApplicationContext())
+                    .load(user.getProfileUrl())
+                    .into(navProfileImg);
         });
         
         ActionBarDrawerToggle drawerToggle =
@@ -101,27 +108,31 @@ public class HomeActivity extends AppCompatActivity {
         
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             if (menuItem.getItemId() == R.id.nav_home) {
-                return false;
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
                 
             } else if (menuItem.getItemId() == R.id.nav_event) {
                 Intent intent = new Intent(this, EventActivity.class);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
                 
-            } else if (menuItem.getItemId() == R.id.nav_create) {
+            } else if (menuItem.getItemId() == R.id.nav_my_event) {
                 Intent intent = new Intent(this, CreateEventActivity.class);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_notification) {
                 Toast.makeText(this, "NOTIFICATION", Toast.LENGTH_SHORT).show();
                 drawerLayout.closeDrawer(GravityCompat.START);
                 
-            } else if (menuItem.getItemId() == R.id.nav_request) {
-                Toast.makeText(this, "REQUEST", Toast.LENGTH_SHORT).show();
-                drawerLayout.closeDrawer(GravityCompat.START);
-                
             } else if (menuItem.getItemId() == R.id.nav_profile) {
                 Intent intent = new Intent(this, ProfileActivity.class);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
+                
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+                Toast.makeText(this, "ABOUT US", Toast.LENGTH_SHORT).show();
+                drawerLayout.closeDrawer(GravityCompat.START);
                 
             } else if (menuItem.getItemId() == R.id.nav_logout) {
                 Intent intent = new Intent(this, OnBoardingActivity.class);
@@ -129,7 +140,7 @@ public class HomeActivity extends AppCompatActivity {
                 userViewModel.signOut();
                 startActivity(intent);
             }
-            return false;
+            return true;
         });
     }
     

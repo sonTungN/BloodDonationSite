@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.sontung.blood.R;
@@ -34,6 +36,7 @@ import com.sontung.blood.viewmodel.UserViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class EventActivity extends AppCompatActivity {
     
@@ -43,7 +46,6 @@ public class EventActivity extends AppCompatActivity {
     // Navbar
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,7 @@ public class EventActivity extends AppCompatActivity {
 
                     @Override
                     public void onPageSelected(int position) {
-                        binding.tabLayout.getTabAt(position).select();
+                        Objects.requireNonNull(binding.tabLayout.getTabAt(position)).select();
                     }
 
                     @Override
@@ -93,19 +95,19 @@ public class EventActivity extends AppCompatActivity {
             return insets;
         });
     }
-
-
+    
     @SuppressLint("SetTextI18n")
     private void generalDrawerSetUp() {
         drawerLayout = binding.drawer;
         navigationView = binding.navigationView;
         
-        binding.toolbarId.toolbarTitleId.setText("Event Sites");
+        binding.toolbarId.toolbarTitleId.setText("Recent Events");
         binding.toolbarId.backIcon.setVisibility(View.GONE);
         
         View headerView = binding.navigationView.getHeaderView(0);
         TextView navName = headerView.findViewById(R.id.nav_name);
         TextView navEmail = headerView.findViewById(R.id.nav_email);
+        ImageView navProfileImg = headerView.findViewById(R.id.profile_image);
         drawerLayout.closeDrawer(GravityCompat.START);
         
         navigationView.bringToFront();
@@ -116,6 +118,10 @@ public class EventActivity extends AppCompatActivity {
                 .observe(this, user -> {
                     navName.setText(user.getUsername());
                     navEmail.setText(user.getEmail());
+                    
+                    Glide.with(getApplicationContext())
+                            .load(user.getProfileUrl())
+                            .into(navProfileImg);
                 });
         
         ActionBarDrawerToggle drawerToggle =
@@ -146,22 +152,29 @@ public class EventActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             if (menuItem.getItemId() == R.id.nav_home) {
                 Intent intent = new Intent(this, HomeActivity.class);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_event) {
-                return false;
+                return true;
+                
+            } else if (menuItem.getItemId() == R.id.nav_my_event) {
+                Intent intent = new Intent(this, CreateEventActivity.class);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_notification) {
                 Toast.makeText(this, "NOTIFICATION", Toast.LENGTH_SHORT).show();
                 drawerLayout.closeDrawer(GravityCompat.START);
                 
-            } else if (menuItem.getItemId() == R.id.nav_request) {
-                Toast.makeText(this, "REQUEST", Toast.LENGTH_SHORT).show();
-                drawerLayout.closeDrawer(GravityCompat.START);
-                
             } else if (menuItem.getItemId() == R.id.nav_profile) {
                 Intent intent = new Intent(this, ProfileActivity.class);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
+                
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+                Toast.makeText(this, "ABOUT US", Toast.LENGTH_SHORT).show();
+                drawerLayout.closeDrawer(GravityCompat.START);
                 
             } else if (menuItem.getItemId() == R.id.nav_logout) {
                 Intent intent = new Intent(this, OnBoardingActivity.class);
@@ -169,7 +182,7 @@ public class EventActivity extends AppCompatActivity {
                 userViewModel.signOut();
                 startActivity(intent);
             }
-            return false;
+            return true;
         });
     }
 }
