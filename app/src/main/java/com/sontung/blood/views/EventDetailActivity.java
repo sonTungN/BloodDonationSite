@@ -116,7 +116,7 @@ public class EventDetailActivity extends AppCompatActivity {
         indicator = binding.dotsIndicator;
 
         setUpDrawer();
-        setUpInitialStage();
+        setUpButtonInitialStage();
         fetchSiteDetailIntoViews(siteId);
         setUpOnButtonClickListener();
         setUpRecyclerView();
@@ -197,8 +197,6 @@ public class EventDetailActivity extends AppCompatActivity {
     //----------------------------------------SET UP APPLY BUTTON-----------------------------------
     private void donorApply() {
         String currentUserId = userViewModel.getCurrentUserId();
-//        siteViewModel.getSiteDataById(siteId).observe(this, site -> {
-//            userViewModel.getUserDataById(currentUserId).observe(this, user -> {
         siteViewModel.addUserIntoSiteRegisteredList(currentUserId, siteId, new FirebaseCallback<>() {
             @Override
             public void onSuccess(List<Boolean> t) {
@@ -213,13 +211,17 @@ public class EventDetailActivity extends AppCompatActivity {
 
                     }
 
-                    @SuppressLint("SetTextI18n")
+                    @SuppressLint({"SetTextI18n", "NotifyDataSetChanged"})
                     @Override
                     public void onSuccess(Boolean aBoolean) {
                         Toast.makeText(EventDetailActivity.this, "Successfully registered as donor", Toast.LENGTH_SHORT).show();
                         setApplyButtonState(binding.donorApplyBtn, false);
                         binding.donorApplyBtn.setText("Already Donor");
                         siteViewModel.getSiteDonorList(siteId);
+                        
+                        siteViewModel
+                                .getSiteDataById(siteId)
+                                .observe(EventDetailActivity.this, site -> binding.setSite(site));
                     }
 
                     @Override
@@ -244,14 +246,10 @@ public class EventDetailActivity extends AppCompatActivity {
                 Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
             }
         });
-//            });
-//        });
     }
 
     private void volunteerApply() {
         String currentUserId = userViewModel.getCurrentUserId();
-//        siteViewModel.getSiteDataById(siteId).observe(this, site -> {
-//            userViewModel.getUserDataById(currentUserId).observe(this, user -> {
         siteViewModel.addUserIntoSiteVolunteerList(currentUserId, siteId, new FirebaseCallback<>() {
             @Override
             public void onSuccess(List<Boolean> t) {
@@ -273,6 +271,10 @@ public class EventDetailActivity extends AppCompatActivity {
                         setApplyButtonState(binding.volunteerApplyBtn, false);
                         binding.volunteerApplyBtn.setText("Already Volunteer");
                         siteViewModel.getSiteVolunteerList(siteId);
+                        
+                        siteViewModel
+                                .getSiteDataById(siteId)
+                                .observe(EventDetailActivity.this, site -> binding.setSite(site));
                     }
 
                     @Override
@@ -297,13 +299,11 @@ public class EventDetailActivity extends AppCompatActivity {
                 Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
             }
         });
-//            });
-//        });
     }
 
     //----------------------------------------SET UP VIEW-------------------------------------------
     @SuppressLint("SetTextI18n")
-    private void setUpInitialStage() {
+    private void setUpButtonInitialStage() {
         String currentUserId = userViewModel.getCurrentUserId();
 
         setApplyButtonState(binding.donorApplyBtn, true);
@@ -318,7 +318,6 @@ public class EventDetailActivity extends AppCompatActivity {
                     binding.donorApplyBtn.setText("BLOOD TYPE MISMATCH");
                 }
             });
-
 
             if (Objects.equals(site.getHost(), currentUserId)) {
                 setApplyButtonState(binding.donorApplyBtn, false);
@@ -358,7 +357,12 @@ public class EventDetailActivity extends AppCompatActivity {
 
                     userViewModel.getUserDataById(site.getHost())
                             .observe(this, user -> {
-                                binding.siteHost.setText(user.getEmail());
+                                binding.setHost(user);
+                                
+                                Glide
+                                        .with(getApplicationContext())
+                                        .load(user.getProfileUrl())
+                                        .into(binding.avatar);
                             });
 
                     MultipleImageAdapter adapter = new MultipleImageAdapter(site.getSiteImageUrl());
@@ -439,7 +443,7 @@ public class EventDetailActivity extends AppCompatActivity {
         navigationView = binding.navigationView;
         
         binding.toolbarId.toolbarTitleId.setText("Event Details");
-        binding.toolbarId.backIcon.setVisibility(View.GONE);
+        binding.toolbarId.backIcon.setVisibility(View.VISIBLE);
         
         View headerView = binding.navigationView.getHeaderView(0);
         TextView navName = headerView.findViewById(R.id.nav_name);

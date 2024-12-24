@@ -8,12 +8,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Coordinates {
-    public static LatLng RMIT = new LatLng(10.74999, 106.666664);
+    public static LatLng RMIT = new LatLng(10.729360903646382, 106.69592019042942);
     
     public static String RMIT_ADDRESS = "Main Gate - 702 Nguyễn Văn Linh Street, Tân Hưng Ward, District 7, Ho Chi Minh City, 700000, Vietnam";
     
-    public static double RMIT_LAT = 10.74999;
-    public static double RMIT_LONG = 106.666664;
+    public static double RMIT_LAT = RMIT.latitude;
+    public static double RMIT_LONG = RMIT.longitude;
     
     public static double BOTTOM_BOUND = RMIT_LAT - .1;
     public static double LEFT_BOUND = RMIT_LONG - .1;

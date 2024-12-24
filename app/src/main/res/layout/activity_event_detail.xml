@@ -9,6 +9,10 @@
         <variable
             name="site"
             type="com.sontung.blood.model.Site" />
+
+        <variable
+            name="host"
+            type="com.sontung.blood.model.User" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -42,7 +46,7 @@
                 android:layout_width="match_parent" />
 
             <androidx.core.widget.NestedScrollView
-                android:id="@+id/scrollView2"
+                android:id="@+id/scrollView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -77,7 +81,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="8dp"
                         android:layout_marginEnd="12dp"
                         android:orientation="vertical">
 
@@ -88,6 +92,114 @@
                             android:textColor="@color/black"
                             android:textSize="24sp"
                             android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Descriptions"
+                                android:textColor="@color/black"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                tools:ignore="HardcodedText" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@{site.siteDesc}"
+                                android:textSize="14sp"
+                                android:textColor="@color/black" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="5dp"
+                            android:orientation="horizontal"
+                            android:background="@drawable/bg_site_profile">
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:layout_gravity="center"
+                                android:layout_margin="5dp"
+                                android:background="@drawable/bg_site_profile">
+
+                                <com.google.android.material.imageview.ShapeableImageView
+                                    android:id="@+id/avatar"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_gravity="center"
+                                    android:layout_margin="2dp"
+                                    android:scaleType="centerCrop"
+                                    app:layout_constraintBottom_toBottomOf="parent"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintStart_toStartOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:shapeAppearanceOverlay="@style/searchRoundedExerciseImageView"
+                                    tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical"
+                                android:layout_margin="5dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@{host.username}"
+                                    style="@style/CardHeading2"
+                                    tools:ignore="HardcodedText" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@{host.email}"
+                                    style="@style/CardDesc2"
+                                    tools:ignore="HardcodedText" />
+
+                            </LinearLayout>
+
+                            <androidx.constraintlayout.widget.ConstraintLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_margin="7dp">
+
+                                <androidx.constraintlayout.widget.ConstraintLayout
+                                    android:layout_width="60dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="3dp"
+                                    android:layout_marginEnd="3dp"
+                                    android:background="@drawable/custom_host_tag"
+                                    app:layout_constraintEnd_toEndOf="parent"
+                                    app:layout_constraintTop_toTopOf="parent">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="HOST"
+                                        style="@style/CardDesc2"
+                                        android:textStyle="bold"
+                                        app:layout_constraintBottom_toBottomOf="parent"
+                                        app:layout_constraintEnd_toEndOf="parent"
+                                        app:layout_constraintStart_toStartOf="parent"
+                                        app:layout_constraintTop_toTopOf="parent"
+                                        tools:ignore="HardcodedText,TooDeepLayout" />
+
+                                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                            </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -110,7 +222,8 @@
                                 android:textSize="16sp"
                                 android:textColor="@color/black"
                                 android:textStyle="bold"
-                                app:layout_constraintStart_toStartOf="parent" />
+                                app:layout_constraintStart_toStartOf="parent"
+                                tools:ignore="HardcodedText" />
 
                             <TextView
                                 android:id="@+id/site_address"
@@ -145,44 +258,11 @@
                                 android:textSize="16sp"
                                 android:textColor="@color/black"
                                 android:textStyle="bold"
-                                app:layout_constraintStart_toStartOf="parent" />
+                                app:layout_constraintStart_toStartOf="parent"
+                                tools:ignore="HardcodedText" />
 
                             <TextView
                                 android:id="@+id/site_date"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:layout_marginStart="2dp"
-                                android:gravity="center_vertical"
-                                android:textSize="16sp"
-                                android:textColor="@color/black"
-                                app:layout_constraintStart_toStartOf="parent" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="10dp"
-                            tools:ignore="UseCompoundDrawables">
-
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/ic_admin_icon" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="2dp"
-                                android:gravity="center_vertical"
-                                android:text="Host: "
-                                android:textSize="16sp"
-                                android:textColor="@color/black"
-                                android:textStyle="bold"
-                                app:layout_constraintStart_toStartOf="parent" />
-
-                            <TextView
-                                android:id="@+id/site_host"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="2dp"
@@ -318,38 +398,30 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:orientation="vertical"
+                        android:layout_marginStart="12dp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginEnd="16dp"
-                        android:orientation="vertical">
+                        android:layout_marginEnd="12dp">
 
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Descriptions"
+                            android:text="Location on map"
                             android:textColor="@color/black"
-                            android:textSize="20sp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             tools:ignore="HardcodedText" />
 
-                        <TextView
+                        <ViewStub
+                            android:id="@+id/stub_map"
+                            android:inflatedId="@+id/panel_map"
+                            android:layout_marginTop="3dp"
+                            android:layout="@layout/displaying_map"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="@{site.siteDesc}"
-                            android:textSize="14sp"
-                            android:textColor="@color/black" />
-                    </LinearLayout>
+                            android:layout_height="200dp"
+                            android:layout_gravity="bottom" />
 
-                    <ViewStub
-                        android:id="@+id/stub_map"
-                        android:inflatedId="@+id/panel_map"
-                        android:layout="@layout/displaying_map"
-                        android:layout_width="match_parent"
-                        android:layout_marginStart="12dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="12dp"
-                        android:layout_height="200dp"
-                        android:layout_gravity="bottom" />
+                    </LinearLayout>
 
                     <FrameLayout
                         android:id="@+id/progressBarHolder"
@@ -378,7 +450,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:layout_marginTop="10dp"
+                            android:layout_marginTop="15dp"
                             android:layout_marginEnd="12dp"
                             android:text="List of Donors"
                             style="@style/CardHeading1"
@@ -389,7 +461,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:layout_marginTop="10dp"
+                            android:layout_marginTop="3dp"
                             android:layout_marginEnd="12dp"
                             android:text="No donors found!"
                             style="@style/CardDesc1"
@@ -404,7 +476,8 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:layout_marginBottom="20dp">
 
                         <TextView
                             android:layout_width="match_parent"
@@ -421,7 +494,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:layout_marginTop="10dp"
+                            android:layout_marginTop="3dp"
                             android:layout_marginEnd="12dp"
                             android:text="No volunteer found!"
                             style="@style/CardDesc1"
@@ -470,7 +543,6 @@
                     </LinearLayout>
 
                 </LinearLayout>
-
 
             </androidx.core.widget.NestedScrollView>
 

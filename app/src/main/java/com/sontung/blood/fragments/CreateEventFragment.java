@@ -112,7 +112,7 @@ public class CreateEventFragment
                     binding.createEventLayout.setVisibility(View.GONE);
                     
                     Toast.makeText(requireContext(), "Hosted site ID: " + user.getHostedSite(), Toast.LENGTH_SHORT).show();
-                } else if (user.getUserRole().equals("donor")) {
+                } else if (user.getUserRole().equals("DONOR")) {
                     setupDonorView();
                 }
             }

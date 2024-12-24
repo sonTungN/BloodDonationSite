@@ -4,9 +4,12 @@
     <color name="pink">#FA6393</color>
 
     <color name="black">#FF000000</color>
+    <color name="darkGrey">#6C6F79</color>
     <color name="softGrayishBlue">#B5BBC6</color>
     <color name="mainBackgroundColor">#F4F8FB</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="polyline">#0f53ff</color>
 
     <color name="primary_200">#25A55F</color>
     <color name="primary_100">#9BDF46</color>

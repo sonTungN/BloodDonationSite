@@ -61,8 +61,13 @@ public class EventFragment extends Fragment {
         siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         binding = FragmentEventBinding.inflate(getLayoutInflater());
     }
-
-
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        setUpSiteRecyclerView();
+    }
+    
     // Setting up the search engine
     @SuppressLint("NotifyDataSetChanged")
     private void setUpSiteToViews(List<Site> sites) {

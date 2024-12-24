@@ -25,7 +25,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:background="@color/mainBackgroundColor"
             tools:context=".views.EventActivity">
+
             <include
                 android:id="@+id/toolbarId"
                 layout="@layout/toolbar"
@@ -39,7 +41,8 @@
                 app:tabIndicatorColor="@color/black"
                 app:tabRippleColor="@color/pink"
                 app:tabSelectedTextColor="@color/black"
-                app:tabTextAppearance="@style/TabText">
+                app:tabTextAppearance="@style/TabText"
+                android:background="@color/mainBackgroundColor">
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"

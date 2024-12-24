@@ -156,6 +156,7 @@ public class EventActivity extends AppCompatActivity {
                 startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_event) {
+                drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
                 
             } else if (menuItem.getItemId() == R.id.nav_my_event) {

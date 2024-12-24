@@ -180,26 +180,34 @@ public class SiteRepository {
                 .document(userId)
                 .get()
                 .addOnSuccessListener(userDocumentSnapshot -> {
-                    List<Site> registeredList = new ArrayList<>();
-                    
                     if (userDocumentSnapshot.exists()) {
                         User currentUser = userDocumentSnapshot.toObject(User.class);
                         
                         if (currentUser != null) {
                             List<String> listOfRegisteredSiteId = currentUser.getListOfRegisteredSites();
                             
+                            if (listOfRegisteredSiteId.isEmpty()) {
+                                userRegisteredSite.postValue(new ArrayList<>());
+                                return;
+                            }
+                            
+                            List<Site> registeredList = new ArrayList<>();
+                            AtomicInteger pendingRequest = new AtomicInteger(listOfRegisteredSiteId.size());
+                            
                             for (String siteId: listOfRegisteredSiteId) {
                                 siteCollection
                                         .document(siteId)
                                         .get()
                                         .addOnSuccessListener(siteDocumentSnapshot -> {
-                                            Site site;
-                                            
                                             if (siteDocumentSnapshot.exists()) {
-                                                site = siteDocumentSnapshot.toObject(Site.class);
-                                                registeredList.add(site);
-                                            } else {
-                                                Log.d("SITE", "Document not found!");
+                                                Site site = siteDocumentSnapshot.toObject(Site.class);
+                                                
+                                                if (site != null) {
+                                                    registeredList.add(site);
+                                                }
+                                            }
+                                            if (pendingRequest.decrementAndGet() == 0) {
+                                                userRegisteredSite.postValue(registeredList);
                                             }
                                         })
                                         .addOnFailureListener(e -> {
@@ -207,15 +215,15 @@ public class SiteRepository {
                                         
                                         });
                             }
-                            userRegisteredSite.postValue(registeredList);
-                            
                         } else {
                             Log.d("USER", "User is null");
+                            userRegisteredSite.postValue(new ArrayList<>());
                         }
                     }
                 })
                 .addOnFailureListener(e -> {
                     Log.e("USER: Register Site Fetch Error", Objects.requireNonNull(e.getMessage()));
+                    userRegisteredSite.postValue(new ArrayList<>());
                 });
         return userRegisteredSite;
     }

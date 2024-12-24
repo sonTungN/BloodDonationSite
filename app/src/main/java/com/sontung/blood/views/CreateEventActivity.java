@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.sontung.blood.R;
@@ -88,12 +90,13 @@ public class CreateEventActivity extends AppCompatActivity {
         drawerLayout = binding.drawer;
         navigationView = binding.navigationView;
         
-        binding.toolbarId.toolbarTitleId.setText("Create Site");
-        binding.toolbarId.backIcon.setVisibility(View.VISIBLE);
+        binding.toolbarId.toolbarTitleId.setText("Event Details");
+        binding.toolbarId.backIcon.setVisibility(View.GONE);
         
         View headerView = binding.navigationView.getHeaderView(0);
         TextView navName = headerView.findViewById(R.id.nav_name);
         TextView navEmail = headerView.findViewById(R.id.nav_email);
+        ImageView navProfileImg = headerView.findViewById(R.id.profile_image);
         drawerLayout.closeDrawer(GravityCompat.START);
         
         navigationView.bringToFront();
@@ -104,6 +107,10 @@ public class CreateEventActivity extends AppCompatActivity {
                 .observe(this, user -> {
                     navName.setText(user.getUsername());
                     navEmail.setText(user.getEmail());
+                    
+                    Glide.with(getApplicationContext())
+                            .load(user.getProfileUrl())
+                            .into(navProfileImg);
                 });
         
         ActionBarDrawerToggle drawerToggle =
@@ -129,31 +136,36 @@ public class CreateEventActivity extends AppCompatActivity {
         generalDrawerSetUp();
         navigationView.getMenu().clear();
         navigationView.inflateMenu(R.menu.general_menu);
-        navigationView.setCheckedItem(R.id.nav_create);
+        navigationView.setCheckedItem(R.id.nav_my_event);
         
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             if (menuItem.getItemId() == R.id.nav_home) {
                 Intent intent = new Intent(this, HomeActivity.class);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_event) {
                 Intent intent = new Intent(this, EventActivity.class);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
                 
-            } else if (menuItem.getItemId() == R.id.nav_create) {
-                return false;
+            } else if (menuItem.getItemId() == R.id.nav_my_event) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+                finish();
+                return true;
                 
             } else if (menuItem.getItemId() == R.id.nav_notification) {
                 Toast.makeText(this, "NOTIFICATION", Toast.LENGTH_SHORT).show();
                 drawerLayout.closeDrawer(GravityCompat.START);
                 
-            } else if (menuItem.getItemId() == R.id.nav_request) {
-                Toast.makeText(this, "REQUEST", Toast.LENGTH_SHORT).show();
-                drawerLayout.closeDrawer(GravityCompat.START);
-                
             } else if (menuItem.getItemId() == R.id.nav_profile) {
                 Intent intent = new Intent(this, ProfileActivity.class);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
+                
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+                Toast.makeText(this, "ABOUT US", Toast.LENGTH_SHORT).show();
+                drawerLayout.closeDrawer(GravityCompat.START);
                 
             } else if (menuItem.getItemId() == R.id.nav_logout) {
                 Intent intent = new Intent(this, OnBoardingActivity.class);
@@ -161,7 +173,7 @@ public class CreateEventActivity extends AppCompatActivity {
                 userViewModel.signOut();
                 startActivity(intent);
             }
-            return false;
+            return true;
         });
     }
     

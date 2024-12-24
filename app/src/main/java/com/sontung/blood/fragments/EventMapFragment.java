@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -89,8 +90,8 @@ public class EventMapFragment
     private SiteViewModel siteViewModel;
     private User currentUser;
     
-    private List<Site> userRegisteredSite = new ArrayList<>();
-    private List<Site> userVolunteerSite = new ArrayList<>();
+    private final List<Site> userRegisteredSite = new ArrayList<>();
+    private final List<Site> userVolunteerSite = new ArrayList<>();
     private Site userHostedSite;
     
     // Google map API
@@ -101,13 +102,10 @@ public class EventMapFragment
     private LocationRequest locRequest;
     private LocationCallback locCallback;
     
-    // Custom Marker
-    private LatLngBounds latLngBounds;
     private ClusterManager<CustomAdvancedMarker> customManager;
     private MarkerSetter markerRenderer;
     
-    private List<CustomAdvancedMarker> customAdvancedMarkers = new ArrayList<>();
-    private List<Marker> locationMarkers = new ArrayList<>();
+    private final List<CustomAdvancedMarker> customAdvancedMarkers = new ArrayList<>();
     
     // Polylines
     private List<MapPolyline> listOfMapPolyline = new ArrayList<>();
@@ -128,53 +126,8 @@ public class EventMapFragment
                 userViewModel.getUserDataById(
                         userViewModel.getCurrentUserId()
                 ).getValue();
-//
-//        if (currentUser == null) {
-//            Toast.makeText(requireContext(), "USER: currentUser is null", Toast.LENGTH_SHORT).show();
-//        }
         
-        userViewModel
-                .getUserDataById(userViewModel.getCurrentUserId())
-                .observe(this, user -> {
-                    currentUser = user;
-                });
-        
-        siteViewModel
-                .getUserRegisteredSite(userViewModel.getCurrentUserId())
-                .observe(this, sites -> {
-                    if (sites != null) {
-                        userRegisteredSite.clear();
-                        userRegisteredSite.addAll(sites);
-                        
-                        markAllSiteFromList(map, userRegisteredSite);
-                    } else {
-                        Log.d("MAP", "Failed to get registered site!");
-                    }
-                });
-        
-        siteViewModel
-                .getUserVolunteerSite(userViewModel.getCurrentUserId())
-                .observe(this, sites -> {
-                    if (sites != null) {
-                        userVolunteerSite.clear();
-                        userVolunteerSite.addAll(sites);
-                        
-                        markAllSiteFromList(map, userVolunteerSite);
-                    } else {
-                        Log.d("MAP", "Failed to get volunteer site!");
-                    }
-                });
-        
-        siteViewModel
-                .getUserHostedSite(userViewModel.getCurrentUserId())
-                .observe(this, sites -> {
-                    if (sites != null) {
-                        userHostedSite = sites;
-                        markAllSiteFromList(map, List.of(userHostedSite));
-                    } else {
-                        Log.d("MAP", "Failed to get hosted site!");
-                    }
-                });
+        fetchAllSiteIntoMap();
         
         locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
         
@@ -219,6 +172,7 @@ public class EventMapFragment
     public void onResume() {
         super.onResume();
         startUpdatingLocation();
+        fetchAllSiteIntoMap();
     }
     
     @Override
@@ -253,30 +207,61 @@ public class EventMapFragment
     
     private void polylineClickHandler(Polyline polyline) {
         for (MapPolyline currentPolyline: listOfMapPolyline) {
-            
             if (polyline.getId().equals(currentPolyline.getPolyline().getId())) {
                 currentPolyline
                         .getPolyline()
                         .setColor(
-                                ContextCompat.getColor (
-                                        requireActivity(),
-                                        R.color.purple_500
-                                )
+                                ContextCompat.getColor(requireActivity(), R.color.polyline)
                         );
                 currentPolyline.getPolyline().setZIndex(1);
-                
                 binding.duration.setText(currentPolyline.getDirectionsLeg().duration.toString());
                 
             } else {
                 currentPolyline.getPolyline().setColor(
-                        ContextCompat.getColor (
-                                requireActivity(),
-                                R.color.softGrayishBlue
-                        )
+                        ContextCompat.getColor(requireActivity(), R.color.purple_500)
                 );
                 currentPolyline.getPolyline().setZIndex(0);
             }
         }
+    }
+    
+    private void fetchAllSiteIntoMap() {
+        siteViewModel
+                .getUserRegisteredSite(userViewModel.getCurrentUserId())
+                .observe(this, sites -> {
+                    if (sites != null) {
+                        userRegisteredSite.clear();
+                        userRegisteredSite.addAll(sites);
+
+                        markAllSiteFromList(map, userRegisteredSite);
+                    } else {
+                        Log.d("MAP", "Failed to get registered site!");
+                    }
+                });
+        
+//        siteViewModel
+//                .getUserVolunteerSite(userViewModel.getCurrentUserId())
+//                .observe(this, sites -> {
+//                    if (sites != null) {
+//                        userVolunteerSite.clear();
+//                        userVolunteerSite.addAll(sites);
+//
+//                        markAllSiteFromList(map, userVolunteerSite);
+//                    } else {
+//                        Log.d("MAP", "Failed to get volunteer site!");
+//                    }
+//                });
+        
+        siteViewModel
+                .getUserHostedSite(userViewModel.getCurrentUserId())
+                .observe(this, sites -> {
+                    if (sites != null) {
+                        userHostedSite = sites;
+                        markAllSiteFromList(map, List.of(userHostedSite));
+                    } else {
+                        Log.d("MAP", "Failed to get hosted site!");
+                    }
+                });
     }
     
     @SuppressLint("SetTextI18n")
@@ -290,62 +275,88 @@ public class EventMapFragment
             customManager.setRenderer(markerRenderer);
         }
         
-        // Adding Markers into Marker Manager
-        for (Site site: siteList) {
-            String hostEmail =
-                    Objects.requireNonNull(
-                            userViewModel.getUserDataById(site.getHost()
-                            ).getValue()
-                    ).getEmail();
-            double latValue = Double.parseDouble(site.getLatitude());
-            double longValue = Double.parseDouble(site.getLongitude());
-            
-            CustomAdvancedMarker marker =
-                    CustomAdvancedMarker.builder()
-                            .site(site)
-                            .iconPic(R.drawable.ic_bloodtype_icon)
-                            .title(site.getSiteName())
-                            .snippet(hostEmail)
-                            .position(new LatLng(latValue, longValue))
-                            .build();
-            
-            customManager.addItem(marker);
-            customAdvancedMarkers.add(marker);
-        }
-        
-        LatLng coordinates = Coordinates.RMIT;
-        CustomAdvancedMarker myMarker =
-                CustomAdvancedMarker.builder()
-                        .site(null)
-                        .iconPic(R.drawable.ic_location_icon)
-                        .title(currentUser.getUsername())
-                        .snippet(currentUser.getEmail())
-                        .position(coordinates)
-                        .build();
-        
-        customManager.addItem(myMarker);
-        customAdvancedMarkers.add(myMarker);
-        customManager.cluster();
-        customManager.setOnClusterItemClickListener(marker -> {
-            if (marker.getSite() == null) {
-                binding.siteName.setText("CURRENT LOCATION");
-                binding.siteAddress.setText(Coordinates.RMIT_ADDRESS);
-                renderSiteDetailIntoView(false);
+        userViewModel.getCurrentUser().observe(this, user -> {
+            for (Site site: siteList) {
+                String hostEmail =
+                        Objects.requireNonNull(
+                                userViewModel.getUserDataById(site.getHost()).getValue()
+                        ).getEmail();
+                double latValue = Double.parseDouble(site.getLatitude());
+                double longValue = Double.parseDouble(site.getLongitude());
                 
-            } else {
-                getSiteDistance(marker);
-                binding.siteName.setText(marker.getSite().getSiteName());
-                binding.siteAddress.setText(marker.getSite().getSiteAddress());
+                int markerIcon = 0;
+                if (site.getHost().equals(userViewModel.getCurrentUserId())) {
+                    markerIcon = R.drawable.ic_admin_icon;
+                    
+                } else if (isUserRegistered(site, user)) {
+                    markerIcon = R.drawable.ic_donor_icon;
+                    
+                } else if (isUserVolunteered(site, user)) {
+                    markerIcon = R.drawable.ic_volunteer_icon;
+                    
+                } else {
+                    markerIcon = R.drawable.icon_blood_type;
+                }
                 
-                setUpImageSlider(marker.getSite().getSiteImageUrl());
-                setUpDetailBtnClicked(marker.getSite());
-                renderSiteDetailIntoView(true);
+                CustomAdvancedMarker marker =
+                        CustomAdvancedMarker.builder()
+                                .site(site)
+                                .iconPic(markerIcon)
+                                .title(site.getSiteName())
+                                .snippet(hostEmail)
+                                .position(new LatLng(latValue, longValue))
+                                .build();
+                
+                customManager.addItem(marker);
+                customAdvancedMarkers.add(marker);
             }
-            
-            return false;
         });
         
-        setCameraViewToUserCurrentLocation();
+        LatLng coordinates = Coordinates.RMIT;
+        userViewModel.getCurrentUser().observe(this, user -> {
+            CustomAdvancedMarker myMarker =
+                    CustomAdvancedMarker.builder()
+                            .site(null)
+                            .iconPic(R.drawable.ic_location_icon)
+                            .title(user.getUsername())
+                            .snippet(user.getEmail())
+                            .position(coordinates)
+                            .build();
+            
+            customManager.addItem(myMarker);
+            customAdvancedMarkers.add(myMarker);
+            customManager.cluster();
+            customManager.setOnClusterItemClickListener(marker -> {
+                if (marker.getSite() == null) {
+                    binding.siteName.setText("YOUR LOCATION");
+                    binding.siteAddress.setText(Coordinates.RMIT_ADDRESS);
+                    renderSiteDetailIntoView(false);
+                    
+                } else {
+                    getSiteDistance(marker);
+                    binding.siteName.setText(marker.getSite().getSiteName());
+                    binding.siteAddress.setText("Location: " + marker.getSite().getSiteAddress());
+                    
+                    setUpImageSlider(marker.getSite().getSiteImageUrl());
+                    setUpDetailBtnClicked(marker.getSite());
+                    renderSiteDetailIntoView(true);
+                }
+                
+                return false;
+            });
+            
+            setCameraViewToUserCurrentLocation();
+        });
+    }
+    
+    private boolean isUserRegistered(Site site, User user) {
+        return site.getListOfDonors() != null &&
+                site.getListOfDonors().contains(user.getUserId());
+    }
+    
+    private boolean isUserVolunteered(Site site, User user) {
+        return site.getListOfVolunteers() != null &&
+                site.getListOfVolunteers().contains(user.getUserId());
     }
     
     private void renderSiteDetailIntoView (boolean isDetailVisible) {
@@ -379,7 +390,7 @@ public class EventMapFragment
     }
     
     private void setCameraViewToUserCurrentLocation() {
-        latLngBounds = new LatLngBounds(
+        LatLngBounds latLngBounds = new LatLngBounds(
                 new LatLng(Coordinates.BOTTOM_BOUND, Coordinates.LEFT_BOUND),
                 new LatLng(Coordinates.TOP_BOUND, Coordinates.RIGHT_BOUND)
         );
@@ -402,7 +413,7 @@ public class EventMapFragment
         
         directions
                 .destination(location)
-                .setCallback(new PendingResult.Callback<DirectionsResult>() {
+                .setCallback(new PendingResult.Callback<>() {
                     @Override
                     public void onResult(DirectionsResult result) {
                         addPolylinesForLocationToMap(result);
@@ -449,7 +460,7 @@ public class EventMapFragment
                                         .polyline(poly)
                                         .directionsLeg(route.legs[0])
                                         .build();
-                                
+                        
                         listOfMapPolyline.add(mapPolyline);
                         
                         double checkDuration = route.legs[0].duration.inSeconds;
@@ -463,12 +474,10 @@ public class EventMapFragment
     }
     
     private void zoomRoute(List<LatLng> route, int padding, int duration) {
-        // Validate map and route input
         if (map == null || route == null || route.isEmpty()) {
-            return; // Exit if map or route is invalid
+            return;
         }
         
-        // Create bounds builder and include all points in the route
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
         for (LatLng point : route) {
             boundsBuilder.include(point);

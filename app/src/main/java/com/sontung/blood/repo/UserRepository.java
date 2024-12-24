@@ -38,8 +38,6 @@ public class UserRepository {
     
     private final MutableLiveData<User> userData = new MutableLiveData<>();
     private final MutableLiveData<User> currentUserData = new MutableLiveData<>();
-    
-    public static final MediaType JSON = MediaType.get("application/json");
 
     public UserRepository(Context context) {
         this.context = context;
@@ -79,58 +77,6 @@ public class UserRepository {
                     Toast.makeText(context, "Register Status: FAILED", Toast.LENGTH_SHORT).show();
                 });
     }
-
-    /*
-    public void signUpUserWithEmailAndPassword(
-            final String email,
-            final String password,
-            final String displayName,
-            final String bloodType
-    ) {
-            firebaseAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(task -> {
-                        currentUser = firebaseAuth.getCurrentUser();
-                        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
-                                .setDisplayName(displayName)
-                                .build();
-
-                        if (currentUser != null) {
-                            currentUser.updateProfile(profileUpdate)
-                                    .addOnCompleteListener(updateTask -> {
-                                        if (!updateTask.isSuccessful()) {
-                                            Log.d("REGISTER", "Register with display name failed");
-                                        }
-                                    });
-
-                            if (task.isSuccessful()) {
-                                String currentUserId = currentUser.getUid();
-                                User userObject =
-                                        User.builder()
-                                            .userId(currentUserId)
-                                            .username(displayName)
-                                            .email(email)
-                                            .password(password)
-                                            .bloodType(bloodType)
-                                            .build();
-
-                                userCollection
-                                        .document(currentUserId)
-                                        .set(userObject);
-
-                                Intent intent = new Intent(context, SignInActivity.class)
-                                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                context.startActivity(intent);
-
-                                Toast.makeText(context, "Register Status: SUCCESS", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    })
-                    .addOnFailureListener(exception -> {
-                        Log.d("REGISTER", exception.getMessage() != null ? exception.getMessage() : "Error");
-                        Toast.makeText(context, "Register Status: FAILED", Toast.LENGTH_SHORT).show();
-                    });
-        }
-     */
         
     public void signInUserWithEmailAndPassword(String email, String password) {
         firebaseAuth
