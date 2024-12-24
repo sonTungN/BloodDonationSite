@@ -348,7 +348,6 @@
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="10dp"
                         android:layout_marginEnd="12dp"
-                        android:layout_marginBottom="40dp"
                         android:layout_height="200dp"
                         android:layout_gravity="bottom" />
 
@@ -369,6 +368,70 @@
                             android:layout_gravity="center"
                             android:indeterminate="true" />
                     </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="12dp"
+                            android:text="List of Donors"
+                            style="@style/CardHeading1"
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:id="@+id/not_found_donor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="12dp"
+                            android:text="No donors found!"
+                            style="@style/CardDesc1"
+                            tools:ignore="HardcodedText" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/donor_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="12dp"
+                            android:text="List of Volunteers"
+                            style="@style/CardHeading1"
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:id="@+id/not_found_volunteer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="12dp"
+                            android:text="No volunteer found!"
+                            style="@style/CardDesc1"
+                            tools:ignore="HardcodedText" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/volunteer_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"

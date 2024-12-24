@@ -4,13 +4,8 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,11 +15,11 @@ import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
 import com.sontung.blood.preference.LocalStorageManager;
 import com.sontung.blood.shared.Paths;
-import com.sontung.blood.viewmodel.UserViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SiteRepository {
     private final Context context;
@@ -36,6 +31,9 @@ public class SiteRepository {
     private LocalStorageManager manager;
     
     private final MutableLiveData<Site> siteData = new MutableLiveData<>();
+    private final MutableLiveData<List<User>> allVolunteer = new MutableLiveData<>();
+    private final MutableLiveData<List<User>> allDonor = new MutableLiveData<>();
+    
     private final MutableLiveData<List<Site>> allSiteListData = new MutableLiveData<>();
     
     private final MutableLiveData<List<Site>> userRegisteredSite = new MutableLiveData<>();
@@ -70,6 +68,88 @@ public class SiteRepository {
                 });
                 
         return allSiteListData;
+    }
+    
+    public MutableLiveData<List<User>> getSiteVolunteerList(String siteId) {
+        siteCollection
+                .document(siteId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    Site targetSite = documentSnapshot.toObject(Site.class);
+                    if (targetSite == null || targetSite.getListOfVolunteers().isEmpty()) {
+                        allVolunteer.setValue(new ArrayList<>());
+                        return;
+                    }
+                    
+                    AtomicInteger pendingRequests = new AtomicInteger(targetSite.getListOfVolunteers().size());
+                    List<User> volunteerList = new ArrayList<>();
+                    
+                    for (String volunteerId: targetSite.getListOfVolunteers()) {
+                        userCollection
+                                .document(volunteerId)
+                                .get()
+                                .addOnSuccessListener(userSnapshot -> {
+                                    if(userSnapshot.exists()) {
+                                        User volunteer = userSnapshot.toObject(User.class);
+                                        volunteerList.add(volunteer);
+                                    }
+                                    
+                                    if (pendingRequests.decrementAndGet() == 0) {
+                                        allVolunteer.setValue(volunteerList);
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.d("VOLUNTEER", "Can't load volunteer from site");
+                                    allVolunteer.setValue(new ArrayList<>());
+                                });
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("VOLUNTEER", "Can't get site required");
+                });
+        
+        return allVolunteer;
+    }
+    
+    public MutableLiveData<List<User>> getSiteDonorList(String siteId) {
+        siteCollection
+                .document(siteId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    Site targetSite = documentSnapshot.toObject(Site.class);
+                    if (targetSite == null || targetSite.getListOfDonors().isEmpty()) {
+                        allDonor.setValue(new ArrayList<>());
+                        return;
+                    }
+                    
+                    AtomicInteger pendingRequests = new AtomicInteger(targetSite.getListOfDonors().size());
+                    List<User> donorList = new ArrayList<>();
+                    
+                    for (String donorId: targetSite.getListOfDonors()) {
+                        userCollection
+                                .document(donorId)
+                                .get()
+                                .addOnSuccessListener(userSnapshot -> {
+                                    if(userSnapshot.exists()) {
+                                        User donor = userSnapshot.toObject(User.class);
+                                        donorList.add(donor);
+                                    }
+                                    
+                                    if (pendingRequests.decrementAndGet() == 0) {
+                                        allDonor.setValue(donorList);
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.d("DONOR", "Can't load donor from site");
+                                    allDonor.setValue(new ArrayList<>());
+                                });
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("DONOR", "Can't get site required");
+                });
+        
+        return allDonor;
     }
     
     public MutableLiveData<Site> getSiteDataById(String siteId) {

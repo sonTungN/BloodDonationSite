@@ -4,6 +4,8 @@ import static android.content.ContentValues.TAG;
 
 import static androidx.core.content.ContentProviderCompat.requireContext;
 
+import static java.security.AccessController.getContext;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -27,6 +29,8 @@ import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,15 +44,19 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.sontung.blood.R;
+import com.sontung.blood.adapter.DonorCardAdapter;
 import com.sontung.blood.adapter.MultipleImageAdapter;
+import com.sontung.blood.adapter.VolunteerCardAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityEventDetailBinding;
 import com.sontung.blood.model.Site;
+import com.sontung.blood.model.User;
 import com.sontung.blood.utils.DateFormatter;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -70,6 +78,15 @@ public class EventDetailActivity extends AppCompatActivity {
     // ViewPager with DotIndicator
     private ViewPager2 viewPager2;
     private DotsIndicator indicator;
+    
+    // RecyclerView
+    private RecyclerView volunteerRecyclerView;
+    private List<User> volunteerList;
+    private VolunteerCardAdapter volunteerAdapter;
+    
+    private RecyclerView donorRecyclerView;
+    private List<User> donorList;
+    private DonorCardAdapter donorAdapter;
     
     // Navbar
     private DrawerLayout drawerLayout;
@@ -100,6 +117,7 @@ public class EventDetailActivity extends AppCompatActivity {
         setUpInitialStage();
         fetchSiteDetailIntoViews(siteId);
         setUpOnButtonClickListener();
+        setUpRecyclerView();
         
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -112,17 +130,72 @@ public class EventDetailActivity extends AppCompatActivity {
         binding.volunteerApplyBtn.setOnClickListener(view -> volunteerApply());
     }
     
+    private void setUpRecyclerView() {
+        setUpVolunteerRecyclerView();
+        setUpDonorRecyclerView();
+    }
+    
+    @SuppressLint("NotifyDataSetChanged")
+    private void setUpDonorRecyclerView() {
+        donorRecyclerView = binding.donorRecyclerView;
+        donorRecyclerView.setLayoutManager(
+                new LinearLayoutManager(
+                        getApplicationContext(),
+                        LinearLayoutManager.VERTICAL,
+                        false)
+        );
+        donorRecyclerView.hasFixedSize();
+        donorList = new ArrayList<>();
+        
+        siteViewModel.getSiteDonorList(siteId).observe(this, users -> {
+            donorList.clear();
+            donorList.addAll(users);
+            
+            if (donorList.isEmpty()) {
+                binding.notFoundDonor.setVisibility(View.VISIBLE);
+            } else {
+                binding.notFoundDonor.setVisibility(View.GONE);
+            }
+            
+            donorAdapter = new DonorCardAdapter(getApplicationContext(), donorList);
+            donorRecyclerView.setAdapter(donorAdapter);
+            donorAdapter.notifyDataSetChanged();
+        });
+    }
+    
+    @SuppressLint("NotifyDataSetChanged")
+    private void setUpVolunteerRecyclerView() {
+        volunteerRecyclerView = binding.volunteerRecyclerView;
+        volunteerRecyclerView.setLayoutManager(
+                new LinearLayoutManager(
+                        getApplicationContext(),
+                        LinearLayoutManager.VERTICAL,
+                        false)
+        );
+        volunteerRecyclerView.hasFixedSize();
+        volunteerList = new ArrayList<>();
+        
+        siteViewModel.getSiteVolunteerList(siteId).observe(this, users -> {
+            volunteerList.clear();
+            volunteerList.addAll(users);
+            
+            if (volunteerList.isEmpty()) {
+                binding.notFoundVolunteer.setVisibility(View.VISIBLE);
+            } else {
+                binding.notFoundVolunteer.setVisibility(View.GONE);
+            }
+            
+            volunteerAdapter = new VolunteerCardAdapter(getApplicationContext(), volunteerList);
+            volunteerRecyclerView.setAdapter(volunteerAdapter);
+            volunteerAdapter.notifyDataSetChanged();
+        });
+    }
+    
+    //----------------------------------------SET UP APPLY BUTTON-----------------------------------
     private void donorApply() {
         String currentUserId = userViewModel.getCurrentUserId();
-        
         siteViewModel.getSiteDataById(siteId).observe(this, site -> {
-            
             userViewModel.getUserDataById(currentUserId).observe(this, user -> {
-                if (!site.getRequiredBloodType().equals(user.getBloodType())) {
-                    Toast.makeText(this, "Your blood type does not match the requirement!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                
                 siteViewModel.addUserIntoSiteRegisteredList(currentUserId, site.getSiteId(), new FirebaseCallback<>() {
                     @Override
                     public void onSuccess(List<Boolean> t) {
@@ -143,6 +216,7 @@ public class EventDetailActivity extends AppCompatActivity {
                                 Toast.makeText(EventDetailActivity.this, "Successfully registered as donor", Toast.LENGTH_SHORT).show();
                                 setApplyButtonState(binding.donorApplyBtn, false);
                                 binding.donorApplyBtn.setText("Already Donor");
+                                siteViewModel.getSiteDonorList(siteId);
                             }
                             
                             @Override
@@ -173,7 +247,6 @@ public class EventDetailActivity extends AppCompatActivity {
     
     private void volunteerApply() {
         String currentUserId = userViewModel.getCurrentUserId();
-        
         siteViewModel.getSiteDataById(siteId).observe(this, site -> {
             userViewModel.getUserDataById(currentUserId).observe(this, user -> {
                 siteViewModel.addUserIntoSiteVolunteerList(currentUserId, site.getSiteId(), new FirebaseCallback<>() {
@@ -196,6 +269,7 @@ public class EventDetailActivity extends AppCompatActivity {
                                 Toast.makeText(EventDetailActivity.this, "Successfully registered as volunteer", Toast.LENGTH_SHORT).show();
                                 setApplyButtonState(binding.volunteerApplyBtn, false);
                                 binding.volunteerApplyBtn.setText("Already Volunteer");
+                                siteViewModel.getSiteVolunteerList(siteId);
                             }
                             
                             @Override
@@ -224,6 +298,7 @@ public class EventDetailActivity extends AppCompatActivity {
         });
     }
     
+    //----------------------------------------SET UP VIEW-------------------------------------------
     @SuppressLint("SetTextI18n")
     private void setUpInitialStage() {
         String currentUserId = userViewModel.getCurrentUserId();
@@ -234,10 +309,17 @@ public class EventDetailActivity extends AppCompatActivity {
         binding.volunteerApplyBtn.setText("Volunteer Apply");
         
         siteViewModel.getSiteDataById(siteId).observe(this, site -> {
+            userViewModel.getCurrentUser().observe(this, user -> {
+                if (!site.getRequiredBloodType().equals(user.getBloodType())) {
+                    setApplyButtonState(binding.donorApplyBtn, false);
+                    binding.donorApplyBtn.setText("BLOOD TYPE MISMATCH");
+                }
+            });
+            
+            
             if (Objects.equals(site.getHost(), currentUserId)) {
                 setApplyButtonState(binding.donorApplyBtn, false);
                 binding.donorApplyBtn.setText("You are Host");
-                return;
             }
             
             if (site.getListOfDonors().contains(currentUserId)) {
@@ -263,10 +345,6 @@ public class EventDetailActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-    
-    private void setApplyButtonState(View view, boolean isEnable) {
-        view.setEnabled(isEnable);
     }
     
     private void fetchSiteDetailIntoViews(String siteId) {
@@ -299,6 +377,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 });
     }
     
+    //----------------------------------------SET UP MAP FRAGMENT-----------------------------------
     private void setUpMapFragment() {
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         
@@ -306,7 +385,7 @@ public class EventDetailActivity extends AppCompatActivity {
             if (mapPanel == null || mapPanel.getVisibility() == View.GONE) {
                 mapPanel = ((ViewStub) findViewById(R.id.stub_map)).inflate();
             }
-
+            
             GoogleMapOptions options = new GoogleMapOptions();
             options.mapToolbarEnabled(false);
             
@@ -344,6 +423,11 @@ public class EventDetailActivity extends AppCompatActivity {
         if (mapPanel.getVisibility() == View.GONE) {
             mapPanel.setVisibility(View.VISIBLE);
         }
+    }
+    
+    //----------------------------------------SET UP TOOL FUNCTIONS---------------------------------
+    private void setApplyButtonState(View view, boolean isEnable) {
+        view.setEnabled(isEnable);
     }
     
     @SuppressLint("SetTextI18n")

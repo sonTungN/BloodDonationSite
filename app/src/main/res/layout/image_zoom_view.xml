@@ -6,6 +6,6 @@
     <ImageView
         android:id="@+id/imageZoomId"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_300sdp"
+        android:layout_height="400dp"
         android:scaleType="centerCrop" />
 </LinearLayout>

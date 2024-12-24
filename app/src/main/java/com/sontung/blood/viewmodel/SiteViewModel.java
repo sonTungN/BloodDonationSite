@@ -1,19 +1,17 @@
 package com.sontung.blood.viewmodel;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.firebase.firestore.FieldValue;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.model.Site;
+import com.sontung.blood.model.User;
 import com.sontung.blood.repo.SiteRepository;
 
 import java.util.List;
-import java.util.Objects;
 
 public class SiteViewModel extends AndroidViewModel {
     private final SiteRepository siteRepository;
@@ -29,6 +27,14 @@ public class SiteViewModel extends AndroidViewModel {
     
     public MutableLiveData<Site> getSiteDataById(String siteId) {
         return siteRepository.getSiteDataById(siteId);
+    }
+    
+    public MutableLiveData<List<User>> getSiteVolunteerList(String siteId) {
+        return siteRepository.getSiteVolunteerList(siteId);
+    }
+    
+    public MutableLiveData<List<User>> getSiteDonorList(String siteId) {
+        return siteRepository.getSiteDonorList(siteId);
     }
     
     public MutableLiveData<List<Site>> getUserRegisteredSite(String userId) {
