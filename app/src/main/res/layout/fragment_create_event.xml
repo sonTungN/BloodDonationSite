@@ -356,12 +356,6 @@
                     android:inflatedId="@+id/panel_map"
                     android:layout="@layout/displaying_map" />
 
-                <!--                <ViewStub-->
-                <!--                    android:id="@+id/mapStub"-->
-                <!--                    android:layout_width="match_parent"-->
-                <!--                    android:layout_height="200dp"-->
-                <!--                    android:layout="@layout/displaying_map" />-->
-
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/createSiteButton"
                     android:layout_width="match_parent"

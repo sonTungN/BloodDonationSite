@@ -62,7 +62,7 @@ public class CreateEventFragment
         extends Fragment
         implements ImageAdapter.OnItemCountAfterDelete, ImageAdapter.OnItemZoom {
     
-    private FragmentCreateEventBinding fragmentCreateSiteBinding;
+    private FragmentCreateEventBinding binding;
     private UserViewModel userViewModel;
     private SiteViewModel siteViewModel;
     private ImageViewModel imageViewModel;
@@ -81,7 +81,7 @@ public class CreateEventFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentCreateSiteBinding = FragmentCreateEventBinding.inflate(getLayoutInflater());
+        binding = FragmentCreateEventBinding.inflate(getLayoutInflater());
         
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
@@ -95,8 +95,8 @@ public class CreateEventFragment
                              Bundle savedInstanceState) {
         
         inflater.inflate(R.layout.fragment_create_event, container, false);
-        fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.GONE);
-        fragmentCreateSiteBinding.createEventLayout.setVisibility(View.GONE);
+        binding.siteDisplayingText.setVisibility(View.GONE);
+        binding.createEventLayout.setVisibility(View.GONE);
 
 //        setUpAutoCompleteAddress();
         setUpInitialState();
@@ -106,13 +106,13 @@ public class CreateEventFragment
         
         imageAdapter = new ImageAdapter(requireContext(), this, this);
         imageAdapter.setData(imageUriList);
-        fragmentCreateSiteBinding.imageRecyclerView.setAdapter(imageAdapter);
+        binding.imageRecyclerView.setAdapter(imageAdapter);
         
         userViewModel.getCurrentUser().observe(getViewLifecycleOwner(), user -> {
             if (user != null) {
                 if (user.getHostedSite() != null) {
-                    fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.VISIBLE);
-                    fragmentCreateSiteBinding.createEventLayout.setVisibility(View.GONE);
+                    binding.siteDisplayingText.setVisibility(View.VISIBLE);
+                    binding.createEventLayout.setVisibility(View.GONE);
                     
                     Toast.makeText(requireContext(), "Hosted site ID: " + user.getHostedSite(), Toast.LENGTH_SHORT).show();
                 } else if (user.getUserRole().equals("donor")) {
@@ -121,12 +121,12 @@ public class CreateEventFragment
             }
         });
         
-        return fragmentCreateSiteBinding.getRoot();
+        return binding.getRoot();
     }
     
     private void setupDonorView() {
-        fragmentCreateSiteBinding.siteDisplayingText.setVisibility(View.GONE);
-        fragmentCreateSiteBinding.createEventLayout.setVisibility(View.VISIBLE);
+        binding.siteDisplayingText.setVisibility(View.GONE);
+        binding.createEventLayout.setVisibility(View.VISIBLE);
     }
     
     //----------------------------------------SET UP MAP VIEWS--------------------------------------
@@ -158,7 +158,7 @@ public class CreateEventFragment
         autoCompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                fragmentCreateSiteBinding.addressDisplay.setText(place.getAddress());
+                binding.addressDisplay.setText(place.getAddress());
                 coordinates = place.getLatLng();
                 showLocationOnMap(place);
             }
@@ -178,7 +178,7 @@ public class CreateEventFragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
         if (mapFragment == null) {
-            mapPanel = fragmentCreateSiteBinding.stubMap.inflate();
+            mapPanel = binding.stubMap.inflate();
 
             GoogleMapOptions options = new GoogleMapOptions();
             options.mapToolbarEnabled(false);
@@ -228,7 +228,7 @@ public class CreateEventFragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         
         if (mapFragment == null) {
-            mapPanel = fragmentCreateSiteBinding.stubMap.inflate();
+            mapPanel = binding.stubMap.inflate();
             
             GoogleMapOptions options = new GoogleMapOptions();
             options.mapToolbarEnabled(false);
@@ -270,7 +270,7 @@ public class CreateEventFragment
     //----------------------------------------SET UP VIEWS------------------------------------------
     private void setUpBloodTypeSpinner() {
         // Spinner
-        Spinner bloodTypeSpinner = fragmentCreateSiteBinding.bloodTypeSpinner;
+        Spinner bloodTypeSpinner = binding.bloodTypeSpinner;
         ArrayAdapter<CharSequence> bloodTypesAdapter = ArrayAdapter.createFromResource(
                 requireContext(),
                 R.array.blood_types,
@@ -283,7 +283,7 @@ public class CreateEventFragment
     }
     
     private void setUpAddressSpinner() {
-        Spinner addressSpinner = fragmentCreateSiteBinding.addressSpinner;
+        Spinner addressSpinner = binding.addressSpinner;
         
         ArrayAdapter<String> addressAdapter = new ArrayAdapter<>(
                 requireContext(),
@@ -301,7 +301,7 @@ public class CreateEventFragment
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Address selectedAddress = addressList.get(position);
                 coordinates = selectedAddress.getCoordinates();
-                fragmentCreateSiteBinding.addressDisplay.setText(selectedAddress.getName());
+                binding.addressDisplay.setText(selectedAddress.getName());
                 
                 if (map != null) {
                     updateMapWithCoordinates(coordinates);
@@ -317,8 +317,8 @@ public class CreateEventFragment
     }
     
     private void setUpButtonClickHandler() {
-        fragmentCreateSiteBinding.addImageBtn.setOnClickListener(v -> openFile());
-        fragmentCreateSiteBinding.createSiteButton.setOnClickListener(v -> createSite());
+        binding.addImageBtn.setOnClickListener(v -> openFile());
+        binding.createSiteButton.setOnClickListener(v -> createSite());
     }
     
     //----------------------------------------SET UP CREATE SITE------------------------------------
@@ -327,46 +327,46 @@ public class CreateEventFragment
         int invalidCount = 0;
         
         // Get input values
-        String siteName = fragmentCreateSiteBinding.createSiteName.getText().toString();
-        String siteDesc = fragmentCreateSiteBinding.createSiteDesc.getText().toString();
-        String siteAddress = fragmentCreateSiteBinding.addressDisplay.getText().toString();
-        String volunteerCapText = fragmentCreateSiteBinding.volunteerCap.getText().toString();
-        String donorCapText = fragmentCreateSiteBinding.donorCap.getText().toString();
+        String siteName = binding.createSiteName.getText().toString();
+        String siteDesc = binding.createSiteDesc.getText().toString();
+        String siteAddress = binding.addressDisplay.getText().toString();
+        String volunteerCapText = binding.volunteerCap.getText().toString();
+        String donorCapText = binding.donorCap.getText().toString();
         
         if (!FieldValidation.isValidStringInRange(siteName, 6, 15)) {
-            turnOnErrorMessage(fragmentCreateSiteBinding.createSiteNameError, true);
+            turnOnErrorMessage(binding.createSiteNameError, true);
             invalidCount++;
         }
         
         if (!FieldValidation.isValidStringInRange(siteDesc, 0, 25)) {
-            turnOnErrorMessage(fragmentCreateSiteBinding.createSiteDescErr, true);
+            turnOnErrorMessage(binding.createSiteDescErr, true);
             invalidCount++;
         }
         
         if (siteAddress.isEmpty()) {
-            turnOnErrorMessage(fragmentCreateSiteBinding.createSiteAddressErr, true);
+            turnOnErrorMessage(binding.createSiteAddressErr, true);
             invalidCount++;
         }
         
         try {
             if (volunteerCapText.isEmpty()) {
-                turnOnErrorMessage(fragmentCreateSiteBinding.createVolunteerCapErr, true);
+                turnOnErrorMessage(binding.createVolunteerCapErr, true);
                 invalidCount++;
             } else {
                 int volunteerCap = Integer.parseInt(volunteerCapText);
                 if (!FieldValidation.isValidNumberInRange(volunteerCap, 1, 20)) {
-                    turnOnErrorMessage(fragmentCreateSiteBinding.createVolunteerCapErr, true);
+                    turnOnErrorMessage(binding.createVolunteerCapErr, true);
                     invalidCount++;
                 }
             }
             
             if (donorCapText.isEmpty()) {
-                turnOnErrorMessage(fragmentCreateSiteBinding.createDonorCapErr, true);
+                turnOnErrorMessage(binding.createDonorCapErr, true);
                 invalidCount++;
             } else {
                 int donorCap = Integer.parseInt(donorCapText);
                 if (!FieldValidation.isValidNumberInRange(donorCap, 1, 20)) {
-                    turnOnErrorMessage(fragmentCreateSiteBinding.createDonorCapErr, true);
+                    turnOnErrorMessage(binding.createDonorCapErr, true);
                     invalidCount++;
                 }
             }
@@ -387,12 +387,12 @@ public class CreateEventFragment
         Site pendingCreatedSite =
                 Site.builder()
                         .host(userViewModel.getCurrentUserId())
-                        .siteName(fragmentCreateSiteBinding.createSiteName.getText().toString())
-                        .siteDesc(fragmentCreateSiteBinding.createSiteDesc.getText().toString())
-                        .siteAddress(fragmentCreateSiteBinding.addressDisplay.getText().toString())
-                        .requiredBloodType(fragmentCreateSiteBinding.bloodTypeSpinner.getSelectedItem().toString())
-                        .donorMaxCapacity(Integer.parseInt(fragmentCreateSiteBinding.donorCap.getText().toString()))
-                        .volunteerMaxCapacity(Integer.parseInt(fragmentCreateSiteBinding.volunteerCap.getText().toString()))
+                        .siteName(binding.createSiteName.getText().toString())
+                        .siteDesc(binding.createSiteDesc.getText().toString())
+                        .siteAddress(binding.addressDisplay.getText().toString())
+                        .requiredBloodType(binding.bloodTypeSpinner.getSelectedItem().toString())
+                        .donorMaxCapacity(Integer.parseInt(binding.donorCap.getText().toString()))
+                        .volunteerMaxCapacity(Integer.parseInt(binding.volunteerCap.getText().toString()))
                         .latitude(String.valueOf(coordinates.latitude))
                         .longitude(String.valueOf(coordinates.longitude))
                         .build();
@@ -489,28 +489,28 @@ public class CreateEventFragment
                                 
                                 imageAdapter.setData(imageUriList);
                                 if (!imageUriList.isEmpty()) {
-                                    fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.INVISIBLE);
+                                    binding.defaultImageLayout.setVisibility(View.INVISIBLE);
                                 } else {
-                                    fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.VISIBLE);
+                                    binding.defaultImageLayout.setVisibility(View.VISIBLE);
                                 }
                                 
-                                fragmentCreateSiteBinding.imageCount.setText(imageUriList.size() + "/3");
+                                binding.imageCount.setText(imageUriList.size() + "/3");
                             }
                         }
                     });
     
     //----------------------------------------SET UP TOOLS FUNCTION---------------------------------
     private void setUpInitialState() {
-        fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.VISIBLE);
+        binding.defaultImageLayout.setVisibility(View.VISIBLE);
         clearErrorMessage();
     }
     
     private void clearErrorMessage() {
-        turnOnErrorMessage(fragmentCreateSiteBinding.createSiteNameError, false);
-        turnOnErrorMessage(fragmentCreateSiteBinding.createSiteDescErr, false);
-        turnOnErrorMessage(fragmentCreateSiteBinding.createVolunteerCapErr, false);
-        turnOnErrorMessage(fragmentCreateSiteBinding.createDonorCapErr, false);
-        turnOnErrorMessage(fragmentCreateSiteBinding.createSiteAddressErr, false);
+        turnOnErrorMessage(binding.createSiteNameError, false);
+        turnOnErrorMessage(binding.createSiteDescErr, false);
+        turnOnErrorMessage(binding.createVolunteerCapErr, false);
+        turnOnErrorMessage(binding.createDonorCapErr, false);
+        turnOnErrorMessage(binding.createSiteAddressErr, false);
     }
     
     private void turnOnErrorMessage(View view, Boolean isError) {
@@ -525,12 +525,12 @@ public class CreateEventFragment
     @SuppressLint("SetTextI18n")
     @Override
     public void clickDelete(int leftNum) {
-        fragmentCreateSiteBinding.imageCount.setText(leftNum + "/3");
+        binding.imageCount.setText(leftNum + "/3");
         
         if (imageUriList.isEmpty()) {
-            fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.VISIBLE);
+            binding.defaultImageLayout.setVisibility(View.VISIBLE);
         } else {
-            fragmentCreateSiteBinding.defaultImageLayout.setVisibility(View.INVISIBLE);
+            binding.defaultImageLayout.setVisibility(View.INVISIBLE);
         }
     }
     

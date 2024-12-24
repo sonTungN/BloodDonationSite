@@ -6,12 +6,14 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.sontung.blood.R;
 import com.sontung.blood.databinding.ItemHorizontalCardBinding;
+import com.sontung.blood.fragments.CreateReportFragment;
 import com.sontung.blood.model.User;
 
 import java.util.List;
@@ -19,10 +21,12 @@ import java.util.List;
 public class DonorCardAdapter extends RecyclerView.Adapter<DonorCardAdapter.ViewHolder> {
     private final Context context;
     private final List<User> listOfDonors;
+    private final String siteId;
     
-    public DonorCardAdapter(Context context, List<User> listOfDonors) {
+    public DonorCardAdapter(Context context, List<User> listOfDonors, String siteId) {
         this.context = context;
         this.listOfDonors = listOfDonors;
+        this.siteId = siteId;
     }
     
     @NonNull
@@ -68,7 +72,16 @@ public class DonorCardAdapter extends RecyclerView.Adapter<DonorCardAdapter.View
                 int pos = getAbsoluteAdapterPosition();
                 
                 String userId = listOfDonors.get(pos).getUserId();
-                Toast.makeText(context, "Donors IO:" + userId, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "DonorId:" + userId, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "SiteId: " + siteId, Toast.LENGTH_SHORT).show();
+                
+                if (context instanceof AppCompatActivity) {
+                    CreateReportFragment fragment = CreateReportFragment.newInstance(userId, siteId);
+                    fragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "CreateReportFragment");
+                    
+                } else {
+                    Toast.makeText(context, "Context is not an AppCompatActivity", Toast.LENGTH_SHORT).show();
+                }
             });
         }
     }

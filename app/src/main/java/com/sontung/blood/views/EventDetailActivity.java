@@ -140,7 +140,7 @@ public class EventDetailActivity extends AppCompatActivity {
         donorRecyclerView = binding.donorRecyclerView;
         donorRecyclerView.setLayoutManager(
                 new LinearLayoutManager(
-                        getApplicationContext(),
+                        this,
                         LinearLayoutManager.VERTICAL,
                         false)
         );
@@ -157,7 +157,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 binding.notFoundDonor.setVisibility(View.GONE);
             }
             
-            donorAdapter = new DonorCardAdapter(getApplicationContext(), donorList);
+            donorAdapter = new DonorCardAdapter(this, donorList, siteId);
             donorRecyclerView.setAdapter(donorAdapter);
             donorAdapter.notifyDataSetChanged();
         });
@@ -185,7 +185,7 @@ public class EventDetailActivity extends AppCompatActivity {
                 binding.notFoundVolunteer.setVisibility(View.GONE);
             }
             
-            volunteerAdapter = new VolunteerCardAdapter(getApplicationContext(), volunteerList);
+            volunteerAdapter = new VolunteerCardAdapter(this, volunteerList);
             volunteerRecyclerView.setAdapter(volunteerAdapter);
             volunteerAdapter.notifyDataSetChanged();
         });

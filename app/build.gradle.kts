@@ -108,4 +108,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.11.0")
     // JSON & Server
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // Cardview for popup report
+    implementation("androidx.cardview:cardview:1.0.0")
 }
