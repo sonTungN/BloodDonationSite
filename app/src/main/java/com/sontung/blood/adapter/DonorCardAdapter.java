@@ -72,8 +72,6 @@ public class DonorCardAdapter extends RecyclerView.Adapter<DonorCardAdapter.View
                 int pos = getAbsoluteAdapterPosition();
                 
                 String userId = listOfDonors.get(pos).getUserId();
-//                Toast.makeText(context, "DonorId:" + userId, Toast.LENGTH_SHORT).show();
-//                Toast.makeText(context, "SiteId: " + siteId, Toast.LENGTH_SHORT).show();
                 
                 if (context instanceof AppCompatActivity) {
                     CreateReportFragment fragment = CreateReportFragment.newInstance(userId, siteId);

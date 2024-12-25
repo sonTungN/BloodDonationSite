@@ -166,10 +166,12 @@ public class SignUpActivity
                         Intent.ACTION_PICK,
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 )
-                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         
         chooseImageAction.launch(intent);
     }
+    
     
     private final ActivityResultLauncher<Intent> chooseImageAction =
             registerForActivityResult(
@@ -202,21 +204,26 @@ public class SignUpActivity
         clearErrorMessage();
         int invalidCount = 0;
         
-        String siteName = binding.signupDisplayName.getText().toString();
-        String siteDesc = binding.signupEmail.getText().toString();
-        String siteAddress = binding.signupPassword.getText().toString();
+        String userName = binding.signupDisplayName.getText().toString().trim();
+        String userEmail = binding.signupEmail.getText().toString().trim();
+        String userPassword = binding.signupPassword.getText().toString().trim();
         
-        if (!FieldValidation.isValidStringInRange(siteName, 6, 15)) {
+        if (profileAvatar == null) {
+            turnOnErrorMessage(binding.signupAvatarErr, true);
+            invalidCount++;
+        }
+        
+        if (FieldValidation.isValidStringInRange(userName, 3, 15)) {
             turnOnErrorMessage(binding.signupDisplayNameErr, true);
             invalidCount++;
         }
         
-        if (!FieldValidation.isValidStringInRange(siteDesc, 0, 25)) {
+        if (!FieldValidation.isValidEmail(userEmail) || userEmail.isEmpty()) {
             turnOnErrorMessage(binding.signupEmailErr, true);
             invalidCount++;
         }
         
-        if (siteAddress.isEmpty()) {
+        if (FieldValidation.isValidStringInRange(userPassword, 6, 15)) {
             turnOnErrorMessage(binding.signupPasswordErr, true);
             invalidCount++;
         }
@@ -231,6 +238,7 @@ public class SignUpActivity
     }
     
     private void clearErrorMessage() {
+        turnOnErrorMessage(binding.signupAvatarErr, false);
         turnOnErrorMessage(binding.signupDisplayNameErr, false);
         turnOnErrorMessage(binding.signupEmailErr, false);
         turnOnErrorMessage(binding.signupPasswordErr, false);

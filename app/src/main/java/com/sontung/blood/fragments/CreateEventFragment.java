@@ -298,7 +298,7 @@ public class CreateEventFragment
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Address selectedAddress = addressList.get(position);
                 coordinates = selectedAddress.getCoordinates();
-                binding.addressDisplay.setText(selectedAddress.getName());
+                binding.addressDisplay.setText(selectedAddress.getAddress());
                 
                 if (map != null) {
                     updateMapWithCoordinates(coordinates);
@@ -323,19 +323,18 @@ public class CreateEventFragment
         clearErrorMessage();
         int invalidCount = 0;
         
-        // Get input values
-        String siteName = binding.createSiteName.getText().toString();
-        String siteDesc = binding.createSiteDesc.getText().toString();
-        String siteAddress = binding.addressDisplay.getText().toString();
-        String volunteerCapText = binding.volunteerCap.getText().toString();
-        String donorCapText = binding.donorCap.getText().toString();
+        String siteName = binding.createSiteName.getText().toString().trim();
+        String siteDesc = binding.createSiteDesc.getText().toString().trim();
+        String siteAddress = binding.addressDisplay.getText().toString().trim();
+        String volunteerCapText = binding.volunteerCap.getText().toString().trim();
+        String donorCapText = binding.donorCap.getText().toString().trim();
         
-        if (!FieldValidation.isValidStringInRange(siteName, 6, 15)) {
+        if (FieldValidation.isValidStringInRange(siteName, 6, 15)) {
             turnOnErrorMessage(binding.createSiteNameError, true);
             invalidCount++;
         }
         
-        if (!FieldValidation.isValidStringInRange(siteDesc, 0, 25)) {
+        if (FieldValidation.isValidStringInRange(siteDesc, 0, 25)) {
             turnOnErrorMessage(binding.createSiteDescErr, true);
             invalidCount++;
         }
@@ -351,7 +350,7 @@ public class CreateEventFragment
                 invalidCount++;
             } else {
                 int volunteerCap = Integer.parseInt(volunteerCapText);
-                if (!FieldValidation.isValidNumberInRange(volunteerCap, 1, 20)) {
+                if (FieldValidation.isValidNumberInRange(volunteerCap, 1, 20)) {
                     turnOnErrorMessage(binding.createVolunteerCapErr, true);
                     invalidCount++;
                 }
@@ -362,7 +361,7 @@ public class CreateEventFragment
                 invalidCount++;
             } else {
                 int donorCap = Integer.parseInt(donorCapText);
-                if (!FieldValidation.isValidNumberInRange(donorCap, 1, 20)) {
+                if (FieldValidation.isValidNumberInRange(donorCap, 1, 20)) {
                     turnOnErrorMessage(binding.createDonorCapErr, true);
                     invalidCount++;
                 }

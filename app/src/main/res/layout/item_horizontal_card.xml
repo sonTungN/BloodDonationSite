@@ -71,15 +71,19 @@
             android:layout_margin="7dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/card_user_role_layout"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
+                android:layout_marginTop="1dp"
                 android:layout_marginEnd="3dp"
+                android:paddingVertical="1dp"
+                android:paddingHorizontal="2dp"
                 android:background="@drawable/custom_role_tag"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
+                    android:id="@+id/card_user_role"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{user.userRole}"
@@ -96,7 +100,7 @@
                 android:id="@+id/add_report_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                android:background="@drawable/custom_btn_in_card"
+                android:background="@drawable/custom_btn_add_report"
                 android:text="ADD REPORT"
                 android:textColor="@color/black"
                 android:gravity="center"

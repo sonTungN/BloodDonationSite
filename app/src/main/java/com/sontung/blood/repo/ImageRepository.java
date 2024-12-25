@@ -85,6 +85,8 @@ public class ImageRepository {
             String parent,
             FirebaseCallback<String> callback
     ) {
+        
+        
         long index = new Date().getTime();
         StorageReference imageRef =
                 storageReference

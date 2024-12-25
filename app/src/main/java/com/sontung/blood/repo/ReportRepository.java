@@ -12,13 +12,17 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.model.Report;
 import com.sontung.blood.model.Site;
 import com.sontung.blood.shared.Paths;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class ReportRepository {
@@ -29,6 +33,7 @@ public class ReportRepository {
     private final CollectionReference reportCollection;
     
     private final MutableLiveData<Report> reportData = new MutableLiveData<>();
+    private final MutableLiveData<List<Report>> reportMutableList = new MutableLiveData<>();
     
     public ReportRepository(Context context) {
         this.context = context;
@@ -75,5 +80,33 @@ public class ReportRepository {
                     Log.d("REPORT: UPDATE ID ERROR", Objects.requireNonNull(e.getMessage()));
                     Toast.makeText(context, "Failed to update report id", Toast.LENGTH_SHORT).show();
                 });
+    }
+    
+    public MutableLiveData<List<Report>> getReportDataBySiteId(String siteId) {
+        reportCollection
+                .whereEqualTo("siteId", siteId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<Report> reportList = new ArrayList<>();
+                        
+                        if (task.getResult() != null) {
+                            for (DocumentSnapshot snapshot: task.getResult()) {
+                                Report report = snapshot.toObject(Report.class);
+                                if (report != null) {
+                                    reportList.add(report);
+                                }
+                            }
+                            
+                            reportMutableList.postValue(reportList);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("REPORT", "Error getting reports: " + e.getMessage());
+                    Toast.makeText(context, "Failed to fetch reports", Toast.LENGTH_SHORT).show();
+                });
+        
+        return reportMutableList;
     }
 }

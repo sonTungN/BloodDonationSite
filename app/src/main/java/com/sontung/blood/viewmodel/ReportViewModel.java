@@ -29,4 +29,8 @@ public class ReportViewModel extends AndroidViewModel {
     public void updateReportId(String reportId, Report updateReport) {
         reportRepository.updateReportId(reportId, updateReport);
     }
+    
+    public MutableLiveData<List<Report>> getReportDataBySiteId(String siteId) {
+        return reportRepository.getReportDataBySiteId(siteId);
+    }
 }

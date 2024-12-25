@@ -77,6 +77,14 @@
 
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/signup_avatar_err"
+                    style="@style/ErrorText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="*Required"
+                    tools:ignore="HardcodedText" />
+
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/add_avatar_btn"
                     android:layout_width="wrap_content"
@@ -116,7 +124,7 @@
                     android:layout_marginStart="5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Between 6 and 15 characters"
+                    android:text="Between 3 and 15 characters"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
 
@@ -146,7 +154,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="Between 6 and 15 characters"
+                    android:text="Input valid email format"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
 

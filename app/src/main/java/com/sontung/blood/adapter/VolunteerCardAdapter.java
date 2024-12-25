@@ -3,6 +3,7 @@ package com.sontung.blood.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -44,8 +45,10 @@ public class VolunteerCardAdapter extends RecyclerView.Adapter<VolunteerCardAdap
         User user = listOfVolunteers.get(position);
         holder.binding.setUser(user);
         
-        holder.binding.addReportBtn.setText("NO REPORT");
-        holder.binding.addReportBtn.setEnabled(false);
+        if (!user.getUserRole().equals("SUPER")) {
+            holder.binding.cardUserRoleLayout.setVisibility(View.GONE);
+        }
+        holder.binding.addReportBtn.setVisibility(View.GONE);
         
         Glide.with(context)
                 .load(user.getProfileUrl())

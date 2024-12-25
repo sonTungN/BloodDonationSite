@@ -3,6 +3,13 @@
     <color name="mainColor">#FA6393</color>
     <color name="pink">#FA6393</color>
 
+    <color name="lightPinkRed">#ffdad6</color>
+    <color name="lightPink">#ffd9dc</color>
+    <color name="surfaceDim">#e7d6d7</color>
+
+    <color name="lightYellow">#ffddb6</color>
+
+
     <color name="black">#FF000000</color>
     <color name="darkGrey">#6C6F79</color>
     <color name="softGrayishBlue">#B5BBC6</color>

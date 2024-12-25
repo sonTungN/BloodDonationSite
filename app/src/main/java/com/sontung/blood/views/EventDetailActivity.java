@@ -51,6 +51,8 @@ import com.sontung.blood.adapter.MultipleImageAdapter;
 import com.sontung.blood.adapter.VolunteerCardAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityEventDetailBinding;
+import com.sontung.blood.fragments.CreateReportFragment;
+import com.sontung.blood.fragments.SummarizeReportFragment;
 import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
 import com.sontung.blood.utils.DateFormatter;
@@ -129,6 +131,7 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     private void setUpOnButtonClickListener() {
+        binding.summaryBtn.setOnClickListener(view -> popUpDonationOverview());
         binding.donorApplyBtn.setOnClickListener(view -> donorApply());
         binding.volunteerApplyBtn.setOnClickListener(view -> volunteerApply());
     }
@@ -195,6 +198,11 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     //----------------------------------------SET UP APPLY BUTTON-----------------------------------
+    private void popUpDonationOverview() {
+        SummarizeReportFragment fragment = SummarizeReportFragment.newInstance(siteId);
+        fragment.show(this.getSupportFragmentManager(), "SummarizeReportFragment");
+    }
+    
     private void donorApply() {
         String currentUserId = userViewModel.getCurrentUserId();
         siteViewModel.addUserIntoSiteRegisteredList(currentUserId, siteId, new FirebaseCallback<>() {
