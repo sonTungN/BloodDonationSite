@@ -29,6 +29,10 @@ public class SiteViewModel extends AndroidViewModel {
         return siteRepository.getSiteDataById(siteId);
     }
     
+    public void getSiteDataById(String siteId, FirebaseCallback<Site> callback) {
+        siteRepository.getSiteDataById(siteId, callback);
+    }
+    
     public MutableLiveData<List<User>> getSiteVolunteerList(String siteId) {
         return siteRepository.getSiteVolunteerList(siteId);
     }

@@ -64,6 +64,10 @@ public class UserViewModel extends AndroidViewModel {
         return userRepository.getUserDataById(userId);
     }
     
+    public void getUserDataById(String userId, FirebaseCallback<User> callback) {
+        userRepository.getUserDataById(userId, callback);
+    }
+    
     public void addCurrentUserRegisteredSite(String siteId, FirebaseCallback<Boolean> callback) {
         userRepository.addCurrentUserRegisteredSite(siteId, callback);
     }

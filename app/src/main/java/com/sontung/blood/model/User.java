@@ -28,5 +28,5 @@ public class User {
     @Builder.Default private String hostedSite = null;
     @Builder.Default private List<String> listOfRegisteredSites = new ArrayList<>();
     @Builder.Default private List<String> listOfVolunteerSites = new ArrayList<>();
-    @Builder.Default private List<String> listOfRequests = new ArrayList<>();
+    @Builder.Default private List<String> listOfNotifications = new ArrayList<>();
 }

@@ -33,8 +33,7 @@ public class EventFragment extends Fragment {
     private RecyclerView siteRecyclerView;
     private EventSiteAdapter siteAdapter;
     private List<Site> siteList = new ArrayList<>();
-
-
+    
     // Search and Filter
     private SearchView searchView;
 
@@ -46,9 +45,8 @@ public class EventFragment extends Fragment {
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //    userService.signOut();
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_event, container, false);
+        inflater.inflate(R.layout.fragment_event, container, false);
+        
         searchView = binding.searchView;
         setUpSiteRecyclerView();
         return binding.getRoot();
@@ -91,8 +89,7 @@ public class EventFragment extends Fragment {
             }
         });
     }
-
-    // Setting up Site Recycler View
+    
     private void setUpSiteRecyclerView() {
         siteRecyclerView = binding.siteRecyclerView;
         siteRecyclerView.setLayoutManager(

@@ -35,7 +35,6 @@ public class Site {
     @Builder.Default private List<String> listOfDonors = new ArrayList<>();
     @Builder.Default private List<String> listOfVolunteers = new ArrayList<>();
     @Builder.Default private List<String> listOfReports = new ArrayList<>();
-    @Builder.Default private List<String> listOfRequests = new ArrayList<>();
     
     @Builder.Default private Date eventDate = new Date();
     @Builder.Default private Date updatedDate = new Date();

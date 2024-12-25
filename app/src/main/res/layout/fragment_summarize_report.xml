@@ -259,7 +259,7 @@
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="1.2"
                         android:layout_marginTop="10dp"
                         android:layout_marginStart="5dp"
                         android:background="@drawable/custom_edittext"
@@ -282,15 +282,7 @@
                                 style="@style/CardDesc1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="24sp"
-                                android:textStyle="bold"
-                                tools:ignore="HardcodedText" />
-
-                            <TextView
-                                style="@style/CardDesc1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text=" ML"
+                                android:text=""
                                 android:textSize="24sp"
                                 android:textStyle="bold"
                                 tools:ignore="HardcodedText" />

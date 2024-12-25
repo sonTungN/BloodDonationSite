@@ -17,6 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,50 +25,43 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.sontung.blood.R;
-import com.sontung.blood.adapter.EventSiteAdapter;
+import com.sontung.blood.adapter.NotificationAdapter;
 import com.sontung.blood.databinding.ActivityHomeBinding;
-import com.sontung.blood.model.Site;
-import com.sontung.blood.viewmodel.SiteViewModel;
+import com.sontung.blood.databinding.ActivityNotificationBinding;
+import com.sontung.blood.model.Notification;
+import com.sontung.blood.viewmodel.NotificationViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
-
-    private ActivityHomeBinding binding;
-
+public class NotificationActivity extends AppCompatActivity {
+    
+    private ActivityNotificationBinding binding;
     private UserViewModel userViewModel;
-    private SiteViewModel siteViewModel;
+    private NotificationViewModel notificationViewModel;
     
-    private RecyclerView recentRecyclerView;
-    private List<Site> recentSiteList = new ArrayList<>();
+    private RecyclerView notificationRecyclerView;
+    private NotificationAdapter notificationAdapter;
+    private List<Notification> notificationList = new ArrayList<>();
     
-    private RecyclerView registeredRecyclerView;
-    private List<Site> registeredSiteList = new ArrayList<>();
-    
-    private EventSiteAdapter adapter;
-
     // Navbar
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_home);
-
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
+        setContentView(R.layout.activity_notification);
+        
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_notification);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
         
-        binding.noEventDisplay.setVisibility(View.GONE);
-        binding.discoverMoreBtn.setVisibility(View.GONE);
-        
+        binding.noNotificationDisplay.setVisibility(View.GONE);
+        setUpNotificationRecyclerView();
         setUpDrawer();
-        setUpRecyclerView();
-        setUpButtonClickHandler();
         
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -76,83 +70,35 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
     
-    private void setUpButtonClickHandler() {
-        binding.discoverMoreBtn.setOnClickListener(view -> {
-            Intent i = new Intent(this, EventActivity.class);
-            startActivity(i);
-            finish();
-        });
+    private void setUpNotificationRecyclerView() {
+        notificationRecyclerView = binding.notificationRecyclerView;
+        notificationRecyclerView.setLayoutManager(
+                new LinearLayoutManager(
+                        this,
+                        LinearLayoutManager.VERTICAL,
+                        false)
+        );
+        notificationRecyclerView.hasFixedSize();
+        notificationList = new ArrayList<>();
         
-        binding.eventActivityCta.setOnClickListener(view -> {
-            Intent i = new Intent(this, EventActivity.class);
-            startActivity(i);
-            finish();
+        notificationViewModel.getNotificationDataByReceiverId(userViewModel.getCurrentUserId()).observe(this, new Observer<List<Notification>>() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onChanged(List<Notification> notifications) {
+                if (notifications.isEmpty()) {
+                    binding.noNotificationDisplay.setVisibility(View.VISIBLE);
+                } else {
+                    binding.noNotificationDisplay.setVisibility(View.GONE);
+                }
+                
+                notificationList.clear();
+                notificationList.addAll(notifications);
+                
+                notificationAdapter = new NotificationAdapter(NotificationActivity.this, notificationList);
+                notificationRecyclerView.setAdapter(notificationAdapter);
+                notificationAdapter.notifyDataSetChanged();
+            }
         });
-    }
-    
-    private void setUpRecyclerView() {
-        setUpRegisteredRecyclerView();
-        setUpRecentRecyclerView();
-    }
-    
-    @SuppressLint("NotifyDataSetChanged")
-    private void setUpRegisteredRecyclerView() {
-        siteViewModel
-                .getUserRegisteredSite(userViewModel.getCurrentUserId())
-                .observe(this, sites -> {
-                    if (sites.isEmpty()) {
-                        binding.noEventDisplay.setVisibility(View.VISIBLE);
-                    } else {
-                        binding.noEventDisplay.setVisibility(View.GONE);
-                    }
-                    
-                    registeredSiteList.clear();
-                    registeredSiteList.addAll(sites);
-                    
-                    registeredRecyclerView= binding.registeredRecyclerView;
-                    registeredRecyclerView.setLayoutManager(
-                            new LinearLayoutManager(
-                                    getApplicationContext(),
-                                    LinearLayoutManager.VERTICAL,
-                                    false)
-                    );
-                    registeredRecyclerView.hasFixedSize();
-                    
-                    adapter = new EventSiteAdapter(this, registeredSiteList);
-                    registeredRecyclerView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                });
-    }
-    
-    @SuppressLint("NotifyDataSetChanged")
-    private void setUpRecentRecyclerView() {
-        siteViewModel
-                .getAllSiteData()
-                .observe(this, sites -> {
-                    binding.discoverMoreBtn.setVisibility(View.VISIBLE);
-                    
-                    recentSiteList.clear();
-                    
-                    int count = 0;
-                    for (Site site: sites) {
-                        recentSiteList.add(site);
-                        count++;
-                        if (count == 2) break;
-                    }
-                    
-                    recentRecyclerView= binding.recentRecyclerView;
-                    recentRecyclerView.setLayoutManager(
-                            new LinearLayoutManager(
-                                    getApplicationContext(),
-                                    LinearLayoutManager.VERTICAL,
-                                    false)
-                    );
-                    recentRecyclerView.hasFixedSize();
-                    
-                    adapter = new EventSiteAdapter(this, recentSiteList);
-                    recentRecyclerView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                });
     }
     
     @SuppressLint("SetTextI18n")
@@ -160,7 +106,7 @@ public class HomeActivity extends AppCompatActivity {
         drawerLayout = binding.drawer;
         navigationView = binding.navigationView;
         
-        binding.toolbarId.toolbarTitleId.setText("Home");
+        binding.toolbarId.toolbarTitleId.setText("Notifications");
         binding.toolbarId.backIcon.setVisibility(View.GONE);
         
         View headerView = binding.navigationView.getHeaderView(0);
@@ -175,13 +121,13 @@ public class HomeActivity extends AppCompatActivity {
         userViewModel
                 .getUserDataById(userViewModel.getCurrentUserId())
                 .observe(this, user -> {
-            navName.setText(user.getUsername());
-            navEmail.setText(user.getEmail());
-            
-            Glide.with(getApplicationContext())
-                    .load(user.getProfileUrl())
-                    .into(navProfileImg);
-        });
+                    navName.setText(user.getUsername());
+                    navEmail.setText(user.getEmail());
+                    
+                    Glide.with(getApplicationContext())
+                            .load(user.getProfileUrl())
+                            .into(navProfileImg);
+                });
         
         ActionBarDrawerToggle drawerToggle =
                 new ActionBarDrawerToggle(
@@ -206,12 +152,13 @@ public class HomeActivity extends AppCompatActivity {
         generalDrawerSetUp();
         navigationView.getMenu().clear();
         navigationView.inflateMenu(R.menu.general_menu);
-        navigationView.setCheckedItem(R.id.nav_home);
+        navigationView.setCheckedItem(R.id.nav_notification);
         
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             if (menuItem.getItemId() == R.id.nav_home) {
+                Intent intent = new Intent(this, HomeActivity.class);
                 drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
+                startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_event) {
                 Intent intent = new Intent(this, EventActivity.class);
@@ -224,9 +171,8 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_notification) {
-                Intent intent = new Intent(this, NotificationActivity.class);
                 drawerLayout.closeDrawer(GravityCompat.START);
-                startActivity(intent);
+                return true;
                 
             } else if (menuItem.getItemId() == R.id.nav_profile) {
                 Intent intent = new Intent(this, ProfileActivity.class);
@@ -245,14 +191,5 @@ public class HomeActivity extends AppCompatActivity {
             }
             return true;
         });
-    }
-    
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 }

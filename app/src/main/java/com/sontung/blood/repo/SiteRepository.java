@@ -175,6 +175,25 @@ public class SiteRepository {
         return siteData;
     }
     
+    public void getSiteDataById(String siteId, FirebaseCallback<Site> callback) {
+        siteCollection
+                .document(siteId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Site targetSite = documentSnapshot.toObject(Site.class);
+                        callback.onSuccess(targetSite);
+                        
+                    } else {
+                        Log.d("USER: FETCH ERROR", "Document not found!");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("SITE: FETCH ERROR", Objects.requireNonNull(e.getMessage()));
+                    Toast.makeText(context, "SITE DOCUMENT: ERROR", Toast.LENGTH_SHORT).show();
+                });
+    }
+    
     public MutableLiveData<List<Site>> getUserRegisteredSite(String userId) {
         userCollection
                 .document(userId)
