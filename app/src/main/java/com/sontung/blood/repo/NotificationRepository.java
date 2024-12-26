@@ -10,6 +10,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.model.Notification;
 import com.sontung.blood.model.Report;
@@ -79,6 +80,7 @@ public class NotificationRepository {
     public MutableLiveData<List<Notification>> getNotificationDataByReceiverId(String receiverId) {
         notificationCollection
                 .whereEqualTo("receiverId", receiverId)
+                .orderBy("sentDate")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

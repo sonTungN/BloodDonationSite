@@ -2,15 +2,10 @@ package com.sontung.blood.views;
 
 import static android.content.ContentValues.TAG;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
-import static java.security.AccessController.getContext;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
@@ -19,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -28,7 +22,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,7 +31,6 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -51,17 +43,18 @@ import com.sontung.blood.adapter.MultipleImageAdapter;
 import com.sontung.blood.adapter.VolunteerCardAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityEventDetailBinding;
-import com.sontung.blood.fragments.CreateReportFragment;
 import com.sontung.blood.fragments.SummarizeReportFragment;
+import com.sontung.blood.model.Notification;
 import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
+import com.sontung.blood.utils.DateComparer;
 import com.sontung.blood.utils.DateFormatter;
+import com.sontung.blood.viewmodel.NotificationViewModel;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -80,6 +73,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
     private UserViewModel userViewModel;
     private SiteViewModel siteViewModel;
+    private NotificationViewModel notificationViewModel;
 
     // ViewPager with DotIndicator
     private ViewPager2 viewPager2;
@@ -112,6 +106,7 @@ public class EventDetailActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_event_detail);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
 
         siteId = getIntent().getStringExtra("SITE_ID");
 
@@ -206,107 +201,253 @@ public class EventDetailActivity extends AppCompatActivity {
     }
     
     private void donorApply() {
-        String currentUserId = userViewModel.getCurrentUserId();
-        siteViewModel.addUserIntoSiteRegisteredList(currentUserId, siteId, new FirebaseCallback<>() {
+        userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<>() {
             @Override
-            public void onSuccess(List<Boolean> t) {
-
+            public void onSuccess(List<User> t) {
+            
             }
-
+            
             @Override
-            public void onSuccess(Boolean aBoolean) {
-                userViewModel.addCurrentUserRegisteredSite(siteId, new FirebaseCallback<>() {
+            public void onSuccess(User user) {
+                siteViewModel.addUserIntoSiteRegisteredList(user.getUserId(), siteId, new FirebaseCallback<>() {
                     @Override
                     public void onSuccess(List<Boolean> t) {
-
+                    
                     }
-
-                    @SuppressLint({"SetTextI18n", "NotifyDataSetChanged"})
+                    
                     @Override
                     public void onSuccess(Boolean aBoolean) {
-                        Toast.makeText(EventDetailActivity.this, "Successfully registered as donor", Toast.LENGTH_SHORT).show();
-                        setApplyButtonState(binding.donorApplyBtn, false);
-                        binding.donorApplyBtn.setText("Already Donor");
-                        siteViewModel.getSiteDonorList(siteId);
-                        
-                        siteViewModel
-                                .getSiteDataById(siteId)
-                                .observe(EventDetailActivity.this, site -> binding.setSite(site));
+                        userViewModel.addCurrentUserRegisteredSite(siteId, new FirebaseCallback<>() {
+                            @Override
+                            public void onSuccess(List<Boolean> t) {
+                            
+                            }
+                            
+                            @SuppressLint({"SetTextI18n", "NotifyDataSetChanged"})
+                            @Override
+                            public void onSuccess(Boolean aBoolean) {
+                                Toast.makeText(EventDetailActivity.this, "Successfully registered as donor", Toast.LENGTH_SHORT).show();
+                                setApplyButtonState(binding.donorApplyBtn, false);
+                                binding.donorApplyBtn.setText("Already Donor");
+                                siteViewModel.getSiteDonorList(siteId);
+                                
+                                siteViewModel
+                                        .getSiteDataById(siteId)
+                                        .observe(EventDetailActivity.this, site -> binding.setSite(site));
+                                
+                                siteViewModel.getSiteDataById(siteId, new FirebaseCallback<Site>() {
+                                    @Override
+                                    public void onSuccess(List<Site> t) {
+                                    
+                                    }
+                                    
+                                    @Override
+                                    public void onSuccess(Site site) {
+                                        String message = "I’ve joined your blood donation event as donor!";
+                                        
+                                        Notification pendingSentNotification =
+                                                Notification.builder()
+                                                        .senderId(user.getUserId())
+                                                        .senderEmail(user.getEmail())
+                                                        .receiverId(site.getHost())
+                                                        .siteId(site.getSiteId())
+                                                        .title("DONOR JOINED")
+                                                        .desc(message)
+                                                        .build();
+                                        
+                                        notificationViewModel.createNotification(pendingSentNotification, new FirebaseCallback<>() {
+                                            @Override
+                                            public void onSuccess(List<Notification> t) {
+                                            
+                                            }
+                                            
+                                            @Override
+                                            public void onSuccess(Notification notification) {
+                                                notificationViewModel.updateNotificationId(notification.getNotificationId(), notification);
+                                            }
+                                            
+                                            @Override
+                                            public void onFailure(List<Notification> t) {
+                                            
+                                            }
+                                            
+                                            @Override
+                                            public void onFailure(Notification notification) {
+                                            
+                                            }
+                                        });
+                                    }
+                                    
+                                    @Override
+                                    public void onFailure(List<Site> t) {
+                                    
+                                    }
+                                    
+                                    @Override
+                                    public void onFailure(Site site) {
+                                    
+                                    }
+                                });
+                            }
+                            
+                            @Override
+                            public void onFailure(List<Boolean> t) {
+                            
+                            }
+                            
+                            @Override
+                            public void onFailure(Boolean aBoolean) {
+                                Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-
+                    
                     @Override
                     public void onFailure(List<Boolean> t) {
-
+                    
                     }
-
+                    
                     @Override
                     public void onFailure(Boolean aBoolean) {
                         Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
-
+            
             @Override
-            public void onFailure(List<Boolean> t) {
-
+            public void onFailure(List<User> t) {
+            
             }
-
+            
             @Override
-            public void onFailure(Boolean aBoolean) {
-                Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
+            public void onFailure(User user) {
+            
             }
         });
     }
 
     private void volunteerApply() {
-        String currentUserId = userViewModel.getCurrentUserId();
-        siteViewModel.addUserIntoSiteVolunteerList(currentUserId, siteId, new FirebaseCallback<>() {
+        userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<User>() {
             @Override
-            public void onSuccess(List<Boolean> t) {
-
+            public void onSuccess(List<User> t) {
+            
             }
-
+            
             @Override
-            public void onSuccess(Boolean aBoolean) {
-                userViewModel.addCurrentUserVolunteerSite(siteId, new FirebaseCallback<>() {
+            public void onSuccess(User user) {
+                siteViewModel.addUserIntoSiteVolunteerList(user.getUserId(), siteId, new FirebaseCallback<>() {
                     @Override
                     public void onSuccess(List<Boolean> t) {
-
+                    
                     }
-
-                    @SuppressLint("SetTextI18n")
+                    
                     @Override
                     public void onSuccess(Boolean aBoolean) {
-                        Toast.makeText(EventDetailActivity.this, "Successfully registered as volunteer", Toast.LENGTH_SHORT).show();
-                        setApplyButtonState(binding.volunteerApplyBtn, false);
-                        binding.volunteerApplyBtn.setText("Already Volunteer");
-                        siteViewModel.getSiteVolunteerList(siteId);
-                        
-                        siteViewModel
-                                .getSiteDataById(siteId)
-                                .observe(EventDetailActivity.this, site -> binding.setSite(site));
+                        userViewModel.addCurrentUserVolunteerSite(siteId, new FirebaseCallback<>() {
+                            @Override
+                            public void onSuccess(List<Boolean> t) {
+                            
+                            }
+                            
+                            @SuppressLint("SetTextI18n")
+                            @Override
+                            public void onSuccess(Boolean aBoolean) {
+                                Toast.makeText(EventDetailActivity.this, "Successfully registered as volunteer", Toast.LENGTH_SHORT).show();
+                                setApplyButtonState(binding.volunteerApplyBtn, false);
+                                binding.volunteerApplyBtn.setText("Already Volunteer");
+                                siteViewModel.getSiteVolunteerList(siteId);
+                                
+                                siteViewModel
+                                        .getSiteDataById(siteId)
+                                        .observe(EventDetailActivity.this, site -> binding.setSite(site));
+                                
+                                siteViewModel.getSiteDataById(siteId, new FirebaseCallback<Site>() {
+                                    @Override
+                                    public void onSuccess(List<Site> t) {
+                                    
+                                    }
+                                    
+                                    @Override
+                                    public void onSuccess(Site site) {
+                                        String message = "I’ve joined your blood donation event as volunteer!";
+                                        
+                                        Notification pendingSentNotification =
+                                                Notification.builder()
+                                                        .senderId(user.getUserId())
+                                                        .senderEmail(user.getEmail())
+                                                        .receiverId(site.getHost())
+                                                        .siteId(site.getSiteId())
+                                                        .title("VOLUNTEER JOINED")
+                                                        .desc(message)
+                                                        .build();
+                                        
+                                        notificationViewModel.createNotification(pendingSentNotification, new FirebaseCallback<>() {
+                                            @Override
+                                            public void onSuccess(List<Notification> t) {
+                                            
+                                            }
+                                            
+                                            @Override
+                                            public void onSuccess(Notification notification) {
+                                                notificationViewModel.updateNotificationId(notification.getNotificationId(), notification);
+                                            }
+                                            
+                                            @Override
+                                            public void onFailure(List<Notification> t) {
+                                            
+                                            }
+                                            
+                                            @Override
+                                            public void onFailure(Notification notification) {
+                                            
+                                            }
+                                        });
+                                    }
+                                    
+                                    @Override
+                                    public void onFailure(List<Site> t) {
+                                    
+                                    }
+                                    
+                                    @Override
+                                    public void onFailure(Site site) {
+                                    
+                                    }
+                                });
+                            }
+                            
+                            @Override
+                            public void onFailure(List<Boolean> t) {
+                            
+                            }
+                            
+                            @Override
+                            public void onFailure(Boolean aBoolean) {
+                                Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
-
+                    
                     @Override
                     public void onFailure(List<Boolean> t) {
-
+                    
                     }
-
+                    
                     @Override
                     public void onFailure(Boolean aBoolean) {
                         Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
-
+            
             @Override
-            public void onFailure(List<Boolean> t) {
-
+            public void onFailure(List<User> t) {
+            
             }
-
+            
             @Override
-            public void onFailure(Boolean aBoolean) {
-                Toast.makeText(EventDetailActivity.this, "Failed to update user record", Toast.LENGTH_SHORT).show();
+            public void onFailure(User user) {
+            
             }
         });
     }
@@ -398,7 +539,8 @@ public class EventDetailActivity extends AppCompatActivity {
     private void checkEventDate(Site site, String currentUserId) {
             if (site.getEventDate().after(new Date())) {
             disableButtonsForFutureEvent(site, currentUserId);
-        } else if (isEventDatePassed(site.getEventDate())) {
+            
+        } else if (DateComparer.isEventDatePassed(site.getEventDate())) {
             disableButtonsForPastEvent();
         }
     }
@@ -506,19 +648,6 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     //----------------------------------------SET UP TOOL FUNCTIONS---------------------------------
-    private boolean isEventDatePassed(Date eventDate) {
-        Calendar eventCal = Calendar.getInstance();
-        eventCal.setTime(eventDate);
-        
-        Calendar currentCal = Calendar.getInstance();
-        currentCal.setTime(new Date());
-        
-        // Check if same day
-        return eventCal.get(Calendar.YEAR) != currentCal.get(Calendar.YEAR) ||
-                eventCal.get(Calendar.MONTH) != currentCal.get(Calendar.MONTH) ||
-                eventCal.get(Calendar.DAY_OF_MONTH) < currentCal.get(Calendar.DAY_OF_MONTH);
-    }
-    
     private void setApplyButtonState(View view, boolean isEnable) {
         view.setEnabled(isEnable);
     }

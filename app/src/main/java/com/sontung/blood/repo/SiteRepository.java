@@ -8,18 +8,22 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
 import com.sontung.blood.preference.LocalStorageManager;
 import com.sontung.blood.shared.Paths;
+import com.sontung.blood.utils.DateComparer;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,6 +42,7 @@ public class SiteRepository {
     private final MutableLiveData<List<User>> allDonor = new MutableLiveData<>();
     
     private final MutableLiveData<List<Site>> allSiteListData = new MutableLiveData<>();
+    private final MutableLiveData<List<Site>> querySiteListData = new MutableLiveData<>();
     
     private final MutableLiveData<List<Site>> userRegisteredSite = new MutableLiveData<>();
     private final MutableLiveData<List<Site>> userVolunteerSite = new MutableLiveData<>();
@@ -71,6 +76,29 @@ public class SiteRepository {
                 });
                 
         return allSiteListData;
+    }
+    
+    public MutableLiveData<List<Site>> getAllSiteDataWithQuery(String bloodType, Date startDate) {
+        List<Site> querySiteList = new ArrayList<>();
+        siteCollection
+                .whereEqualTo("requiredBloodType", bloodType)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot snapshot: queryDocumentSnapshots) {
+                        Site site = snapshot.toObject(Site.class);
+                        if (site.getEventDate().compareTo(startDate) >= 0) {
+                            querySiteList.add(site);
+                        }
+                    }
+                    
+                    querySiteListData.postValue(querySiteList);
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("SITE: FETCH ERROR", Objects.requireNonNull(e.getMessage()));
+                    Toast.makeText(context, "Can't get site with filter", Toast.LENGTH_SHORT).show();
+                });
+        
+        return querySiteListData;
     }
     
     public MutableLiveData<List<User>> getSiteVolunteerList(String siteId) {

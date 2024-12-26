@@ -46,13 +46,13 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="ALL EVENTS"
+                    android:text="DONATION EVENTS"
                     tools:ignore="HardcodedText"/>
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Map"
+                    android:text="YOUR MAP"
                     tools:ignore="HardcodedText" />
             </com.google.android.material.tabs.TabLayout>
 

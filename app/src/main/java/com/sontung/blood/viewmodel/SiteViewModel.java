@@ -11,6 +11,7 @@ import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
 import com.sontung.blood.repo.SiteRepository;
 
+import java.util.Date;
 import java.util.List;
 
 public class SiteViewModel extends AndroidViewModel {
@@ -23,6 +24,10 @@ public class SiteViewModel extends AndroidViewModel {
     
     public MutableLiveData<List<Site>> getAllSiteData() {
         return siteRepository.getAllSiteData();
+    }
+    
+    public MutableLiveData<List<Site>> getAllSiteDataWithQuery(String bloodType, Date startDate) {
+        return siteRepository.getAllSiteDataWithQuery(bloodType, startDate);
     }
     
     public MutableLiveData<Site> getSiteDataById(String siteId) {

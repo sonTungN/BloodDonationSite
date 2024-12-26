@@ -334,7 +334,7 @@ public class CreateEventFragment
             turnOnErrorMessage(binding.createSiteDatePast, false);
             invalidCount++;
             
-        } else if (DateFormatter.toDate(eventDateStr).getTime() <= currentDate.getTime()) {
+        } else if (isEventDatePassed(DateFormatter.toDate(eventDateStr))) {
             turnOnErrorMessage(binding.createSiteDateEmpty, false);
             turnOnErrorMessage(binding.createSiteDatePast, true);
             invalidCount++;
@@ -405,6 +405,7 @@ public class CreateEventFragment
             }
         });
     }
+    
     //----------------------------------------SET UP IMAGE UPLOADING--------------------------------
     private void openFile() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
@@ -461,6 +462,19 @@ public class CreateEventFragment
                     });
     
     //----------------------------------------SET UP TOOLS FUNCTION---------------------------------
+    private boolean isEventDatePassed(Date eventDate) {
+        Calendar eventCal = Calendar.getInstance();
+        eventCal.setTime(eventDate);
+        
+        Calendar currentCal = Calendar.getInstance();
+        currentCal.setTime(new Date());
+        
+        // Check if same day
+        return eventCal.get(Calendar.YEAR) != currentCal.get(Calendar.YEAR) ||
+                eventCal.get(Calendar.MONTH) != currentCal.get(Calendar.MONTH) ||
+                eventCal.get(Calendar.DAY_OF_MONTH) < currentCal.get(Calendar.DAY_OF_MONTH);
+    }
+    
     private void setUpInitialState() {
         binding.defaultImageLayout.setVisibility(View.VISIBLE);
         clearErrorMessage();
