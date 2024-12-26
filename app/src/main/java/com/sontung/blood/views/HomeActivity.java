@@ -25,8 +25,10 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.EventSiteAdapter;
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityHomeBinding;
 import com.sontung.blood.model.Site;
+import com.sontung.blood.model.User;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 
@@ -160,7 +162,7 @@ public class HomeActivity extends AppCompatActivity {
         drawerLayout = binding.drawer;
         navigationView = binding.navigationView;
         
-        binding.toolbarId.toolbarTitleId.setText("Home");
+        binding.toolbarId.toolbarTitleId.setText("Dashboard");
         binding.toolbarId.backIcon.setVisibility(View.GONE);
         
         View headerView = binding.navigationView.getHeaderView(0);
@@ -172,15 +174,31 @@ public class HomeActivity extends AppCompatActivity {
         navigationView.bringToFront();
         binding.toolbarId.backIcon.setOnClickListener(view -> finish());
         
-        userViewModel
-                .getUserDataById(userViewModel.getCurrentUserId())
-                .observe(this, user -> {
-            navName.setText(user.getUsername());
-            navEmail.setText(user.getEmail());
+        userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<>() {
+            @Override
+            public void onSuccess(List<User> t) {
             
-            Glide.with(getApplicationContext())
-                    .load(user.getProfileUrl())
-                    .into(navProfileImg);
+            }
+            
+            @Override
+            public void onSuccess(User user) {
+                navName.setText(user.getUsername());
+                navEmail.setText(user.getEmail());
+                
+                Glide.with(getApplicationContext())
+                        .load(user.getProfileUrl())
+                        .into(navProfileImg);
+            }
+            
+            @Override
+            public void onFailure(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(User user) {
+            
+            }
         });
         
         ActionBarDrawerToggle drawerToggle =

@@ -4,9 +4,7 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.ContentValues.TAG;
 
 import android.annotation.SuppressLint;
-import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
@@ -16,19 +14,15 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -46,30 +40,37 @@ import com.sontung.blood.R;
 import com.sontung.blood.adapter.ImageAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.FragmentCreateEventBinding;
+import com.sontung.blood.databinding.FragmentEditEventBinding;
 import com.sontung.blood.model.Address;
+import com.sontung.blood.model.Notification;
 import com.sontung.blood.model.Site;
+import com.sontung.blood.model.User;
 import com.sontung.blood.shared.Coordinates;
 import com.sontung.blood.utils.DateFormatter;
 import com.sontung.blood.utils.FieldValidation;
 import com.sontung.blood.viewmodel.ImageViewModel;
+import com.sontung.blood.viewmodel.NotificationViewModel;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 import com.sontung.blood.views.EventActivity;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CreateEventFragment
+public class EditEventFragment
         extends Fragment
         implements ImageAdapter.OnItemCountAfterDelete, ImageAdapter.OnItemZoom {
     
-    private FragmentCreateEventBinding binding;
+    private FragmentEditEventBinding binding;
     private UserViewModel userViewModel;
     private SiteViewModel siteViewModel;
     private ImageViewModel imageViewModel;
+    private NotificationViewModel notificationViewModel;
     
     // Google Map displaying
     private View mapPanel;
@@ -82,10 +83,16 @@ public class CreateEventFragment
     
     private final List<Address> addressList = Coordinates.CREATE_ADDRESS_AVAILABLE;
     
+    private Spinner bloodTypeSpinner;
+    private ArrayAdapter<CharSequence> bloodTypesAdapter;
+    
+    private Spinner addressSpinner;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = FragmentCreateEventBinding.inflate(getLayoutInflater());
+        
+        binding = FragmentEditEventBinding.inflate(getLayoutInflater());
         
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
@@ -93,43 +100,21 @@ public class CreateEventFragment
     }
     
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        
-        inflater.inflate(R.layout.fragment_create_event, container, false);
+        inflater.inflate(R.layout.fragment_edit_event, container, false);
         binding.siteDisplayingText.setVisibility(View.GONE);
         binding.createEventLayout.setVisibility(View.GONE);
         
         setUpInitialState();
         setUpAddressSpinner();
         setUpBloodTypeSpinner();
-        setUpCalendarPicker();
-        setUpButtonClickHandler();
         
         imageAdapter = new ImageAdapter(requireContext(), this, this);
-        imageAdapter.setData(imageUriList);
-        binding.imageRecyclerView.setAdapter(imageAdapter);
         
-        userViewModel.getCurrentUser().observe(getViewLifecycleOwner(), user -> {
-            if (user != null) {
-                if (user.getHostedSite() != null) {
-                    binding.siteDisplayingText.setVisibility(View.VISIBLE);
-                    binding.createEventLayout.setVisibility(View.GONE);
-                    
-                    Toast.makeText(requireContext(), "Hosted site ID: " + user.getHostedSite(), Toast.LENGTH_SHORT).show();
-                    
-                } else {
-                    setUpCreateSiteView();
-                }
-            }
-        });
+        fetchSiteDataIntoView();
         
         return binding.getRoot();
-    }
-    
-    private void setUpCreateSiteView() {
-        binding.siteDisplayingText.setVisibility(View.GONE);
-        binding.createEventLayout.setVisibility(View.VISIBLE);
     }
     
     //----------------------------------------SET UP MAP VIEWS--------------------------------------
@@ -189,20 +174,21 @@ public class CreateEventFragment
     
     //----------------------------------------SET UP VIEWS------------------------------------------
     private void setUpBloodTypeSpinner() {
-        Spinner bloodTypeSpinner = binding.bloodTypeSpinner;
-        ArrayAdapter<CharSequence> bloodTypesAdapter = ArrayAdapter.createFromResource(
+        // Spinner
+        bloodTypeSpinner = binding.bloodTypeSpinner;
+        bloodTypesAdapter = ArrayAdapter.createFromResource(
                 requireContext(),
                 R.array.blood_types,
                 android.R.layout.simple_spinner_item
         );
         bloodTypesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         bloodTypeSpinner.setAdapter(bloodTypesAdapter);
+        
         bloodTypeSpinner.setSelection(0);
     }
     
     private void setUpAddressSpinner() {
-        Spinner addressSpinner = binding.addressSpinner;
-        
+        addressSpinner = binding.addressSpinner;
         ArrayAdapter<String> addressAdapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_spinner_item,
@@ -211,8 +197,6 @@ public class CreateEventFragment
         
         addressAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         addressSpinner.setAdapter(addressAdapter);
-        
-        addressSpinner.setSelection(0);
         
         addressSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -234,38 +218,111 @@ public class CreateEventFragment
         });
     }
     
-    private void setUpCalendarPicker() {
-        binding.createSiteDate.setOnClickListener(v -> {
-            Calendar c = Calendar.getInstance();
+    private void setUpButtonClickHandler(Site site, User host) {
+        binding.addImageBtn.setOnClickListener(v -> openFile());
+        binding.createSiteButton.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), "UPDATE SITE", Toast.LENGTH_SHORT).show();
             
-            DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
-                    (view, selectedYear, selectedMonth, selectedDay) -> {
-                        
-                        TimePickerDialog timePickerDialog = new TimePickerDialog(requireContext(),
-                                (timePicker, selectedHour, selectedMinute) -> {
-                                    Calendar calendar = Calendar.getInstance();
-                                    calendar.set(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute, 0);
-                                    
-                                    String formattedDate = DateFormatter.toDateString(calendar.getTime());
-                                    binding.createSiteDate.setText(formattedDate);
-                                    
-                                }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE),
-                                true);
-                        timePickerDialog.show();
-                        
-                    },
-                    c.get(Calendar.YEAR),
-                    c.get(Calendar.MONTH),
-                    c.get(Calendar.DAY_OF_MONTH)
-            );
-            
-            datePickerDialog.show();
+            updateSite(site, host);
         });
     }
     
-    private void setUpButtonClickHandler() {
-        binding.addImageBtn.setOnClickListener(v -> openFile());
-        binding.createSiteButton.setOnClickListener(v -> createSite());
+    private void fetchSiteDataIntoView() {
+        userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<>() {
+            @Override
+            public void onSuccess(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onSuccess(User user) {
+                if (user.getHostedSite() == null) {
+                    binding.siteDisplayingText.setVisibility(View.VISIBLE);
+                    binding.createEventLayout.setVisibility(View.GONE);
+                    
+                } else {
+                    binding.siteDisplayingText.setVisibility(View.GONE);
+                    binding.createEventLayout.setVisibility(View.VISIBLE);
+                    
+                    siteViewModel.getSiteDataById(user.getHostedSite(), new FirebaseCallback<>() {
+                        @Override
+                        public void onSuccess(List<Site> t) {
+                        
+                        }
+                        
+                        @Override
+                        public void onSuccess(Site site) {
+                            setUpSiteImageDetail(site);
+                            setUpSiteDetail(site);
+                            setUpSiteSpinnerDetail(site);
+                            setUpSiteEventDate(site);
+                            setUpButtonClickHandler(site, user);
+                        }
+                        
+                        @Override
+                        public void onFailure(List<Site> t) {
+                        
+                        }
+                        
+                        @Override
+                        public void onFailure(Site site) {
+                        
+                        }
+                    });
+                }
+            }
+            
+            @Override
+            public void onFailure(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(User user) {
+            
+            }
+        });
+    }
+    
+    @SuppressLint("SetTextI18n")
+    private void setUpSiteImageDetail(Site site) {
+        if (site.getSiteImageUrl().isEmpty()) {
+            binding.defaultImageLayout.setVisibility(View.VISIBLE);
+        } else {
+            binding.defaultImageLayout.setVisibility(View.GONE);
+        }
+        
+        for (String imageUrl: site.getSiteImageUrl()) {
+            imageUriList.add(Uri.parse(imageUrl));
+        }
+        binding.imageCount.setText(imageUriList.size() + "/3");
+        
+        imageAdapter.setData(imageUriList);
+        binding.imageRecyclerView.setAdapter(imageAdapter);
+    }
+    
+    private void setUpSiteDetail(Site site) {
+        binding.createSiteName.setText(site.getSiteName());
+        binding.createSiteDesc.setText(site.getSiteDesc());
+        binding.donorCap.setText(String.valueOf(site.getDonorMaxCapacity()));
+        binding.volunteerCap.setText(String.valueOf(site.getVolunteerMaxCapacity()));
+    }
+    
+    private void setUpSiteSpinnerDetail(Site site) {
+        int bloodTypePosition = bloodTypesAdapter.getPosition(site.getRequiredBloodType());
+        bloodTypeSpinner.setSelection(bloodTypePosition);
+        
+        String siteAddress = site.getSiteAddress();
+        for (int i = 0; i < addressList.size(); i++) {
+            if (addressList.get(i).getAddress().equals(siteAddress)) {
+                addressSpinner.setSelection(i);
+                break;
+            }
+        }
+    }
+    
+    private void setUpSiteEventDate(Site site) {
+        binding.createSiteDate.setText(DateFormatter.toDateString(site.getEventDate()));
     }
     
     //----------------------------------------SET UP CREATE SITE------------------------------------
@@ -276,11 +333,6 @@ public class CreateEventFragment
         String siteName = binding.createSiteName.getText().toString().trim();
         String siteDesc = binding.createSiteDesc.getText().toString().trim();
         String siteAddress = binding.addressDisplay.getText().toString().trim();
-        String volunteerCapText = binding.volunteerCap.getText().toString().trim();
-        String donorCapText = binding.donorCap.getText().toString().trim();
-        String eventDateStr = binding.createSiteDate.getText().toString().trim();
-        
-        Date currentDate = new Date();
         
         if (imageUriList.isEmpty()) {
             turnOnErrorMessage(binding.createAddImageErr, true);
@@ -302,68 +354,34 @@ public class CreateEventFragment
             invalidCount++;
         }
         
-        try {
-            if (volunteerCapText.isEmpty()) {
-                turnOnErrorMessage(binding.createVolunteerCapErr, true);
-                invalidCount++;
-            } else {
-                int volunteerCap = Integer.parseInt(volunteerCapText);
-                if (FieldValidation.isValidNumberInRange(volunteerCap, 1, 20)) {
-                    turnOnErrorMessage(binding.createVolunteerCapErr, true);
-                    invalidCount++;
-                }
-            }
-            
-            if (donorCapText.isEmpty()) {
-                turnOnErrorMessage(binding.createDonorCapErr, true);
-                invalidCount++;
-            } else {
-                int donorCap = Integer.parseInt(donorCapText);
-                if (FieldValidation.isValidNumberInRange(donorCap, 1, 20)) {
-                    turnOnErrorMessage(binding.createDonorCapErr, true);
-                    invalidCount++;
-                }
-            }
-        } catch (NumberFormatException e) {
-            Toast.makeText(requireContext(), "Please enter valid numbers for capacity", Toast.LENGTH_SHORT).show();
-            invalidCount++;
-        }
-        
-        if (eventDateStr.isEmpty()) {
-            turnOnErrorMessage(binding.createSiteDateEmpty, true);
-            turnOnErrorMessage(binding.createSiteDatePast, false);
-            invalidCount++;
-            
-        } else if (DateFormatter.toDate(eventDateStr).getTime() <= currentDate.getTime()) {
-            turnOnErrorMessage(binding.createSiteDateEmpty, false);
-            turnOnErrorMessage(binding.createSiteDatePast, true);
-            invalidCount++;
-        }
-        
         return invalidCount == 0;
     }
     
-    private void createSite() {
+    private void updateSite(Site site, User host) {
         if (!isSiteInputValid()) {
             Toast.makeText(requireContext(), "ERROR: Some input are invalid!", Toast.LENGTH_SHORT).show();
             return;
         }
         
-        Site pendingCreatedSite =
+        Site pendingUpdatedSite =
                 Site.builder()
                         .host(userViewModel.getCurrentUserId())
+                        .siteId(site.getSiteId())
                         .siteName(binding.createSiteName.getText().toString().trim())
-                        .siteDesc(binding.createSiteDesc.getText().toString().trim())
                         .siteAddress(binding.addressDisplay.getText().toString().trim())
+                        .siteImageUrl(site.getSiteImageUrl())
                         .requiredBloodType(binding.bloodTypeSpinner.getSelectedItem().toString().trim())
                         .donorMaxCapacity(Integer.parseInt(binding.donorCap.getText().toString().trim()))
                         .volunteerMaxCapacity(Integer.parseInt(binding.volunteerCap.getText().toString().trim()))
                         .latitude(String.valueOf(coordinates.latitude))
                         .longitude(String.valueOf(coordinates.longitude))
+                        .listOfDonors(site.getListOfDonors())
+                        .listOfVolunteers(site.getListOfVolunteers())
+                        .listOfReports(site.getListOfReports())
                         .eventDate(DateFormatter.toDate(binding.createSiteDate.getText().toString().trim()))
                         .build();
         
-        siteViewModel.createNewSite(pendingCreatedSite, new FirebaseCallback<>() {
+        siteViewModel.updateSite(site.getSiteId(), pendingUpdatedSite, new FirebaseCallback<Site>() {
             @Override
             public void onSuccess(List<Site> t) {
             
@@ -377,21 +395,65 @@ public class CreateEventFragment
                         site.setSiteImageUrl(imageUrls);
                         siteViewModel.updateSiteImages(site.getSiteId(), site);
                         
-                        Intent i = new Intent(requireContext(), EventActivity.class);
-                        startActivity(i);
+                        List<String> listOfAllSiteMembers = site.getListOfDonors();
+                        listOfAllSiteMembers.addAll(site.getListOfVolunteers());
+                        listOfAllSiteMembers.remove(site.getHost());
+                        
+                        String message = "We’ve updated our blood donation site. Check it out!";
+                        
+                        for (String memberId : listOfAllSiteMembers) {
+                            Notification pendingSentNotification =
+                                    Notification.builder()
+                                            .senderId(host.getUserId())
+                                            .senderEmail(host.getEmail())
+                                            .receiverId(memberId)
+                                            .siteId(site.getSiteId())
+                                            .title("SITE UPDATED")
+                                            .desc(message)
+                                            .build();
+                            
+                            notificationViewModel.createNotification(pendingSentNotification, new FirebaseCallback<>() {
+                                @Override
+                                public void onSuccess(List<Notification> t) {
+                                
+                                }
+                                
+                                @Override
+                                public void onSuccess(Notification notification) {
+                                    notificationViewModel.updateNotificationId(notification.getNotificationId(), notification);
+                                    
+                                    Intent i = new Intent(requireContext(), EventActivity.class);
+                                    startActivity(i);
+                                }
+                                
+                                @Override
+                                public void onFailure(List<Notification> t) {
+                                
+                                }
+                                
+                                @Override
+                                public void onFailure(Notification notification) {
+                                
+                                }
+                            });
+                        }
                     }
                     
                     @Override
-                    public void onSuccess(String imageUrl) {}
+                    public void onSuccess(String s) {
+                    
+                    }
                     
                     @Override
-                    public void onFailure(List<String> imageUrls) {}
+                    public void onFailure(List<String> t) {
+                    
+                    }
                     
                     @Override
-                    public void onFailure(String imageUrl) {}
+                    public void onFailure(String s) {
+                    
+                    }
                 });
-                
-                siteViewModel.updateSiteId(site.getSiteId(), site);
             }
             
             @Override
@@ -405,6 +467,7 @@ public class CreateEventFragment
             }
         });
     }
+    
     //----------------------------------------SET UP IMAGE UPLOADING--------------------------------
     private void openFile() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
@@ -463,6 +526,12 @@ public class CreateEventFragment
     //----------------------------------------SET UP TOOLS FUNCTION---------------------------------
     private void setUpInitialState() {
         binding.defaultImageLayout.setVisibility(View.VISIBLE);
+        binding.donorCap.setEnabled(false);
+        binding.volunteerCap.setEnabled(false);
+        binding.bloodTypeSpinner.setEnabled(false);
+        binding.createSiteDate.setEnabled(false);
+        binding.createSiteDate.setFocusable(false);
+        
         clearErrorMessage();
     }
     
@@ -472,9 +541,6 @@ public class CreateEventFragment
         turnOnErrorMessage(binding.createSiteDescErr, false);
         turnOnErrorMessage(binding.createVolunteerCapErr, false);
         turnOnErrorMessage(binding.createDonorCapErr, false);
-        turnOnErrorMessage(binding.createSiteBloodTypeErr, false);
-        turnOnErrorMessage(binding.createSiteDateEmpty, false);
-        turnOnErrorMessage(binding.createSiteDatePast, false);
         turnOnErrorMessage(binding.createSiteAddressErr, false);
     }
     

@@ -57,6 +57,10 @@ public class SiteViewModel extends AndroidViewModel {
         siteRepository.createNewSite(site, callback);
     }
     
+    public void updateSite(String siteId, Site site, FirebaseCallback<Site> callback) {
+        siteRepository.updateSite(siteId, site, callback);
+    }
+    
     public void updateSiteId(String siteId, Site site) {
         siteRepository.updateSiteId(siteId, site);
     }

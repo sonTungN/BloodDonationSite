@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relative"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragments.CreateEventFragment">
+    tools:context=".fragments.EditEventFragment">
 
     <TextView
         android:id="@+id/site_displaying_text"
@@ -16,7 +17,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
-        android:text="You have already created a site. Change to edit tab."
+        android:text="You have no site to edit!"
         android:textSize="14sp"
         android:visibility="gone"
         tools:ignore="HardcodedText" />
@@ -37,7 +38,7 @@
                 style="@style/CardHeading1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="CREATE NEW SITE"
+                android:text="EDIT YOUR SITE"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
@@ -47,7 +48,7 @@
                 style="@style/CardDesc2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Make a new blood donation site to save lives, organize drives and connect donors with those in need."
+                android:text="Update your blood donation site to improve management, organize better drives, and enhance donor connections."
                 android:layout_marginStart="20dp"
                 android:layout_marginEnd="20dp"
                 tools:ignore="HardcodedText" />
@@ -328,15 +329,6 @@
                             android:gravity="center"
                             android:spinnerMode="dropdown" />
                     </RelativeLayout>
-
-                    <TextView
-                        android:id="@+id/create_site_blood_type_err"
-                        style="@style/ErrorText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="3dp"
-                        android:text="*Required"
-                        tools:ignore="HardcodedText" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -369,24 +361,6 @@
                     android:textColor="@color/black"
                     android:textColorHint="@color/black"
                     android:textSize="16sp"
-                    tools:ignore="HardcodedText" />
-
-                <TextView
-                    android:id="@+id/create_site_date_empty"
-                    style="@style/ErrorText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="3dp"
-                    android:text="*Required"
-                    tools:ignore="HardcodedText" />
-
-                <TextView
-                    android:id="@+id/create_site_date_past"
-                    style="@style/ErrorText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="3dp"
-                    android:text="Event date must be tomorrow or later."
                     tools:ignore="HardcodedText" />
 
             </LinearLayout>
@@ -479,7 +453,7 @@
                 android:layout_marginHorizontal="20dp"
                 android:layout_marginVertical="30dp"
                 android:background="@drawable/custom_btn_pink"
-                android:text="CREATE SITE"
+                android:text="UPDATE SITE"
                 android:textColor="@color/black"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -506,3 +480,4 @@
     </FrameLayout>
 
 </RelativeLayout>
+

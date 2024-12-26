@@ -9,10 +9,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.sontung.blood.R;
+import com.sontung.blood.databinding.ItemAddedImageBinding;
+
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
@@ -40,8 +43,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     @NonNull
     @Override
     public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view =
-                LayoutInflater.from(parent.getContext()).inflate(R.layout.added_image, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(
+                        R.layout.item_added_image,
+                        parent,
+                        false
+                );
         return new ImageViewHolder(view, onItemCountAfterDelete, onItemZoom);
     }
     
@@ -65,18 +72,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     
     @Override
     public int getItemCount() {
-        if (imageUris != null) {
-            return imageUris.size();
-        }
-        return 0;
+        return imageUris != null ? imageUris.size() : 0;
     }
     
-    public static class ImageViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+    public static class ImageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private final ImageView imageView;
         private final ImageView deleteIcon;
-        
-        private OnItemCountAfterDelete onItemCountAfterDelete;
         
         private final OnItemZoom onItemZoom;
         
@@ -85,7 +86,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                 OnItemCountAfterDelete onItemCountAfterDelete,
                 OnItemZoom onItemZoom) {
             super(itemView);
-            this.onItemCountAfterDelete = onItemCountAfterDelete;
             this.onItemZoom = onItemZoom;
             imageView = itemView.findViewById(R.id.addedImageId);
             deleteIcon = itemView.findViewById(R.id.deleteImageIcon);
@@ -95,7 +95,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         @Override
         public void onClick(View v) {
             if (onItemZoom != null) {
-                onItemZoom.itemZoomClick(getAdapterPosition());
+                onItemZoom.itemZoomClick(getAbsoluteAdapterPosition());
             }
         }
     }
