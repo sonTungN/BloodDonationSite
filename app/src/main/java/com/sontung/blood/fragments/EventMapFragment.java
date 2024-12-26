@@ -81,41 +81,41 @@ import java.util.Objects;
 public class EventMapFragment
         extends Fragment
         implements OnMapReadyCallback {
-    
+
     private FragmentEventMapBinding binding;
-    
+
     private GoogleMap map;
-    
+
     private UserViewModel userViewModel;
     private SiteViewModel siteViewModel;
     private User currentUser;
-    
+
     private final List<Site> userRegisteredSite = new ArrayList<>();
     private final List<Site> userVolunteerSite = new ArrayList<>();
     private Site userHostedSite;
-    
+
     // Google map API
     private GeoApiContext mapGeoAPIContext;
-    
+
     // Location Service
     private FusedLocationProviderClient locationClient;
     private LocationRequest locRequest;
     private LocationCallback locCallback;
-    
+
     private ClusterManager<CustomAdvancedMarker> customManager;
     private MarkerSetter markerRenderer;
-    
+
     private final List<CustomAdvancedMarker> customAdvancedMarkers = new ArrayList<>();
-    
+
     // Polylines
     private List<MapPolyline> listOfMapPolyline = new ArrayList<>();
-    
+
     @Override
     public void onStart() {
         super.onStart();
         validateLocationPermission();
     }
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,11 +126,11 @@ public class EventMapFragment
                 userViewModel.getUserDataById(
                         userViewModel.getCurrentUserId()
                 ).getValue();
-        
+
         fetchAllSiteIntoMap();
-        
+
         locationClient = LocationServices.getFusedLocationProviderClient(requireContext());
-        
+
         locRequest = new LocationRequest
                 .Builder(Priority.PRIORITY_HIGH_ACCURACY)
                 .setIntervalMillis(Location.LOCATION_INTERVAL)
@@ -138,54 +138,54 @@ public class EventMapFragment
                 .setMaxUpdateDelayMillis(Location.LOCATION_DELAY_TIME_MAX)
                 .setWaitForAccurateLocation(true)
                 .build();
-        
+
         locCallback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 for (android.location.Location location : locationResult.getLocations()) {
                     Log.d("UPDATE LOCATION: LAT:", String.valueOf(location.getLatitude()));
                     Log.d("UPDATE LOCATION: LONG:", String.valueOf(location.getLongitude()));
-                    
+
                     super.onLocationResult(locationResult);
                 }
             }
-            
+
         };
     }
-    
+
     @Override
-    public View onCreateView (
+    public View onCreateView(
             @NonNull LayoutInflater inflater,
             ViewGroup container,
             Bundle savedInstanceState) {
-        
+
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        
+
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
-        
+
         return binding.getRoot();
     }
-    
+
     @Override
     public void onResume() {
         super.onResume();
         startUpdatingLocation();
         fetchAllSiteIntoMap();
     }
-    
+
     @Override
     public void onStop() {
         super.onStop();
         stopUpdatingLocation();
     }
-    
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.map = googleMap;
         map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-        
+
         try {
             boolean success =
                     map.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.style_raw));
@@ -195,18 +195,18 @@ public class EventMapFragment
         } catch (Resources.NotFoundException e) {
             Log.e(TAG, "STYLE: Style not found", e);
         }
-        
+
         if (mapGeoAPIContext == null) {
             mapGeoAPIContext =
                     new GeoApiContext.Builder()
                             .apiKey(BuildConfig.MAPS_API_KEY).build();
         }
-        
+
         map.setOnPolylineClickListener(this::polylineClickHandler);
     }
-    
+
     private void polylineClickHandler(Polyline polyline) {
-        for (MapPolyline currentPolyline: listOfMapPolyline) {
+        for (MapPolyline currentPolyline : listOfMapPolyline) {
             if (polyline.getId().equals(currentPolyline.getPolyline().getId())) {
                 currentPolyline
                         .getPolyline()
@@ -215,7 +215,7 @@ public class EventMapFragment
                         );
                 currentPolyline.getPolyline().setZIndex(1);
                 binding.duration.setText(currentPolyline.getDirectionsLeg().duration.toString());
-                
+
             } else {
                 currentPolyline.getPolyline().setColor(
                         ContextCompat.getColor(requireActivity(), R.color.purple_500)
@@ -224,7 +224,7 @@ public class EventMapFragment
             }
         }
     }
-    
+
     private void fetchAllSiteIntoMap() {
         siteViewModel
                 .getUserRegisteredSite(userViewModel.getCurrentUserId())
@@ -238,20 +238,20 @@ public class EventMapFragment
                         Log.d("MAP", "Failed to get registered site!");
                     }
                 });
-        
-//        siteViewModel
-//                .getUserVolunteerSite(userViewModel.getCurrentUserId())
-//                .observe(this, sites -> {
-//                    if (sites != null) {
-//                        userVolunteerSite.clear();
-//                        userVolunteerSite.addAll(sites);
-//
-//                        markAllSiteFromList(map, userVolunteerSite);
-//                    } else {
-//                        Log.d("MAP", "Failed to get volunteer site!");
-//                    }
-//                });
-        
+
+        siteViewModel
+                .getUserVolunteerSite(userViewModel.getCurrentUserId())
+                .observe(this, sites -> {
+                    if (sites != null) {
+                        userVolunteerSite.clear();
+                        userVolunteerSite.addAll(sites);
+
+                        markAllSiteFromList(map, userVolunteerSite);
+                    } else {
+                        Log.d("MAP", "Failed to get volunteer site!");
+                    }
+                });
+
         siteViewModel
                 .getUserHostedSite(userViewModel.getCurrentUserId())
                 .observe(this, sites -> {
@@ -263,41 +263,41 @@ public class EventMapFragment
                     }
                 });
     }
-    
+
     @SuppressLint("SetTextI18n")
-    private void markAllSiteFromList (GoogleMap googleMap, List<Site> siteList) {
+    private void markAllSiteFromList(GoogleMap googleMap, List<Site> siteList) {
         if (customManager == null) {
             customManager = new ClusterManager<>(requireContext(), googleMap);
         }
-        
+
         if (markerRenderer == null) {
             markerRenderer = new MarkerSetter(requireContext(), googleMap, customManager);
             customManager.setRenderer(markerRenderer);
         }
-        
+
         userViewModel.getCurrentUser().observe(this, user -> {
-            for (Site site: siteList) {
+            for (Site site : siteList) {
                 String hostEmail =
                         Objects.requireNonNull(
                                 userViewModel.getUserDataById(site.getHost()).getValue()
                         ).getEmail();
                 double latValue = Double.parseDouble(site.getLatitude());
                 double longValue = Double.parseDouble(site.getLongitude());
-                
+
                 int markerIcon = 0;
                 if (site.getHost().equals(userViewModel.getCurrentUserId())) {
                     markerIcon = R.drawable.ic_admin_icon;
-                    
+
                 } else if (isUserRegistered(site, user)) {
                     markerIcon = R.drawable.ic_donor_icon;
-                    
+
                 } else if (isUserVolunteered(site, user)) {
                     markerIcon = R.drawable.ic_volunteer_icon;
-                    
+
                 } else {
                     markerIcon = R.drawable.icon_blood_type;
                 }
-                
+
                 CustomAdvancedMarker marker =
                         CustomAdvancedMarker.builder()
                                 .site(site)
@@ -306,12 +306,12 @@ public class EventMapFragment
                                 .snippet(hostEmail)
                                 .position(new LatLng(latValue, longValue))
                                 .build();
-                
+
                 customManager.addItem(marker);
                 customAdvancedMarkers.add(marker);
             }
         });
-        
+
         LatLng coordinates = Coordinates.RMIT;
         userViewModel.getCurrentUser().observe(this, user -> {
             CustomAdvancedMarker myMarker =
@@ -322,7 +322,7 @@ public class EventMapFragment
                             .snippet(user.getEmail())
                             .position(coordinates)
                             .build();
-            
+
             customManager.addItem(myMarker);
             customAdvancedMarkers.add(myMarker);
             customManager.cluster();
@@ -331,41 +331,42 @@ public class EventMapFragment
                     binding.siteName.setText("YOUR LOCATION");
                     binding.siteAddress.setText(Coordinates.RMIT_ADDRESS);
                     renderSiteDetailIntoView(false);
-                    
+
                 } else {
                     getSiteDistance(marker);
                     binding.siteName.setText(marker.getSite().getSiteName());
                     binding.siteAddress.setText("Location: " + marker.getSite().getSiteAddress());
-                    
+
                     setUpImageSlider(marker.getSite().getSiteImageUrl());
                     setUpDetailBtnClicked(marker.getSite());
                     renderSiteDetailIntoView(true);
                 }
-                
+
                 return false;
             });
-            
-            setCameraViewToUserCurrentLocation();
+
         });
+        setCameraViewToUserCurrentLocation();
+
     }
-    
+
     private boolean isUserRegistered(Site site, User user) {
         return site.getListOfDonors() != null &&
                 site.getListOfDonors().contains(user.getUserId());
     }
-    
+
     private boolean isUserVolunteered(Site site, User user) {
         return site.getListOfVolunteers() != null &&
                 site.getListOfVolunteers().contains(user.getUserId());
     }
-    
-    private void renderSiteDetailIntoView (boolean isDetailVisible) {
+
+    private void renderSiteDetailIntoView(boolean isDetailVisible) {
         if (isDetailVisible) {
             binding.toDetails.setVisibility(View.VISIBLE);
             binding.imageSlider.setVisibility(View.VISIBLE);
             binding.dotsIndicator.setVisibility(View.VISIBLE);
             binding.durationContainer.setVisibility(View.VISIBLE);
-            
+
         } else {
             binding.toDetails.setVisibility(View.GONE);
             binding.imageSlider.setVisibility(View.GONE);
@@ -373,8 +374,8 @@ public class EventMapFragment
             binding.durationContainer.setVisibility(View.GONE);
         }
     }
-    
-    private void setUpDetailBtnClicked (Site site) {
+
+    private void setUpDetailBtnClicked(Site site) {
         binding.toDetails.setOnClickListener(view -> {
             Intent i = new Intent(requireContext(), EventDetailActivity.class)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -382,13 +383,13 @@ public class EventMapFragment
             startActivity(i);
         });
     }
-    
-    private void setUpImageSlider (List<String> siteImageUrl) {
+
+    private void setUpImageSlider(List<String> siteImageUrl) {
         MultipleImageAdapter adapter = new MultipleImageAdapter(siteImageUrl);
         binding.imageSlider.setAdapter(adapter);
         binding.dotsIndicator.attachTo(binding.imageSlider);
     }
-    
+
     private void setCameraViewToUserCurrentLocation() {
         LatLngBounds latLngBounds = new LatLngBounds(
                 new LatLng(Coordinates.BOTTOM_BOUND, Coordinates.LEFT_BOUND),
@@ -396,7 +397,7 @@ public class EventMapFragment
         );
         map.moveCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0));
     }
-    
+
     private void getSiteDistance(CustomAdvancedMarker marker) {
         com.google.maps.model.LatLng location = new com.google.maps.model.LatLng(
                 marker.getPosition().latitude,
@@ -410,7 +411,7 @@ public class EventMapFragment
                         Coordinates.RMIT_LONG
                 )
         );
-        
+
         directions
                 .destination(location)
                 .setCallback(new PendingResult.Callback<>() {
@@ -418,51 +419,51 @@ public class EventMapFragment
                     public void onResult(DirectionsResult result) {
                         addPolylinesForLocationToMap(result);
                     }
-                    
+
                     @Override
                     public void onFailure(Throwable e) {
                         Log.d("MAP: LOCATION", "Location: Can't get direction, Exception: " + e.getMessage());
                     }
                 });
     }
-    
+
     private void addPolylinesForLocationToMap(DirectionsResult result) {
         Log.d("MAP: LOCATION", "Location: Got direction");
         new Handler(Looper.getMainLooper())
                 .post(() -> {
                     if (!listOfMapPolyline.isEmpty()) {
-                        for (MapPolyline mapPolyline: listOfMapPolyline) {
+                        for (MapPolyline mapPolyline : listOfMapPolyline) {
                             mapPolyline.getPolyline().remove();
                         }
-                        
+
                         listOfMapPolyline.clear();
                         listOfMapPolyline = new ArrayList<>();
                     }
-                    
+
                     double duration = 999999999;
-                    for(DirectionsRoute route: result.routes) {
+                    for (DirectionsRoute route : result.routes) {
                         List<com.google.maps.model.LatLng> paths =
                                 PolylineEncoding.decode(route.overviewPolyline.getEncodedPath());
-                        
+
                         List<LatLng> listOfNewPaths = new ArrayList<>();
-                        for (com.google.maps.model.LatLng ll: paths) {
+                        for (com.google.maps.model.LatLng ll : paths) {
                             listOfNewPaths.add(new LatLng(ll.lat, ll.lng));
                         }
-                        
+
                         Polyline poly = map.addPolyline(
                                 new PolylineOptions().addAll(listOfNewPaths)
                         );
                         poly.setColor(ContextCompat.getColor(requireActivity(), R.color.softGrayishBlue));
                         poly.setClickable(true);
-                        
+
                         MapPolyline mapPolyline =
                                 MapPolyline.builder()
                                         .polyline(poly)
                                         .directionsLeg(route.legs[0])
                                         .build();
-                        
+
                         listOfMapPolyline.add(mapPolyline);
-                        
+
                         double checkDuration = route.legs[0].duration.inSeconds;
                         if (checkDuration < duration) {
                             duration = checkDuration;
@@ -472,24 +473,24 @@ public class EventMapFragment
                     }
                 });
     }
-    
+
     private void zoomRoute(List<LatLng> route, int padding, int duration) {
         if (map == null || route == null || route.isEmpty()) {
             return;
         }
-        
+
         LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
         for (LatLng point : route) {
             boundsBuilder.include(point);
         }
-        
+
         map.animateCamera(
                 CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), padding),
                 duration,
                 null
         );
     }
-    
+
     private void validateLocationPermission() {
         if (LocationPermission.LOCATION_GRANTED(requireContext())) {
             startUpdatingLocation();
@@ -497,11 +498,11 @@ public class EventMapFragment
             requestForLocationPermission();
         }
     }
-    
+
     private void requestForLocationPermission() {
         requestLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
     }
-    
+
     private final ActivityResultLauncher<String> requestLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -513,10 +514,12 @@ public class EventMapFragment
                         }
                     }
             );
-    
+
     private void startUpdatingLocation() {
-        if (LocationPermission.LOCATION_GRANTED(requireContext())) { return; }
-        
+        if (LocationPermission.LOCATION_GRANTED(requireContext())) {
+            return;
+        }
+
         if (
                 ActivityCompat
                         .checkSelfPermission(
@@ -529,11 +532,13 @@ public class EventMapFragment
                                         requireContext(),
                                         Manifest.permission.ACCESS_COARSE_LOCATION
                                 ) != PackageManager.PERMISSION_GRANTED
-        ) { return; }
-        
+        ) {
+            return;
+        }
+
         locationClient.requestLocationUpdates(locRequest, locCallback, null);
     }
-    
+
     private void stopUpdatingLocation() {
         locationClient.removeLocationUpdates(locCallback);
     }
