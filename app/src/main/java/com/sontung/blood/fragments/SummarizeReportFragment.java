@@ -1,5 +1,6 @@
 package com.sontung.blood.fragments;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -91,6 +92,7 @@ public class SummarizeReportFragment extends DialogFragment {
         });
     }
     
+    @SuppressLint("SetTextI18n")
     private void setUpDataIntoView() {
         reportViewModel.getReportDataBySiteId(siteId).observe(this, reports -> {
             double bloodVolume = 0;
@@ -98,7 +100,7 @@ public class SummarizeReportFragment extends DialogFragment {
                 bloodVolume += Double.parseDouble(report.getBloodVolume());
             }
             
-            binding.overviewBloodVolume.setText(String.valueOf(bloodVolume));
+            binding.overviewBloodVolume.setText(bloodVolume + " ML");
         });
     }
     

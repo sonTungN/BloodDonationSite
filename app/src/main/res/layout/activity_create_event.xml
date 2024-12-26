@@ -45,14 +45,13 @@
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="CREATE SITE"
-
+                    android:text="CREATE NEW SITE"
                     tools:ignore="HardcodedText"/>
 
                 <com.google.android.material.tabs.TabItem
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="CREATE REPORT"
+                    android:text="EDIT YOUR SITE"
                     tools:ignore="HardcodedText"/>
 
                 <com.google.android.material.tabs.TabItem

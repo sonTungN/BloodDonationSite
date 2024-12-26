@@ -61,6 +61,8 @@ import com.sontung.blood.viewmodel.UserViewModel;
 import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -320,40 +322,15 @@ public class EventDetailActivity extends AppCompatActivity {
         binding.volunteerApplyBtn.setText("Volunteer Apply");
 
         siteViewModel.getSiteDataById(siteId).observe(this, site -> {
+            checkEventDate(site, currentUserId);
+            checkDonorStatus(site, currentUserId);
+            checkVolunteerStatus(site, currentUserId);
+            
             userViewModel.getCurrentUser().observe(this, user -> {
-                if (!site.getRequiredBloodType().equals(user.getBloodType())) {
-                    setApplyButtonState(binding.donorApplyBtn, false);
-                    binding.donorApplyBtn.setText("BLOOD TYPE MISMATCH");
-                }
+                checkBloodTypeMatch(site, user);
             });
-
-            if (Objects.equals(site.getHost(), currentUserId)) {
-                setApplyButtonState(binding.donorApplyBtn, false);
-                binding.donorApplyBtn.setText("You are Host");
-            }
-
-            if (site.getListOfDonors().contains(currentUserId)) {
-                setApplyButtonState(binding.donorApplyBtn, false);
-                binding.donorApplyBtn.setText("Already Donor");
-
-            } else {
-                boolean isMaxDonor = site.getListOfDonors().size() >= site.getDonorMaxCapacity();
-                if (isMaxDonor) {
-                    setApplyButtonState(binding.donorApplyBtn, false);
-                    binding.donorApplyBtn.setText("Donor at max");
-                }
-            }
-
-            if (site.getListOfVolunteers().contains(currentUserId)) {
-                setApplyButtonState(binding.volunteerApplyBtn, false);
-                binding.volunteerApplyBtn.setText("Already Volunteer");
-            } else {
-                boolean isMaxVolunteer = site.getListOfVolunteers().size() >= site.getVolunteerMaxCapacity();
-                if (isMaxVolunteer) {
-                    setApplyButtonState(binding.volunteerApplyBtn, false);
-                    binding.volunteerApplyBtn.setText("Volunteer at max");
-                }
-            }
+            
+            checkHostStatus(site, currentUserId);
         });
     }
 
@@ -363,16 +340,33 @@ public class EventDetailActivity extends AppCompatActivity {
                     binding.setSite(site);
                     binding.siteDate.setText(DateFormatter.toDateString(site.getEventDate()));
 
-                    userViewModel.getUserDataById(site.getHost())
-                            .observe(this, user -> {
-                                binding.setHost(user);
-                                
-                                Glide
-                                        .with(getApplicationContext())
-                                        .load(user.getProfileUrl())
-                                        .into(binding.avatar);
-                            });
-
+                    userViewModel.getUserDataById(site.getHost(), new FirebaseCallback<User>() {
+                        @Override
+                        public void onSuccess(List<User> t) {
+                        
+                        }
+                        
+                        @Override
+                        public void onSuccess(User user) {
+                            binding.setHost(user);
+                            
+                            Glide
+                                    .with(getApplicationContext())
+                                    .load(user.getProfileUrl())
+                                    .into(binding.avatar);
+                        }
+                        
+                        @Override
+                        public void onFailure(List<User> t) {
+                        
+                        }
+                        
+                        @Override
+                        public void onFailure(User user) {
+                        
+                        }
+                    });
+                    
                     MultipleImageAdapter adapter = new MultipleImageAdapter(site.getSiteImageUrl());
                     viewPager2.setAdapter(adapter);
                     indicator.attachTo(viewPager2);
@@ -390,6 +384,77 @@ public class EventDetailActivity extends AppCompatActivity {
                         Toast.makeText(this, "Invalid site location data.", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+    
+    //----------------------------------------SET UP BUTTON STATUS----------------------------------
+    @SuppressLint("SetTextI18n")
+    private void checkHostStatus(Site site, String currentUserId) {
+        if (Objects.equals(site.getHost(), currentUserId)) {
+            setApplyButtonState(binding.donorApplyBtn, false);
+            binding.donorApplyBtn.setText("You are Host");
+        }
+    }
+    
+    private void checkEventDate(Site site, String currentUserId) {
+            if (site.getEventDate().after(new Date())) {
+            disableButtonsForFutureEvent(site, currentUserId);
+        } else if (isEventDatePassed(site.getEventDate())) {
+            disableButtonsForPastEvent();
+        }
+    }
+    
+    @SuppressLint("SetTextI18n")
+    private void disableButtonsForFutureEvent(Site site, String currentUserId) {
+        if (Objects.equals(site.getHost(), currentUserId)) {
+            setApplyButtonState(binding.volunteerApplyBtn, true);
+            
+        } else {
+            setApplyButtonState(binding.volunteerApplyBtn, false);
+            binding.volunteerApplyBtn.setText("Coming Soon");
+        }
+        
+        setApplyButtonState(binding.donorApplyBtn, false);
+        binding.donorApplyBtn.setText("Coming Soon");
+    }
+    
+    @SuppressLint("SetTextI18n")
+    private void disableButtonsForPastEvent() {
+        setApplyButtonState(binding.donorApplyBtn, false);
+        setApplyButtonState(binding.volunteerApplyBtn, false);
+        binding.donorApplyBtn.setText("Event Already Ended");
+        binding.volunteerApplyBtn.setText("Event Already Ended");
+    }
+    
+    @SuppressLint("SetTextI18n")
+    private void checkDonorStatus(Site site, String currentUserId) {
+        if (site.getListOfDonors().contains(currentUserId)) {
+            setApplyButtonState(binding.donorApplyBtn, false);
+            binding.donorApplyBtn.setText("Already Donor");
+            
+        } else if (site.getListOfDonors().size() >= site.getDonorMaxCapacity()) {
+            setApplyButtonState(binding.donorApplyBtn, false);
+            binding.donorApplyBtn.setText("Donor at max");
+        }
+    }
+    
+    @SuppressLint("SetTextI18n")
+    private void checkVolunteerStatus(Site site, String currentUserId) {
+        if (site.getListOfVolunteers().contains(currentUserId)) {
+            setApplyButtonState(binding.volunteerApplyBtn, false);
+            binding.volunteerApplyBtn.setText("Already Volunteer");
+            
+        } else if (site.getListOfVolunteers().size() >= site.getVolunteerMaxCapacity()) {
+            setApplyButtonState(binding.volunteerApplyBtn, false);
+            binding.volunteerApplyBtn.setText("Volunteer at max");
+        }
+    }
+    
+    @SuppressLint("SetTextI18n")
+    private void checkBloodTypeMatch(Site site, User user) {
+        if (!site.getRequiredBloodType().equals(user.getBloodType())) {
+            setApplyButtonState(binding.donorApplyBtn, false);
+            binding.donorApplyBtn.setText("Blood Type Mismatch");
+        }
     }
 
     //----------------------------------------SET UP MAP FRAGMENT-----------------------------------
@@ -441,6 +506,19 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     //----------------------------------------SET UP TOOL FUNCTIONS---------------------------------
+    private boolean isEventDatePassed(Date eventDate) {
+        Calendar eventCal = Calendar.getInstance();
+        eventCal.setTime(eventDate);
+        
+        Calendar currentCal = Calendar.getInstance();
+        currentCal.setTime(new Date());
+        
+        // Check if same day
+        return eventCal.get(Calendar.YEAR) != currentCal.get(Calendar.YEAR) ||
+                eventCal.get(Calendar.MONTH) != currentCal.get(Calendar.MONTH) ||
+                eventCal.get(Calendar.DAY_OF_MONTH) < currentCal.get(Calendar.DAY_OF_MONTH);
+    }
+    
     private void setApplyButtonState(View view, boolean isEnable) {
         view.setEnabled(isEnable);
     }
@@ -450,7 +528,7 @@ public class EventDetailActivity extends AppCompatActivity {
         drawerLayout = binding.drawer;
         navigationView = binding.navigationView;
         
-        binding.toolbarId.toolbarTitleId.setText("Event Details");
+        binding.toolbarId.toolbarTitleId.setText("Event Detail");
         binding.toolbarId.backIcon.setVisibility(View.VISIBLE);
         
         View headerView = binding.navigationView.getHeaderView(0);
@@ -466,16 +544,32 @@ public class EventDetailActivity extends AppCompatActivity {
             finish();
         });
         
-        userViewModel
-                .getUserDataById(userViewModel.getCurrentUserId())
-                .observe(this, user -> {
-                    navName.setText(user.getUsername());
-                    navEmail.setText(user.getEmail());
-                    
-                    Glide.with(getApplicationContext())
-                            .load(user.getProfileUrl())
-                            .into(navProfileImg);
-                });
+        userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<>() {
+            @Override
+            public void onSuccess(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onSuccess(User user) {
+                navName.setText(user.getUsername());
+                navEmail.setText(user.getEmail());
+                
+                Glide.with(getApplicationContext())
+                        .load(user.getProfileUrl())
+                        .into(navProfileImg);
+            }
+            
+            @Override
+            public void onFailure(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(User user) {
+            
+            }
+        });
         
         ActionBarDrawerToggle drawerToggle =
                 new ActionBarDrawerToggle(

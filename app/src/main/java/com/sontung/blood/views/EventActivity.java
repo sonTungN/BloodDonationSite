@@ -29,8 +29,10 @@ import com.google.android.material.tabs.TabLayout;
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.EventSiteAdapter;
 import com.sontung.blood.adapter.EventTabAdapter;
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityEventBinding;
 import com.sontung.blood.model.Site;
+import com.sontung.blood.model.User;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 
@@ -113,16 +115,32 @@ public class EventActivity extends AppCompatActivity {
         navigationView.bringToFront();
         binding.toolbarId.backIcon.setOnClickListener(view -> finish());
         
-        userViewModel
-                .getUserDataById(userViewModel.getCurrentUserId())
-                .observe(this, user -> {
-                    navName.setText(user.getUsername());
-                    navEmail.setText(user.getEmail());
-                    
-                    Glide.with(getApplicationContext())
-                            .load(user.getProfileUrl())
-                            .into(navProfileImg);
-                });
+        userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<>() {
+            @Override
+            public void onSuccess(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onSuccess(User user) {
+                navName.setText(user.getUsername());
+                navEmail.setText(user.getEmail());
+                
+                Glide.with(getApplicationContext())
+                        .load(user.getProfileUrl())
+                        .into(navProfileImg);
+            }
+            
+            @Override
+            public void onFailure(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(User user) {
+            
+            }
+        });
         
         ActionBarDrawerToggle drawerToggle =
                 new ActionBarDrawerToggle(

@@ -74,7 +74,7 @@ public class ImageRepository {
                                 callback.onSuccess(imageUrls);
                             }
                         } else {
-                            Log.d(TAG, "The bug is that " + Objects.requireNonNull(task.getException()).getMessage());
+                            Log.d("TAGY", "The bug is that " + Objects.requireNonNull(task.getException()).getMessage());
                         }
                     });
         });
@@ -85,8 +85,6 @@ public class ImageRepository {
             String parent,
             FirebaseCallback<String> callback
     ) {
-        
-        
         long index = new Date().getTime();
         StorageReference imageRef =
                 storageReference

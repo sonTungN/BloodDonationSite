@@ -144,6 +144,7 @@
                         android:text="@{String.valueOf(site.listOfDonors.size())}"
                         android:textColor="@color/black"
                         android:textSize="14sp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent" />
 
                     <TextView
@@ -152,6 +153,7 @@
                         android:text="/"
                         android:textColor="@color/black"
                         android:textSize="14sp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         tools:ignore="HardcodedText"/>
 
@@ -186,6 +188,7 @@
                         android:text="@{String.valueOf(site.listOfVolunteers.size())}"
                         android:textColor="@color/black"
                         android:textSize="14sp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent" />
 
                     <TextView
@@ -194,6 +197,7 @@
                         android:text="/"
                         android:textColor="@color/black"
                         android:textSize="14sp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         tools:ignore="HardcodedText"/>
 
@@ -229,6 +233,7 @@
                         android:text="@{site.requiredBloodType}"
                         android:textColor="@color/black"
                         android:textSize="14sp"
+                        android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent" />
                 </LinearLayout>
 

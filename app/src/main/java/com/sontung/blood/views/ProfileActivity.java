@@ -36,7 +36,6 @@ public class ProfileActivity extends AppCompatActivity {
     private Spinner bloodTypeSpinner;
     
     // Toggle and Drawer
-//    private ActionBarDrawerToggle toggle;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     

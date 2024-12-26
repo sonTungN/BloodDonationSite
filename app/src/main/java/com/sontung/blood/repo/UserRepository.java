@@ -167,6 +167,26 @@ public class UserRepository {
        return userData;
     }
     
+    public void getUserDataById(String userId, FirebaseCallback<User> callback) {
+        userCollection
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        User targetUser = documentSnapshot.toObject(User.class);
+                        callback.onSuccess(targetUser);
+                        
+                    } else {
+                        Log.d("USER: FETCH ERROR", "Document not found!");
+                    }
+                })
+                
+                .addOnFailureListener(e -> {
+                    Log.d("USER: FETCH ERROR", Objects.requireNonNull(e.getMessage()));
+                    Toast.makeText(context, "USERS DOCUMENT: ERROR", Toast.LENGTH_SHORT).show();
+                });
+    }
+    
     public void addCurrentUserRegisteredSite(String siteId, FirebaseCallback<Boolean> callback) {
         userCollection
                 .document(getCurrentUserId())

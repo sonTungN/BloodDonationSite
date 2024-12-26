@@ -160,7 +160,6 @@
                                 android:text="Explore Now"
                                 style="@style/CardDesc1"
                                 android:textStyle="bold"
-
                                 tools:ignore="HardcodedText"/>
 
                         </LinearLayout>

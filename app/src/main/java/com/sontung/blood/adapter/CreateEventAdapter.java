@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.sontung.blood.fragments.CreateEventFragment;
+import com.sontung.blood.fragments.EditEventFragment;
 
 public class CreateEventAdapter extends FragmentStateAdapter {
     public CreateEventAdapter(@NonNull FragmentActivity fragmentActivity) {
@@ -16,8 +17,10 @@ public class CreateEventAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         switch (position) {
-//            case 1:
-//                return new EditEventFragment();
+            case 0:
+                return new CreateEventFragment();
+            case 1:
+                return new EditEventFragment();
 //            case 2:
 //                return new CreateReportFragment();
 //            case 3:
@@ -29,6 +32,6 @@ public class CreateEventAdapter extends FragmentStateAdapter {
     
     @Override
     public int getItemCount() {
-        return 1;
+        return 2;
     }
 }

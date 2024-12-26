@@ -20,10 +20,14 @@ import com.bumptech.glide.Glide;
 import com.sontung.blood.R;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.FragmentCreateReportBinding;
+import com.sontung.blood.model.Notification;
 import com.sontung.blood.model.Report;
+import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
 import com.sontung.blood.utils.FieldValidation;
+import com.sontung.blood.viewmodel.NotificationViewModel;
 import com.sontung.blood.viewmodel.ReportViewModel;
+import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 
 import java.util.List;
@@ -35,8 +39,10 @@ public class CreateReportFragment extends DialogFragment {
     private static final String ARG_SITE_ID = "siteId";
     
     private FragmentCreateReportBinding binding;
-    private ReportViewModel reportViewModel;
     private UserViewModel userViewModel;
+    private SiteViewModel siteViewModel;
+    private ReportViewModel reportViewModel;
+    private NotificationViewModel notificationViewModel;
     
     private String userId;
     private String siteId;
@@ -77,8 +83,10 @@ public class CreateReportFragment extends DialogFragment {
             siteId = getArguments().getString(ARG_SITE_ID);
         }
         
-        reportViewModel = new ViewModelProvider(this).get(ReportViewModel.class);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        reportViewModel = new ViewModelProvider(this).get(ReportViewModel.class);
+        notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
         
         setUpButtonClickHandler();
     }
@@ -116,7 +124,6 @@ public class CreateReportFragment extends DialogFragment {
             public void onSuccess(Report report) {
                 reportViewModel.updateReportId(report.getReportId(), report);
                 Toast.makeText(requireContext(), "Create Report Successfully!", Toast.LENGTH_SHORT).show();
-                dismiss();
             }
             
             @Override
@@ -126,6 +133,82 @@ public class CreateReportFragment extends DialogFragment {
             
             @Override
             public void onFailure(Report report) {
+            
+            }
+        });
+        
+        siteViewModel.getSiteDataById(siteId, new FirebaseCallback<Site>() {
+            @Override
+            public void onSuccess(List<Site> t) {
+            
+            }
+            
+            @Override
+            public void onSuccess(Site site) {
+                userViewModel.getUserDataById(site.getHost(), new FirebaseCallback<User>() {
+                    @Override
+                    public void onSuccess(List<User> t) {
+                    
+                    }
+                    
+                    @Override
+                    public void onSuccess(User user) {
+                        String message = "Your blood donation report has been added.";
+                        
+                        Notification pendingCreatedNotification =
+                                Notification.builder()
+                                        .senderId(site.getHost())
+                                        .senderEmail(user.getEmail())
+                                        .receiverId(userId)
+                                        .siteId(siteId)
+                                        .title("REPORT ADDED")
+                                        .desc(message)
+                                        .build();
+                        
+                        notificationViewModel.createNotification(pendingCreatedNotification, new FirebaseCallback<Notification>() {
+                            @Override
+                            public void onSuccess(List<Notification> t) {
+                            
+                            }
+                            
+                            @Override
+                            public void onSuccess(Notification notification) {
+                                notificationViewModel.updateNotificationId(notification.getNotificationId(), notification);
+                                Toast.makeText(requireContext(), "Create Notification Successfully!", Toast.LENGTH_SHORT).show();
+                                dismiss();
+                            }
+                            
+                            @Override
+                            public void onFailure(List<Notification> t) {
+                            
+                            }
+                            
+                            @Override
+                            public void onFailure(Notification notification) {
+                            
+                            }
+                        });
+                    }
+                    
+                    @Override
+                    public void onFailure(List<User> t) {
+                    
+                    }
+                    
+                    @Override
+                    public void onFailure(User user) {
+                    
+                    }
+                });
+            }
+            
+            @Override
+            public void onFailure(List<Site> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(Site site) {
             
             }
         });

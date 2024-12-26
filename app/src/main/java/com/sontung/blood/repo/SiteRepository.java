@@ -4,8 +4,11 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -175,6 +178,25 @@ public class SiteRepository {
         return siteData;
     }
     
+    public void getSiteDataById(String siteId, FirebaseCallback<Site> callback) {
+        siteCollection
+                .document(siteId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Site targetSite = documentSnapshot.toObject(Site.class);
+                        callback.onSuccess(targetSite);
+                        
+                    } else {
+                        Log.d("USER: FETCH ERROR", "Document not found!");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("SITE: FETCH ERROR", Objects.requireNonNull(e.getMessage()));
+                    Toast.makeText(context, "SITE DOCUMENT: ERROR", Toast.LENGTH_SHORT).show();
+                });
+    }
+    
     public MutableLiveData<List<Site>> getUserRegisteredSite(String userId) {
         userCollection
                 .document(userId)
@@ -339,10 +361,25 @@ public class SiteRepository {
                 });
     }
     
-    public void updateSiteId(String siteId, Site updateSite) {
+    public void updateSite(String siteId, Site updatedSite, FirebaseCallback<Site> callback) {
         siteCollection
                 .document(siteId)
-                .update("siteId", updateSite.getSiteId())
+                .set(updatedSite)
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()) {
+                        callback.onSuccess(updatedSite);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.d("SITE: UPDATE ERROR", Objects.requireNonNull(e.getMessage()));
+                    Toast.makeText(context, "Failed to update site", Toast.LENGTH_SHORT).show();
+                });
+    }
+    
+    public void updateSiteId(String siteId, Site updatedSite) {
+        siteCollection
+                .document(siteId)
+                .update("siteId", updatedSite.getSiteId())
                 .addOnSuccessListener(e -> {
                     Toast.makeText(context, "Site ID updated successfully", Toast.LENGTH_SHORT).show();
                 })

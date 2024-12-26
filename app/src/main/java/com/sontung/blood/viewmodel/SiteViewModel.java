@@ -29,6 +29,10 @@ public class SiteViewModel extends AndroidViewModel {
         return siteRepository.getSiteDataById(siteId);
     }
     
+    public void getSiteDataById(String siteId, FirebaseCallback<Site> callback) {
+        siteRepository.getSiteDataById(siteId, callback);
+    }
+    
     public MutableLiveData<List<User>> getSiteVolunteerList(String siteId) {
         return siteRepository.getSiteVolunteerList(siteId);
     }
@@ -51,6 +55,10 @@ public class SiteViewModel extends AndroidViewModel {
     
     public void createNewSite(Site site, FirebaseCallback<Site> callback) {
         siteRepository.createNewSite(site, callback);
+    }
+    
+    public void updateSite(String siteId, Site site, FirebaseCallback<Site> callback) {
+        siteRepository.updateSite(siteId, site, callback);
     }
     
     public void updateSiteId(String siteId, Site site) {

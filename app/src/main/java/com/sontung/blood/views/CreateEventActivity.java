@@ -23,12 +23,16 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.CreateEventAdapter;
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityCreateEventBinding;
 import com.sontung.blood.databinding.ActivityHomeBinding;
+import com.sontung.blood.model.User;
 import com.sontung.blood.viewmodel.UserViewModel;
 
+import java.util.List;
 import java.util.Objects;
 
 public class CreateEventActivity extends AppCompatActivity {
@@ -36,8 +40,6 @@ public class CreateEventActivity extends AppCompatActivity {
     private ActivityCreateEventBinding binding;
     
     private UserViewModel userViewModel;
-    
-    private CreateEventAdapter adapter;
     
     // Navbar
     private DrawerLayout drawerLayout;
@@ -52,23 +54,19 @@ public class CreateEventActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_create_event);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         
-        adapter = new CreateEventAdapter(this);
+        CreateEventAdapter adapter = new CreateEventAdapter(this);
         binding.pageContent.setAdapter(adapter);
         
-        setUpDrawer();
-        
-        binding.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                binding.pageContent.setCurrentItem(tab.getPosition());
+        new TabLayoutMediator(binding.tabLayout, binding.pageContent, (tab, position) -> {
+            switch (position) {
+                case 0:
+                    tab.setText("CREATE NEW SITE");
+                    break;
+                case 1:
+                    tab.setText("EDIT YOUR SITE");
+                    break;
             }
-            
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-            
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
-        });
+        }).attach();
         
         binding.pageContent.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -77,6 +75,8 @@ public class CreateEventActivity extends AppCompatActivity {
                 Objects.requireNonNull(binding.tabLayout.getTabAt(position)).select();
             }
         });
+        
+        setUpDrawer();
         
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -90,7 +90,7 @@ public class CreateEventActivity extends AppCompatActivity {
         drawerLayout = binding.drawer;
         navigationView = binding.navigationView;
         
-        binding.toolbarId.toolbarTitleId.setText("Event Details");
+        binding.toolbarId.toolbarTitleId.setText("My Event");
         binding.toolbarId.backIcon.setVisibility(View.GONE);
         
         View headerView = binding.navigationView.getHeaderView(0);
@@ -102,16 +102,32 @@ public class CreateEventActivity extends AppCompatActivity {
         navigationView.bringToFront();
         binding.toolbarId.backIcon.setOnClickListener(view -> finish());
         
-        userViewModel
-                .getUserDataById(userViewModel.getCurrentUserId())
-                .observe(this, user -> {
-                    navName.setText(user.getUsername());
-                    navEmail.setText(user.getEmail());
-                    
-                    Glide.with(getApplicationContext())
-                            .load(user.getProfileUrl())
-                            .into(navProfileImg);
-                });
+        userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<>() {
+            @Override
+            public void onSuccess(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onSuccess(User user) {
+                navName.setText(user.getUsername());
+                navEmail.setText(user.getEmail());
+                
+                Glide.with(getApplicationContext())
+                        .load(user.getProfileUrl())
+                        .into(navProfileImg);
+            }
+            
+            @Override
+            public void onFailure(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(User user) {
+            
+            }
+        });
         
         ActionBarDrawerToggle drawerToggle =
                 new ActionBarDrawerToggle(
