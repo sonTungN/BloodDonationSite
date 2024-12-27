@@ -73,9 +73,7 @@ public class ReportRepository {
         reportCollection
                 .document(reportId)
                 .update("reportId", updateReport.getReportId())
-                .addOnSuccessListener(e -> {
-                    Toast.makeText(context, "Report ID updated successfully", Toast.LENGTH_SHORT).show();
-                })
+                .addOnSuccessListener(e -> {})
                 .addOnFailureListener(e -> {
                     Log.d("REPORT: UPDATE ID ERROR", Objects.requireNonNull(e.getMessage()));
                     Toast.makeText(context, "Failed to update report id", Toast.LENGTH_SHORT).show();

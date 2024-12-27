@@ -187,6 +187,8 @@ public class EventFragment extends Fragment {
         binding.searchView.setQuery("", false);
         binding.searchView.clearFocus();
         
+        
+        
         siteViewModel.getAllSiteData().observe(getViewLifecycleOwner(), sites -> {
             if (currentUser.getUserRole().equals("SUPER")) {
                 setUpSiteToViews(sites);

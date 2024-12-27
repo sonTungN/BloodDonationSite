@@ -54,7 +54,13 @@ public class SiteMemberFragment extends Fragment {
         setUpInitialState();
         setUpView();
         
+        
         return binding.getRoot();
+    }
+    
+    private void popUpDonationOverview(String siteId) {
+        SummarizeReportFragment fragment = SummarizeReportFragment.newInstance(siteId);
+        fragment.show(this.getChildFragmentManager(), "SummarizeReportFragment");
     }
     
     @SuppressLint("NotifyDataSetChanged")
@@ -118,6 +124,8 @@ public class SiteMemberFragment extends Fragment {
             if (site == null) {
                 binding.siteOverviewLayout.setVisibility(View.GONE);
             } else {
+                binding.siteOverviewLayout.setVisibility(View.VISIBLE);
+                binding.summaryBtn.setVisibility(View.VISIBLE);
                 binding.setCurrentSite(site);
             }
         });
@@ -144,12 +152,14 @@ public class SiteMemberFragment extends Fragment {
                     binding.notFoundDonor.setVisibility(View.GONE);
                     binding.notFoundSiteVolunteer.setVisibility(View.VISIBLE);
                     binding.notFoundVolunteer.setVisibility(View.GONE);
+                    binding.summaryBtn.setVisibility(View.GONE);
                     
                 } else {
                     binding.notFoundSiteDonor.setVisibility(View.GONE);
                     binding.notFoundSiteVolunteer.setVisibility(View.GONE);
                     
                     fetchDataIntoView(user.getHostedSite());
+                    binding.summaryBtn.setOnClickListener(view -> popUpDonationOverview(user.getHostedSite()));
                 }
             }
             

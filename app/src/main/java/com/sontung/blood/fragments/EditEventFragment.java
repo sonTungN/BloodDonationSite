@@ -347,7 +347,7 @@ public class EditEventFragment
             invalidCount++;
         }
 
-        if (FieldValidation.isValidStringInRange(siteDesc, 0, 25)) {
+        if (FieldValidation.isValidStringInRange(siteDesc, 10, 25)) {
             turnOnErrorMessage(binding.createSiteDescErr, true);
             invalidCount++;
         }

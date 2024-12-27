@@ -40,6 +40,12 @@ public class Coordinates {
                     "Bệnh viện Nhi Đồng 2",
                     "14 Lý Tự Trọng, Bến Nghé, Quận 1, Hồ Chí Minh",
                     10.780777186921433, 106.70315183077477
+            ),
+            
+            new Address(
+                    "Trung tâm hiến máu nhân đạo TP.HCM",
+                    "106 Thiên Phước, Phường 9, Tân Bình, Hồ Chí Minh",
+                    10.776394751827489, 106.65367186126883
             )
     ));
 }

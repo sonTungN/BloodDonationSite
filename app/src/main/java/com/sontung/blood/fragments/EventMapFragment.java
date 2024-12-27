@@ -275,7 +275,7 @@ public class EventMapFragment
                     markerIcon = R.drawable.ic_donor_icon;
 
                 } else if (isUserVolunteered(site, user)) {
-                    markerIcon = R.drawable.ic_volunteer_icon;
+                    markerIcon = R.drawable.ic_volunteer_love;
 
                 } else {
                     markerIcon = R.drawable.icon_blood_type;
@@ -300,7 +300,7 @@ public class EventMapFragment
             CustomAdvancedMarker myMarker =
                     CustomAdvancedMarker.builder()
                             .site(null)
-                            .iconPic(R.drawable.ic_location_icon)
+                            .iconPic(R.drawable.logo_pink_no_name)
                             .title(user.getUsername())
                             .snippet(user.getEmail())
                             .position(coordinates)

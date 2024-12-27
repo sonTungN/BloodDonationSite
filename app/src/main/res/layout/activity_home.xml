@@ -217,7 +217,7 @@
                                 android:id="@+id/event_activity_cta"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Explore Now"
+                                android:text="Explore Now!"
                                 style="@style/CardDesc1"
                                 android:textStyle="bold"
                                 tools:ignore="HardcodedText"/>

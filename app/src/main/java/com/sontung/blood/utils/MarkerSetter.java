@@ -29,11 +29,13 @@ public class MarkerSetter extends DefaultClusterRenderer<CustomAdvancedMarker> {
         super(context, map, clusterManager);
         
         iconGenerator = new IconGenerator(context.getApplicationContext());
+        iconGenerator.setContentPadding(10, 10, 10, 10);
         imageView = new ImageView(context.getApplicationContext());
         
         imageView.setLayoutParams(
-                new ViewGroup.LayoutParams(20, 20)
+                new ViewGroup.LayoutParams(50, 50)
         );
+        
         iconGenerator.setContentView(imageView);
     }
     
@@ -45,7 +47,6 @@ public class MarkerSetter extends DefaultClusterRenderer<CustomAdvancedMarker> {
         imageView.setImageResource(item.getIconPic());
         Bitmap bitmapIcon = iconGenerator.makeIcon();
         markerOptions
-                
                 .icon(BitmapDescriptorFactory.fromBitmap(bitmapIcon))
                 .title(item.getTitle())
                 .snippet(item.getSnippet());

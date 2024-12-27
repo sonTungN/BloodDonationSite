@@ -55,6 +55,7 @@ import com.sontung.blood.viewmodel.ImageViewModel;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 import com.sontung.blood.views.EventActivity;
+import com.sontung.blood.views.EventDetailActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -374,7 +375,8 @@ public class CreateEventFragment
                         site.setSiteImageUrl(imageUrls);
                         siteViewModel.updateSiteImages(site.getSiteId(), site);
                         
-                        Intent i = new Intent(requireContext(), EventActivity.class);
+                        Intent i = new Intent(requireContext(), EventDetailActivity.class)
+                                .putExtra("SITE_ID", site.getSiteId());
                         startActivity(i);
                     }
                     
