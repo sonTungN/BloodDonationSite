@@ -69,6 +69,8 @@ public class EventFragment extends Fragment {
             @Override
             public void onSuccess(User user) {
                 currentUser = user;
+                setUpInitialState();
+
             }
             
             @Override
@@ -88,7 +90,6 @@ public class EventFragment extends Fragment {
             LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         inflater.inflate(R.layout.fragment_event, container, false);
         
-        setUpInitialState();
         setUpSiteRecyclerView();
         
         userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<User>() {
@@ -99,7 +100,7 @@ public class EventFragment extends Fragment {
             
             @Override
             public void onSuccess(User user) {
-            
+                currentUser = user;
             }
             
             @Override
