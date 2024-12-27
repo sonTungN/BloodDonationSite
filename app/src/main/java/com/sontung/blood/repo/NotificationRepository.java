@@ -68,9 +68,7 @@ public class NotificationRepository {
         notificationCollection
                 .document(notificationId)
                 .update("notificationId", updateNotification.getNotificationId())
-                .addOnSuccessListener(e -> {
-                    Toast.makeText(context, "Notification ID updated successfully", Toast.LENGTH_SHORT).show();
-                })
+                .addOnSuccessListener(e -> {})
                 .addOnFailureListener(e -> {
                     Log.d("NOTIFICATION: UPDATE ID ERROR", Objects.requireNonNull(e.getMessage()));
                     Toast.makeText(context, "Failed to update notification id", Toast.LENGTH_SHORT).show();

@@ -10,23 +10,23 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.sontung.blood.fragments.EventFragment;
 import com.sontung.blood.fragments.EventMapFragment;
 
-public class EventTabAdapter extends FragmentStateAdapter {
+public class EventTabAdapter extends FragmentPagerAdapter {
     
-    public EventTabAdapter(@NonNull FragmentActivity fragmentActivity) {
-        super(fragmentActivity);
+    public EventTabAdapter(@NonNull FragmentManager fm) {
+        super(fm);
     }
-
+    
     @NonNull
     @Override
-    public Fragment createFragment(int position) {
+    public Fragment getItem(int position) {
         if (position == 1) {
             return new EventMapFragment();
         }
         return new EventFragment();
     }
-
+    
     @Override
-    public int getItemCount() {
+    public int getCount() {
         return 2;
     }
 }

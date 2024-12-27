@@ -293,6 +293,8 @@ public class EventDetailActivity extends AppCompatActivity {
                                             @Override
                                             public void onSuccess(Notification notification) {
                                                 notificationViewModel.updateNotificationId(notification.getNotificationId(), notification);
+                                                
+                                                Toast.makeText(EventDetailActivity.this, "Sent notification to site host", Toast.LENGTH_SHORT).show();
                                             }
                                             
                                             @Override
@@ -419,6 +421,8 @@ public class EventDetailActivity extends AppCompatActivity {
                                             @Override
                                             public void onSuccess(Notification notification) {
                                                 notificationViewModel.updateNotificationId(notification.getNotificationId(), notification);
+                                                
+                                                Toast.makeText(EventDetailActivity.this, "Sent notification to site host", Toast.LENGTH_SHORT).show();
                                             }
                                             
                                             @Override

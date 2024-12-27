@@ -254,7 +254,7 @@ public class EventMapFragment
         }
 
         if (markerRenderer == null) {
-            markerRenderer = new MarkerSetter(requireContext(), googleMap, customManager);
+            markerRenderer = new MarkerSetter(getContext(), googleMap, customManager);
             customManager.setRenderer(markerRenderer);
         }
 
@@ -360,7 +360,7 @@ public class EventMapFragment
 
     private void setUpDetailBtnClicked(Site site) {
         binding.toDetails.setOnClickListener(view -> {
-            Intent i = new Intent(requireContext(), EventDetailActivity.class)
+            Intent i = new Intent(getContext(), EventDetailActivity.class)
                     .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             i.putExtra("SITE_ID", site.getSiteId());
             startActivity(i);
@@ -475,7 +475,7 @@ public class EventMapFragment
     }
 
     private void validateLocationPermission() {
-        if (LocationPermission.LOCATION_GRANTED(requireContext())) {
+        if (LocationPermission.LOCATION_GRANTED(getContext())) {
             startUpdatingLocation();
         } else {
             requestForLocationPermission();
@@ -490,29 +490,29 @@ public class EventMapFragment
             registerForActivityResult(
                     new ActivityResultContracts.RequestPermission(), isGranted -> {
                         if (isGranted) {
-                            Toast.makeText(requireContext(), "Location permission granted.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Location permission granted.", Toast.LENGTH_SHORT).show();
                             startUpdatingLocation();
                         } else {
-                            Toast.makeText(requireContext(), "Permission denied. Enable GPS for Google Maps functionality.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Permission denied. Enable GPS for Google Maps functionality.", Toast.LENGTH_SHORT).show();
                         }
                     }
             );
 
     private void startUpdatingLocation() {
-        if (LocationPermission.LOCATION_GRANTED(requireContext())) {
+        if (LocationPermission.LOCATION_GRANTED(getContext())) {
             return;
         }
 
         if (
                 ActivityCompat
                         .checkSelfPermission(
-                                requireContext(),
+                                getContext(),
                                 Manifest.permission.ACCESS_FINE_LOCATION
                         ) != PackageManager.PERMISSION_GRANTED
                         &&
                 ActivityCompat
                         .checkSelfPermission(
-                                requireContext(),
+                                getContext(),
                                 Manifest.permission.ACCESS_COARSE_LOCATION
                         ) != PackageManager.PERMISSION_GRANTED
         ) {

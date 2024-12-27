@@ -53,27 +53,36 @@ public class EventActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_event);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
-        EventTabAdapter eventTabAdapter = new EventTabAdapter(this);
+        EventTabAdapter eventTabAdapter = new EventTabAdapter(getSupportFragmentManager());
         binding.pageContent.setAdapter(eventTabAdapter);
+        binding.pageContent.addOnPageChangeListener(
+                new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(
+                            int position, float positionOffset, int positionOffsetPixels) {}
+                    
+                    @Override
+                    public void onPageSelected(int position) {
+                        Objects.requireNonNull(binding.tabLayout.getTabAt(position)).select();
+                    }
+                    
+                    @Override
+                    public void onPageScrollStateChanged(int state) {}
+                });
         
-        new TabLayoutMediator(binding.tabLayout, binding.pageContent, (tab, position) -> {
-            switch (position) {
-                case 0:
-                    tab.setText("RECENT EVENTS");
-                    break;
-                case 1:
-                    tab.setText("EVENT MAP");
-                    break;
-            }
-        }).attach();
-        
-        binding.pageContent.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                Objects.requireNonNull(binding.tabLayout.getTabAt(position)).select();
-            }
-        });
+        binding.tabLayout.addOnTabSelectedListener(
+                new TabLayout.OnTabSelectedListener() {
+                    @Override
+                    public void onTabSelected(TabLayout.Tab tab) {
+                        binding.pageContent.setCurrentItem(tab.getPosition());
+                    }
+                    
+                    @Override
+                    public void onTabUnselected(TabLayout.Tab tab) {}
+                    
+                    @Override
+                    public void onTabReselected(TabLayout.Tab tab) {}
+                });
         
         setUpDrawer();
         
