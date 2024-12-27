@@ -22,28 +22,34 @@ import android.widget.Toast;
 
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.EventSiteAdapter;
+import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.FragmentEventBinding;
 import com.sontung.blood.model.Site;
+import com.sontung.blood.model.User;
 import com.sontung.blood.utils.DateComparer;
 import com.sontung.blood.utils.DateFormatter;
 import com.sontung.blood.utils.FieldValidation;
 import com.sontung.blood.viewmodel.SiteViewModel;
+import com.sontung.blood.viewmodel.UserViewModel;
 
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class EventFragment extends Fragment {
 
     private FragmentEventBinding binding;
+    private UserViewModel userViewModel;
     private SiteViewModel siteViewModel;
-
-    // Sites
+    
     private RecyclerView siteRecyclerView;
     private EventSiteAdapter siteAdapter;
     private List<Site> siteList = new ArrayList<>();
+    
+    private User currentUser;
 
     @Override
     public void onStart() {
@@ -55,7 +61,30 @@ public class EventFragment extends Fragment {
         super.onCreate(savedInstanceState);
         binding = FragmentEventBinding.inflate(getLayoutInflater());
         
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        
+        userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<User>() {
+            @Override
+            public void onSuccess(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onSuccess(User user) {
+                currentUser = user;
+            }
+            
+            @Override
+            public void onFailure(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(User user) {
+            
+            }
+        });
     }
 
     @Override
@@ -65,6 +94,29 @@ public class EventFragment extends Fragment {
         
         setUpInitialState();
         setUpSiteRecyclerView();
+        
+        userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<User>() {
+            @Override
+            public void onSuccess(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onSuccess(User user) {
+            
+            }
+            
+            @Override
+            public void onFailure(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(User user) {
+            
+            }
+        });
+        
         setUpBloodTypeSpinner();
         setUpCalendarPicker();
         setUpButtonClickHandler();
@@ -75,7 +127,6 @@ public class EventFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        setUpInitialState();
     }
     
     //----------------------------------------SET UP APPLY BUTTON-----------------------------------
@@ -83,7 +134,13 @@ public class EventFragment extends Fragment {
         clearErrorMessage();
         int invalidCount = 0;
         
+        String bloodType = binding.bloodTypeSpinner.getSelectedItem().toString().trim();
         String startDateStr = binding.filterStartDate.getText().toString().trim();
+        
+        if (bloodType.equals("(Default)")) {
+            turnOnErrorMessage(binding.bloodTypeEmpty, true);
+            invalidCount++;
+        }
         
         if (startDateStr.isEmpty()) {
             turnOnErrorMessage(binding.startDateEmpty, true);
@@ -91,9 +148,11 @@ public class EventFragment extends Fragment {
             invalidCount++;
             
         } else if (DateComparer.isEventDatePassed(DateFormatter.toDate(startDateStr))) {
-            turnOnErrorMessage(binding.startDateEmpty, false);
-            turnOnErrorMessage(binding.startDatePast, true);
-            invalidCount++;
+            if (currentUser.getUserRole().equals("DONOR")) {
+                turnOnErrorMessage(binding.startDateEmpty, false);
+                turnOnErrorMessage(binding.startDatePast, true);
+                invalidCount++;
+            }
         }
         
         return invalidCount == 0;
@@ -104,8 +163,6 @@ public class EventFragment extends Fragment {
             Toast.makeText(requireContext(), "ERROR: Some filter are invalid!", Toast.LENGTH_SHORT).show();
             return;
         }
-        
-        Toast.makeText(requireContext(), "Filter Applied", Toast.LENGTH_SHORT).show();
         
         String bloodType = binding.bloodTypeSpinner.getSelectedItem().toString().trim();
         Date startDate = DateFormatter.toDate(binding.filterStartDate.getText().toString().trim());
@@ -123,6 +180,24 @@ public class EventFragment extends Fragment {
                         setUpSiteToViews(sites);
                     }
                 });
+    }
+    
+    private void clearFilter() {
+        clearErrorMessage();
+        binding.bloodTypeSpinner.setSelection(0);
+        binding.filterStartDate.setText("");
+        
+        binding.searchView.setQuery("", false);
+        binding.searchView.clearFocus();
+        
+        siteViewModel.getAllSiteData().observe(getViewLifecycleOwner(), sites -> {
+            if (currentUser.getUserRole().equals("SUPER")) {
+                setUpSiteToViews(sites);
+                
+            } else {
+                binding.noEventDisplayingText.setVisibility(View.VISIBLE);
+            }
+        });
     }
     
     //----------------------------------------SET UP VIEWS------------------------------------------
@@ -171,7 +246,7 @@ public class EventFragment extends Fragment {
         Spinner bloodTypeSpinner = binding.bloodTypeSpinner;
         ArrayAdapter<CharSequence> bloodTypesAdapter = ArrayAdapter.createFromResource(
                 requireContext(),
-                R.array.blood_types,
+                R.array.filter_blood_types,
                 android.R.layout.simple_spinner_item
         );
         bloodTypesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -202,15 +277,28 @@ public class EventFragment extends Fragment {
     
     private void setUpButtonClickHandler() {
         binding.saveFilterBtn.setOnClickListener(v -> applyFilter());
+        binding.clearFilterBtn.setOnClickListener(v -> clearFilter());
     }
     
     //----------------------------------------SET UP TOOLS FUNCTION---------------------------------
+    private void setUpSuperInitialState() {
+        siteViewModel.getAllSiteData().observe(getViewLifecycleOwner(), sites -> {
+            if (currentUser.getUserRole().equals("SUPER")) {
+                setUpSiteToViews(sites);
+                
+            } else {
+                binding.noEventDisplayingText.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+    
     private void setUpInitialState() {
-        binding.noEventDisplayingText.setVisibility(View.VISIBLE);
+        setUpSuperInitialState();
         clearErrorMessage();
     }
     
     private void clearErrorMessage() {
+        turnOnErrorMessage(binding.bloodTypeEmpty, false);
         turnOnErrorMessage(binding.startDateEmpty, false);
         turnOnErrorMessage(binding.startDatePast, false);
     }

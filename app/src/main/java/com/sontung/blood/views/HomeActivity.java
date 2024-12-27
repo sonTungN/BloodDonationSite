@@ -168,6 +168,7 @@ public class HomeActivity extends AppCompatActivity {
         View headerView = binding.navigationView.getHeaderView(0);
         TextView navName = headerView.findViewById(R.id.nav_name);
         TextView navEmail = headerView.findViewById(R.id.nav_email);
+        TextView navUserRole = headerView.findViewById(R.id.nav_user_role);
         ImageView navProfileImg = headerView.findViewById(R.id.profile_image);
         drawerLayout.closeDrawer(GravityCompat.START);
         
@@ -184,6 +185,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onSuccess(User user) {
                 navName.setText(user.getUsername());
                 navEmail.setText(user.getEmail());
+                navUserRole.setText(user.getUserRole());
                 
                 Glide.with(getApplicationContext())
                         .load(user.getProfileUrl())

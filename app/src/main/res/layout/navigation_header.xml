@@ -11,31 +11,59 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginBottom="20dp"
-        android:gravity="center"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/profile_image"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/icon_profile_sample"
-            app:shapeAppearanceOverlay="@style/roundedImageViewRounded" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/profile_image"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/icon_profile_sample"
+                app:shapeAppearanceOverlay="@style/roundedImageViewRounded" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/card_user_role_layout"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:paddingVertical="1dp"
+                android:paddingHorizontal="2dp"
+                android:background="@drawable/custom_role_tag"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/nav_email">
+
+                <TextView
+                    android:id="@+id/nav_user_role"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/CardDesc2"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="HardcodedText" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:layout_marginStart="10dp">
 
             <TextView
                 android:id="@+id/nav_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{user.username}"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -47,13 +75,11 @@
                 android:id="@+id/nav_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{user.email}"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:textColor="@color/white"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/nav_name"
                 tools:ignore="HardcodedText" />
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -401,6 +401,7 @@
                         android:orientation="vertical"
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="10dp"
+                        android:layout_marginBottom="20dp"
                         android:layout_marginEnd="12dp">
 
                         <TextView
@@ -416,7 +417,7 @@
                             android:id="@+id/stub_map"
                             android:inflatedId="@+id/panel_map"
                             android:layout_marginTop="3dp"
-                            android:layout="@layout/displaying_map"
+                            android:layout="@layout/location_map_display"
                             android:layout_width="match_parent"
                             android:layout_height="200dp"
                             android:layout_gravity="bottom" />
@@ -446,8 +447,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginStart="60dp"
-                        android:layout_marginTop="15dp"
                         android:layout_marginEnd="60dp"
+                        android:layout_marginBottom="20dp"
                         android:background="@drawable/custom_btn_total_report"
                         android:text="OVERVIEW TOTAL DONATIONS"
                         android:paddingStart="5dp"
@@ -458,6 +459,7 @@
                         tools:ignore="HardcodedText" />
 
                     <LinearLayout
+                        android:id="@+id/list_of_donor"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
@@ -468,7 +470,6 @@
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
                             android:layout_marginStart="12dp"
-                            android:layout_marginTop="15dp"
                             android:layout_marginEnd="12dp">
 
                             <TextView
@@ -499,6 +500,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/list_of_volunteer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"

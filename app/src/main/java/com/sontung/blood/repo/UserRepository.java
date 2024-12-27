@@ -9,22 +9,16 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.sontung.blood.callback.FirebaseCallback;
-import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
-import com.sontung.blood.preference.LocalStorageManager;
 import com.sontung.blood.shared.Paths;
 import com.sontung.blood.views.HomeActivity;
-import com.sontung.blood.views.SignInActivity;
 
 import java.util.Objects;
-
-import okhttp3.MediaType;
 
 public class UserRepository {
     private final Context context;
@@ -33,8 +27,6 @@ public class UserRepository {
     
     private final FirebaseFirestore db;
     private final CollectionReference userCollection;
-    
-    private final LocalStorageManager manager;
     
     private final MutableLiveData<User> userData = new MutableLiveData<>();
     private final MutableLiveData<User> currentUserData = new MutableLiveData<>();
@@ -45,8 +37,6 @@ public class UserRepository {
         
         this.db = FirebaseFirestore.getInstance();
         this.userCollection = db.collection(Paths.USER_COLLECTION_PATH);
-        
-        this.manager = new LocalStorageManager(context);
     }
     
     public void signUpUser(User user, FirebaseCallback<User> callback) {
@@ -91,9 +81,9 @@ public class UserRepository {
                                         .addOnCompleteListener(task1 -> {
                                             DocumentSnapshot snapshot = task1.getResult();
                                             User user = snapshot.toObject(User.class);
-                                            user.setUserId(currentUser.getUid());
                                             
-                                            manager.setCurrentUser(user);
+                                            assert user != null;
+                                            user.setUserId(currentUser.getUid());
                                         });
                         
                         Toast.makeText(context, "Login Status: SUCCESS", Toast.LENGTH_SHORT).show();
@@ -212,6 +202,5 @@ public class UserRepository {
     public void signOut() {
         Toast.makeText(context, "LOG OUT", Toast.LENGTH_SHORT).show();
         FirebaseAuth.getInstance().signOut();
-        manager.clearEditor();
     }
 }

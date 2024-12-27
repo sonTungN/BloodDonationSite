@@ -442,7 +442,7 @@
                     android:layout_marginTop="3dp"
                     android:layout_gravity="bottom"
                     android:inflatedId="@+id/panel_map"
-                    android:layout="@layout/displaying_map" />
+                    android:layout="@layout/location_map_display" />
 
             </LinearLayout>
 

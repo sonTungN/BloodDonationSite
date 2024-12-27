@@ -259,8 +259,6 @@ public class EditEventFragment
                             setUpSiteSpinnerDetail(site);
                             setUpSiteEventDate(site);
                             setUpButtonClickHandler(site, user);
-
-
                         }
 
                         @Override
@@ -372,6 +370,7 @@ public class EditEventFragment
                         .host(userViewModel.getCurrentUserId())
                         .siteId(site.getSiteId())
                         .siteName(binding.createSiteName.getText().toString().trim())
+                        .siteDesc(binding.createSiteDesc.getText().toString().trim())
                         .siteAddress(binding.addressDisplay.getText().toString().trim())
                         .siteImageUrl(imageUriList.stream().map(Uri::toString).collect(Collectors.toList()))
                         .requiredBloodType(binding.bloodTypeSpinner.getSelectedItem().toString().trim())
@@ -396,6 +395,9 @@ public class EditEventFragment
 
                 if (updatedImages.isEmpty()){
                     sendNotifications(site, host);
+                    
+                    Intent i = new Intent(requireContext(), EventActivity.class);
+                    startActivity(i);
                     return;
                 }
                 imageViewModel.uploadSiteImageToStorage(updatedImages, site.getSiteId(), new FirebaseCallback<>() {
@@ -404,7 +406,6 @@ public class EditEventFragment
                         pendingUpdatedSite.setSiteImageUrl(imageUrls);
                         siteViewModel.updateSiteImages(site.getSiteId(), pendingUpdatedSite);
                         sendNotifications(site, host);
-
                     }
 
                     @Override
@@ -473,7 +474,7 @@ public class EditEventFragment
                 @Override
                 public void onSuccess(Notification notification) {
                     notificationViewModel.updateNotificationId(notification.getNotificationId(), notification);
-
+                    
                     Intent i = new Intent(requireContext(), EventActivity.class);
                     startActivity(i);
                 }

@@ -63,6 +63,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
     private ActivityEventDetailBinding binding;
     private String siteId;
+    private User currentUser;
 
     private SupportMapFragment mapFragment;
     private View mapPanel;
@@ -109,17 +110,38 @@ public class EventDetailActivity extends AppCompatActivity {
         notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
 
         siteId = getIntent().getStringExtra("SITE_ID");
-
-        // Viewpager2 and DotIndicator
-        viewPager2 = binding.viewPager2;
-        indicator = binding.dotsIndicator;
-
-        setUpDrawer();
-        setUpButtonInitialStage();
-        fetchSiteDetailIntoViews(siteId);
-        setUpOnButtonClickListener();
-        setUpRecyclerView();
-
+        
+        userViewModel.getUserDataById(userViewModel.getCurrentUserId(), new FirebaseCallback<>() {
+            @Override
+            public void onSuccess(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onSuccess(User user) {
+                currentUser = user;
+                
+                viewPager2 = binding.viewPager2;
+                indicator = binding.dotsIndicator;
+                
+                setUpDrawer();
+                setUpButtonInitialStage();
+                fetchSiteDetailIntoViews(siteId);
+                setUpOnButtonClickListener();
+                setUpRecyclerView();
+            }
+            
+            @Override
+            public void onFailure(List<User> t) {
+            
+            }
+            
+            @Override
+            public void onFailure(User user) {
+            
+            }
+        });
+        
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -134,8 +156,14 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     private void setUpRecyclerView() {
-        setUpVolunteerRecyclerView();
-        setUpDonorRecyclerView();
+        if (currentUser.getHostedSite().equals(siteId)) {
+            setUpVolunteerRecyclerView();
+            setUpDonorRecyclerView();
+            
+        } else {
+            binding.listOfDonor.setVisibility(View.GONE);
+            binding.listOfVolunteer.setVisibility(View.GONE);
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -473,6 +501,13 @@ public class EventDetailActivity extends AppCompatActivity {
             
             checkHostStatus(site, currentUserId);
         });
+        
+        if (currentUser.getUserRole().equals("SUPER")) {
+            binding.summaryBtn.setVisibility(View.VISIBLE);
+            
+        } else if (currentUser.getUserRole().equals("DONOR")) {
+            binding.summaryBtn.setVisibility(View.GONE);
+        }
     }
 
     private void fetchSiteDetailIntoViews(String siteId) {

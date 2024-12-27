@@ -7,8 +7,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -17,9 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -42,10 +38,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.firebase.firestore.GeoPoint;
 import com.google.maps.DirectionsApiRequest;
 import com.google.maps.GeoApiContext;
 import com.google.maps.PendingResult;
@@ -68,14 +62,9 @@ import com.sontung.blood.utils.MarkerSetter;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 import com.sontung.blood.views.EventDetailActivity;
-import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
 
-import org.checkerframework.checker.units.qual.A;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public class EventMapFragment
@@ -88,7 +77,6 @@ public class EventMapFragment
 
     private UserViewModel userViewModel;
     private SiteViewModel siteViewModel;
-    private User currentUser;
 
     private final List<Site> userRegisteredSite = new ArrayList<>();
     private final List<Site> userVolunteerSite = new ArrayList<>();
@@ -122,10 +110,6 @@ public class EventMapFragment
         binding = FragmentEventMapBinding.inflate(getLayoutInflater());
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        currentUser =
-                userViewModel.getUserDataById(
-                        userViewModel.getCurrentUserId()
-                ).getValue();
 
         fetchAllSiteIntoMap();
 
@@ -149,7 +133,6 @@ public class EventMapFragment
                     super.onLocationResult(locationResult);
                 }
             }
-
         };
     }
 
@@ -330,7 +313,7 @@ public class EventMapFragment
                 if (marker.getSite() == null) {
                     binding.siteName.setText("YOUR LOCATION");
                     binding.siteAddress.setText(Coordinates.RMIT_ADDRESS);
-                    renderSiteDetailIntoView(false);
+                    setSiteDetailVisibility(false);
 
                 } else {
                     getSiteDistance(marker);
@@ -339,7 +322,7 @@ public class EventMapFragment
 
                     setUpImageSlider(marker.getSite().getSiteImageUrl());
                     setUpDetailBtnClicked(marker.getSite());
-                    renderSiteDetailIntoView(true);
+                    setSiteDetailVisibility(true);
                 }
 
                 return false;
@@ -360,7 +343,7 @@ public class EventMapFragment
                 site.getListOfVolunteers().contains(user.getUserId());
     }
 
-    private void renderSiteDetailIntoView(boolean isDetailVisible) {
+    private void setSiteDetailVisibility(boolean isDetailVisible) {
         if (isDetailVisible) {
             binding.toDetails.setVisibility(View.VISIBLE);
             binding.imageSlider.setVisibility(View.VISIBLE);
@@ -527,11 +510,11 @@ public class EventMapFragment
                                 Manifest.permission.ACCESS_FINE_LOCATION
                         ) != PackageManager.PERMISSION_GRANTED
                         &&
-                        ActivityCompat
-                                .checkSelfPermission(
-                                        requireContext(),
-                                        Manifest.permission.ACCESS_COARSE_LOCATION
-                                ) != PackageManager.PERMISSION_GRANTED
+                ActivityCompat
+                        .checkSelfPermission(
+                                requireContext(),
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED
         ) {
             return;
         }

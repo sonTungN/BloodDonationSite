@@ -4,23 +4,16 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
-import com.sontung.blood.preference.LocalStorageManager;
 import com.sontung.blood.shared.Paths;
-import com.sontung.blood.utils.DateComparer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,8 +27,6 @@ public class SiteRepository {
     private final FirebaseFirestore db;
     private final CollectionReference siteCollection;
     private final CollectionReference userCollection;
-    
-    private LocalStorageManager manager;
     
     private final MutableLiveData<Site> siteData = new MutableLiveData<>();
     private final MutableLiveData<List<User>> allVolunteer = new MutableLiveData<>();
@@ -54,8 +45,6 @@ public class SiteRepository {
         this.db = FirebaseFirestore.getInstance();
         this.siteCollection = db.collection(Paths.SITE_COLLECTION_PATH);
         this.userCollection = db.collection(Paths.USER_COLLECTION_PATH);
-        
-        this.manager = new LocalStorageManager(context);
     }
     
     public MutableLiveData<List<Site>> getAllSiteData() {

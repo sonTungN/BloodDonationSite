@@ -196,9 +196,9 @@ public class EventActivity extends AppCompatActivity {
                 drawerLayout.closeDrawer(GravityCompat.START);
                 
             } else if (menuItem.getItemId() == R.id.nav_logout) {
+                userViewModel.signOut();
                 Intent intent = new Intent(this, OnBoardingActivity.class);
                 finish();
-                userViewModel.signOut();
                 startActivity(intent);
             }
             return true;

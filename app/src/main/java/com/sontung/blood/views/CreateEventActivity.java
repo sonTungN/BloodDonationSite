@@ -65,6 +65,9 @@ public class CreateEventActivity extends AppCompatActivity {
                 case 1:
                     tab.setText("EDIT YOUR SITE");
                     break;
+                case 2:
+                    tab.setText("VIEW MEMBERS");
+                    break;
             }
         }).attach();
         
