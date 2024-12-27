@@ -156,7 +156,7 @@ public class EventDetailActivity extends AppCompatActivity {
     }
 
     private void setUpRecyclerView() {
-        if (currentUser.getHostedSite().equals(siteId)) {
+        if (currentUser.getHostedSite() != null && currentUser.getHostedSite().equals(siteId)) {
             setUpVolunteerRecyclerView();
             setUpDonorRecyclerView();
             
@@ -164,6 +164,7 @@ public class EventDetailActivity extends AppCompatActivity {
             binding.listOfDonor.setVisibility(View.GONE);
             binding.listOfVolunteer.setVisibility(View.GONE);
         }
+        
     }
 
     @SuppressLint("NotifyDataSetChanged")

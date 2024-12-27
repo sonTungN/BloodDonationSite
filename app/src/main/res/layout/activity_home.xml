@@ -131,6 +131,81 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="Host Event"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp"
+                            style="@style/CardHeading1"
+                            tools:ignore="HardcodedText"/>
+
+                        <LinearLayout
+                            android:id="@+id/no_host_event_display"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginStart="20dp"
+                            android:layout_marginEnd="20dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="You have host no site. "
+                                style="@style/CardDesc1"
+                                tools:ignore="HardcodedText"/>
+
+                            <TextView
+                                android:id="@+id/create_event_activity_cta"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Create your own!"
+                                style="@style/CardDesc1"
+                                android:textStyle="bold"
+                                tools:ignore="HardcodedText"/>
+
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/host_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <RelativeLayout
+                            android:id="@+id/loading_host_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:background="@color/mainBackgroundColor">
+
+                            <ProgressBar
+                                android:id="@+id/progress_bar_host"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_centerInParent="true" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/progress_bar_host"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="8dp"
+                                android:text="Loading Registered Events..."
+                                android:textColor="@android:color/black"
+                                style="@style/CardDesc1"
+                                tools:ignore="HardcodedText" />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="Registered Events"
                             android:layout_marginStart="20dp"
                             android:layout_marginEnd="20dp"

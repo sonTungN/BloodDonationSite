@@ -17,6 +17,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,6 +34,8 @@ import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
@@ -41,6 +44,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private UserViewModel userViewModel;
     private SiteViewModel siteViewModel;
+    
+    private RecyclerView hostRecyclerView;
+    private List<Site> hostSiteList = new ArrayList<>();
     
     private RecyclerView recentRecyclerView;
     private List<Site> recentSiteList = new ArrayList<>();
@@ -64,9 +70,11 @@ public class HomeActivity extends AppCompatActivity {
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         
+        binding.noHostEventDisplay.setVisibility(View.GONE);
         binding.noEventDisplay.setVisibility(View.GONE);
         binding.discoverMoreBtn.setVisibility(View.GONE);
         
+        binding.loadingHostLayout.setVisibility(View.VISIBLE);
         binding.loadingRegisteredLayout.setVisibility(View.VISIBLE);
         binding.loadingRecentLayout.setVisibility(View.VISIBLE);
         
@@ -82,6 +90,12 @@ public class HomeActivity extends AppCompatActivity {
     }
     
     private void setUpButtonClickHandler() {
+        binding.createEventActivityCta.setOnClickListener(view -> {
+            Intent i = new Intent(this, CreateEventActivity.class);
+            startActivity(i);
+            finish();
+        });
+        
         binding.discoverMoreBtn.setOnClickListener(view -> {
             Intent i = new Intent(this, EventActivity.class);
             startActivity(i);
@@ -98,6 +112,39 @@ public class HomeActivity extends AppCompatActivity {
     private void setUpRecyclerView() {
         setUpRegisteredRecyclerView();
         setUpRecentRecyclerView();
+        setUpHostRecyclerView();
+    }
+    
+    @SuppressLint("NotifyDataSetChanged")
+    private void setUpHostRecyclerView() {
+        siteViewModel
+                .getUserHostedSite(userViewModel.getCurrentUserId())
+                .observe(this, site -> {
+                    binding.loadingHostLayout.setVisibility(View.GONE);
+                    if (site == null) {
+                        binding.noHostEventDisplay.setVisibility(View.VISIBLE);
+                        return;
+                        
+                    } else {
+                        binding.noHostEventDisplay.setVisibility(View.GONE);
+                    }
+                    
+                    hostSiteList.clear();
+                    hostSiteList.add(site);
+                    
+                    hostRecyclerView= binding.hostRecyclerView;
+                    hostRecyclerView.setLayoutManager(
+                            new LinearLayoutManager(
+                                    getApplicationContext(),
+                                    LinearLayoutManager.VERTICAL,
+                                    false)
+                    );
+                    hostRecyclerView.hasFixedSize();
+                    
+                    adapter = new EventProfileAdapter(this, hostSiteList);
+                    hostRecyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                });
     }
     
     @SuppressLint("NotifyDataSetChanged")
