@@ -53,6 +53,7 @@ import com.sontung.blood.viewmodel.NotificationViewModel;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 import com.sontung.blood.views.EventActivity;
+import com.sontung.blood.views.EventDetailActivity;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -395,8 +396,8 @@ public class EditEventFragment
 
                 if (updatedImages.isEmpty()){
                     sendNotifications(site, host);
-                    
-                    Intent i = new Intent(requireContext(), EventActivity.class);
+                    Intent i = new Intent(getContext(), EventDetailActivity.class);
+                    i.putExtra("SITE_ID", site.getSiteId());
                     startActivity(i);
                     return;
                 }
@@ -406,6 +407,9 @@ public class EditEventFragment
                         pendingUpdatedSite.setSiteImageUrl(imageUrls);
                         siteViewModel.updateSiteImages(site.getSiteId(), pendingUpdatedSite);
                         sendNotifications(site, host);
+                        Intent i = new Intent(getContext(), EventDetailActivity.class);
+                        i.putExtra("SITE_ID", site.getSiteId());
+                        startActivity(i);
                     }
 
                     @Override
@@ -474,9 +478,7 @@ public class EditEventFragment
                 @Override
                 public void onSuccess(Notification notification) {
                     notificationViewModel.updateNotificationId(notification.getNotificationId(), notification);
-                    
-                    Intent i = new Intent(requireContext(), EventActivity.class);
-                    startActivity(i);
+
                 }
 
                 @Override
