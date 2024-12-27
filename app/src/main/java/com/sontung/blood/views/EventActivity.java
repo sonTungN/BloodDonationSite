@@ -180,8 +180,9 @@ public class EventActivity extends AppCompatActivity {
                 startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_notification) {
-                Toast.makeText(this, "NOTIFICATION", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, NotificationActivity.class);
                 drawerLayout.closeDrawer(GravityCompat.START);
+                startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_about_us) {
                 Intent intent = new Intent(this, GuidelineActivity.class);
