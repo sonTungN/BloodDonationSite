@@ -30,7 +30,7 @@
             android:id="@+id/siteName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Choose a site to view info"
+            android:text="Explore your Sites"
             style="@style/CardHeading1"
             tools:ignore="HardcodedText"/>
 
@@ -38,7 +38,7 @@
             android:id="@+id/siteAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="The route will lead you to your desired application!"
+            android:text="Choose a site to view overview information and route to your selected destination!"
             style="@style/CardDesc1"
             tools:ignore="HardcodedText" />
 
@@ -59,6 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
+                android:text="0 min"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 tools:ignore="HardcodedText" />

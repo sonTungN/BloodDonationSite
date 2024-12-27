@@ -115,9 +115,6 @@ public class CreateEventFragment
                 if (user.getHostedSite() != null) {
                     binding.siteDisplayingText.setVisibility(View.VISIBLE);
                     binding.createEventLayout.setVisibility(View.GONE);
-                    
-                    Toast.makeText(requireContext(), "Hosted site ID: " + user.getHostedSite(), Toast.LENGTH_SHORT).show();
-                    
                 } else {
                     setUpCreateSiteView();
                 }

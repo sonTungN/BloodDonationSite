@@ -115,7 +115,11 @@ public class SiteMemberFragment extends Fragment {
     
     private void setUpOverviewCard(String siteId) {
         siteViewModel.getSiteDataById(siteId).observe(this, site -> {
-            binding.setCurrentSite(site);
+            if (site == null) {
+                binding.siteOverviewLayout.setVisibility(View.GONE);
+            } else {
+                binding.setCurrentSite(site);
+            }
         });
     }
     
@@ -163,6 +167,7 @@ public class SiteMemberFragment extends Fragment {
     
     private void setUpInitialState() {
         setLoadingView(true);
+        binding.siteOverviewLayout.setVisibility(View.GONE);
         binding.notFoundSiteDonor.setVisibility(View.GONE);
         binding.notFoundDonor.setVisibility(View.GONE);
         binding.notFoundSiteVolunteer.setVisibility(View.GONE);
