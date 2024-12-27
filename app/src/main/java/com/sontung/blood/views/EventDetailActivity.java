@@ -709,8 +709,6 @@ public class EventDetailActivity extends AppCompatActivity {
         
         navigationView.bringToFront();
         binding.toolbarId.backIcon.setOnClickListener(view -> {
-            Intent intent = new Intent(this, EventActivity.class);
-            startActivity(intent);
             finish();
         });
         
