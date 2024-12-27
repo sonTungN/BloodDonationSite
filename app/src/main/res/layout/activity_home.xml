@@ -64,7 +64,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Donate"
-                            android:textSize="36sp"
+                            android:textSize="40sp"
                             android:textColor="@color/pink"
                             android:layout_gravity="center"
                             tools:ignore="HardcodedText" />
@@ -74,7 +74,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
                             android:text="Blood"
-                            android:textSize="36sp"
+                            android:textSize="40sp"
                             android:textStyle="bold"
                             android:textColor="@color/pink"
                             android:layout_gravity="center"
@@ -82,24 +82,10 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:layout_marginTop="5dp"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="100dp"
-                            android:layout_height="100dp"
-                            android:src="@drawable/img_home_display_1" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="1dp"
                         android:orientation="horizontal">
 
                         <TextView
