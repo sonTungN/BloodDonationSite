@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,24 +18,20 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.sontung.blood.R;
-import com.sontung.blood.adapter.EventSiteAdapter;
 import com.sontung.blood.adapter.EventTabAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityEventBinding;
-import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
-import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,39 +53,30 @@ public class EventActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_event);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
-        EventTabAdapter eventTabAdapter = new EventTabAdapter(getSupportFragmentManager());
+        EventTabAdapter eventTabAdapter = new EventTabAdapter(this);
         binding.pageContent.setAdapter(eventTabAdapter);
-        binding.pageContent.addOnPageChangeListener(
-                new ViewPager.OnPageChangeListener() {
-                    @Override
-                    public void onPageScrolled(
-                            int position, float positionOffset, int positionOffsetPixels) {}
-
-                    @Override
-                    public void onPageSelected(int position) {
-                        Objects.requireNonNull(binding.tabLayout.getTabAt(position)).select();
-                    }
-
-                    @Override
-                    public void onPageScrollStateChanged(int state) {}
-                });
-
-        binding.tabLayout.addOnTabSelectedListener(
-                new TabLayout.OnTabSelectedListener() {
-                    @Override
-                    public void onTabSelected(TabLayout.Tab tab) {
-                        binding.pageContent.setCurrentItem(tab.getPosition());
-                    }
-
-                    @Override
-                    public void onTabUnselected(TabLayout.Tab tab) {}
-
-                    @Override
-                    public void onTabReselected(TabLayout.Tab tab) {}
-                });
-
-
+        
+        new TabLayoutMediator(binding.tabLayout, binding.pageContent, (tab, position) -> {
+            switch (position) {
+                case 0:
+                    tab.setText("RECENT EVENTS");
+                    break;
+                case 1:
+                    tab.setText("EVENT MAP");
+                    break;
+            }
+        }).attach();
+        
+        binding.pageContent.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                Objects.requireNonNull(binding.tabLayout.getTabAt(position)).select();
+            }
+        });
+        
         setUpDrawer();
+        
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -109,6 +95,7 @@ public class EventActivity extends AppCompatActivity {
         View headerView = binding.navigationView.getHeaderView(0);
         TextView navName = headerView.findViewById(R.id.nav_name);
         TextView navEmail = headerView.findViewById(R.id.nav_email);
+        TextView navUserRole = headerView.findViewById(R.id.nav_user_role);
         ImageView navProfileImg = headerView.findViewById(R.id.profile_image);
         drawerLayout.closeDrawer(GravityCompat.START);
         
@@ -125,6 +112,7 @@ public class EventActivity extends AppCompatActivity {
             public void onSuccess(User user) {
                 navName.setText(user.getUsername());
                 navEmail.setText(user.getEmail());
+                navUserRole.setText(user.getUserRole());
                 
                 Glide.with(getApplicationContext())
                         .load(user.getProfileUrl())
@@ -186,19 +174,15 @@ public class EventActivity extends AppCompatActivity {
                 Toast.makeText(this, "NOTIFICATION", Toast.LENGTH_SHORT).show();
                 drawerLayout.closeDrawer(GravityCompat.START);
                 
-            } else if (menuItem.getItemId() == R.id.nav_profile) {
-                Intent intent = new Intent(this, ProfileActivity.class);
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+                Intent intent = new Intent(this, GuidelineActivity.class);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
                 
-            } else if (menuItem.getItemId() == R.id.nav_about_us) {
-                Toast.makeText(this, "ABOUT US", Toast.LENGTH_SHORT).show();
-                drawerLayout.closeDrawer(GravityCompat.START);
-                
             } else if (menuItem.getItemId() == R.id.nav_logout) {
-                userViewModel.signOut();
                 Intent intent = new Intent(this, OnBoardingActivity.class);
                 finish();
+                userViewModel.signOut();
                 startActivity(intent);
             }
             return true;

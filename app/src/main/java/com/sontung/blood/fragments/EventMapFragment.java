@@ -49,7 +49,7 @@ import com.google.maps.model.DirectionsResult;
 import com.google.maps.model.DirectionsRoute;
 import com.sontung.blood.BuildConfig;
 import com.sontung.blood.R;
-import com.sontung.blood.adapter.MultipleImageAdapter;
+import com.sontung.blood.adapter.ImageSliderAdapter;
 import com.sontung.blood.databinding.FragmentEventMapBinding;
 import com.sontung.blood.model.CustomAdvancedMarker;
 import com.sontung.blood.model.MapPolyline;
@@ -368,7 +368,7 @@ public class EventMapFragment
     }
 
     private void setUpImageSlider(List<String> siteImageUrl) {
-        MultipleImageAdapter adapter = new MultipleImageAdapter(siteImageUrl);
+        ImageSliderAdapter adapter = new ImageSliderAdapter(siteImageUrl);
         binding.imageSlider.setAdapter(adapter);
         binding.dotsIndicator.attachTo(binding.imageSlider);
     }

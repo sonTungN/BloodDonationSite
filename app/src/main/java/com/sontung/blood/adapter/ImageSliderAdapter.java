@@ -13,10 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class MultipleImageAdapter extends RecyclerView.Adapter<MultipleImageAdapter.ViewHolder> {
+public class ImageSliderAdapter extends RecyclerView.Adapter<ImageSliderAdapter.ViewHolder> {
     private final List<String> listOfImageUrl;
     
-    public MultipleImageAdapter(List<String> listOfImageUrl) {
+    public ImageSliderAdapter(List<String> listOfImageUrl) {
         this.listOfImageUrl = listOfImageUrl;
     }
     

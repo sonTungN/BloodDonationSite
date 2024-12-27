@@ -35,7 +35,6 @@
             app:dotsWidthFactor="2.5"
             app:layout_constraintBottom_toTopOf="@+id/beginBtn"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:progressMode="true"
             app:selectedDotColor="@color/pink" />

@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
 import com.sontung.blood.R;
-import com.sontung.blood.adapter.EventSiteAdapter;
+import com.sontung.blood.adapter.EventProfileAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityHomeBinding;
 import com.sontung.blood.model.Site;
@@ -48,7 +48,7 @@ public class HomeActivity extends AppCompatActivity {
     private RecyclerView registeredRecyclerView;
     private List<Site> registeredSiteList = new ArrayList<>();
     
-    private EventSiteAdapter adapter;
+    private EventProfileAdapter adapter;
 
     // Navbar
     private DrawerLayout drawerLayout;
@@ -66,6 +66,9 @@ public class HomeActivity extends AppCompatActivity {
         
         binding.noEventDisplay.setVisibility(View.GONE);
         binding.discoverMoreBtn.setVisibility(View.GONE);
+        
+        binding.loadingRegisteredLayout.setVisibility(View.VISIBLE);
+        binding.loadingRecentLayout.setVisibility(View.VISIBLE);
         
         setUpDrawer();
         setUpRecyclerView();
@@ -102,6 +105,8 @@ public class HomeActivity extends AppCompatActivity {
         siteViewModel
                 .getUserRegisteredSite(userViewModel.getCurrentUserId())
                 .observe(this, sites -> {
+                    binding.loadingRegisteredLayout.setVisibility(View.GONE);
+                    
                     if (sites.isEmpty()) {
                         binding.noEventDisplay.setVisibility(View.VISIBLE);
                     } else {
@@ -120,7 +125,7 @@ public class HomeActivity extends AppCompatActivity {
                     );
                     registeredRecyclerView.hasFixedSize();
                     
-                    adapter = new EventSiteAdapter(this, registeredSiteList);
+                    adapter = new EventProfileAdapter(this, registeredSiteList);
                     registeredRecyclerView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
                 });
@@ -131,10 +136,10 @@ public class HomeActivity extends AppCompatActivity {
         siteViewModel
                 .getAllSiteData()
                 .observe(this, sites -> {
+                    binding.loadingRecentLayout.setVisibility(View.GONE);
                     binding.discoverMoreBtn.setVisibility(View.VISIBLE);
                     
                     recentSiteList.clear();
-                    
                     int count = 0;
                     for (Site site: sites) {
                         recentSiteList.add(site);
@@ -151,7 +156,7 @@ public class HomeActivity extends AppCompatActivity {
                     );
                     recentRecyclerView.hasFixedSize();
                     
-                    adapter = new EventSiteAdapter(this, recentSiteList);
+                    adapter = new EventProfileAdapter(this, recentSiteList);
                     recentRecyclerView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
                 });
@@ -248,14 +253,10 @@ public class HomeActivity extends AppCompatActivity {
                 drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
                 
-            } else if (menuItem.getItemId() == R.id.nav_profile) {
-                Intent intent = new Intent(this, ProfileActivity.class);
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+                Intent intent = new Intent(this, GuidelineActivity.class);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
-                
-            } else if (menuItem.getItemId() == R.id.nav_about_us) {
-                Toast.makeText(this, "ABOUT US", Toast.LENGTH_SHORT).show();
-                drawerLayout.closeDrawer(GravityCompat.START);
                 
             } else if (menuItem.getItemId() == R.id.nav_logout) {
                 Intent intent = new Intent(this, OnBoardingActivity.class);

@@ -3,11 +3,9 @@ package com.sontung.blood.fragments;
 import android.annotation.SuppressLint;
 
 import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,14 +19,13 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.sontung.blood.R;
-import com.sontung.blood.adapter.EventSiteAdapter;
+import com.sontung.blood.adapter.EventProfileAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.FragmentEventBinding;
 import com.sontung.blood.model.Site;
 import com.sontung.blood.model.User;
 import com.sontung.blood.utils.DateComparer;
 import com.sontung.blood.utils.DateFormatter;
-import com.sontung.blood.utils.FieldValidation;
 import com.sontung.blood.viewmodel.SiteViewModel;
 import com.sontung.blood.viewmodel.UserViewModel;
 
@@ -37,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class EventFragment extends Fragment {
 
@@ -46,7 +42,7 @@ public class EventFragment extends Fragment {
     private SiteViewModel siteViewModel;
     
     private RecyclerView siteRecyclerView;
-    private EventSiteAdapter siteAdapter;
+    private EventProfileAdapter siteAdapter;
     private List<Site> siteList = new ArrayList<>();
     
     private User currentUser;
@@ -206,7 +202,7 @@ public class EventFragment extends Fragment {
         siteList.clear();
         siteList.addAll(sites);
 
-        siteAdapter = new EventSiteAdapter(getContext(), siteList);
+        siteAdapter = new EventProfileAdapter(getContext(), siteList);
         siteRecyclerView.setAdapter(siteAdapter);
         siteAdapter.notifyDataSetChanged();
         

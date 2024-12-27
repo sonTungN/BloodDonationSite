@@ -70,6 +70,32 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
+                    <RelativeLayout
+                        android:id="@+id/loading_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@color/mainBackgroundColor">
+
+                        <ProgressBar
+                            android:id="@+id/progress_bar_registered"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/progress_bar_registered"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="8dp"
+                            android:text="Loading Notifications..."
+                            android:textColor="@android:color/black"
+                            style="@style/CardDesc1"
+                            tools:ignore="HardcodedText" />
+
+                    </RelativeLayout>
+
                 </LinearLayout>
 
             </androidx.core.widget.NestedScrollView>

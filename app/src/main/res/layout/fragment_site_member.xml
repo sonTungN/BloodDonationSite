@@ -266,7 +266,7 @@
                 android:layout_below="@id/progress_bar"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="8dp"
-                android:text="Getting member list..."
+                android:text="Getting Member List..."
                 android:textColor="@android:color/black"
                 style="@style/CardDesc1"
                 tools:ignore="HardcodedText" />

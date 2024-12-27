@@ -61,7 +61,9 @@ public class NotificationActivity extends AppCompatActivity {
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         notificationViewModel = new ViewModelProvider(this).get(NotificationViewModel.class);
         
+        binding.loadingLayout.setVisibility(View.VISIBLE);
         binding.noNotificationDisplay.setVisibility(View.GONE);
+        
         setUpNotificationRecyclerView();
         setUpDrawer();
         
@@ -95,6 +97,7 @@ public class NotificationActivity extends AppCompatActivity {
                 } else {
                     binding.noNotificationDisplay.setVisibility(View.GONE);
                 }
+                binding.loadingLayout.setVisibility(View.GONE);
                 
                 notificationList.clear();
                 notificationList.addAll(notifications);
@@ -117,6 +120,7 @@ public class NotificationActivity extends AppCompatActivity {
         View headerView = binding.navigationView.getHeaderView(0);
         TextView navName = headerView.findViewById(R.id.nav_name);
         TextView navEmail = headerView.findViewById(R.id.nav_email);
+        TextView navUserRole = headerView.findViewById(R.id.nav_user_role);
         ImageView navProfileImg = headerView.findViewById(R.id.profile_image);
         drawerLayout.closeDrawer(GravityCompat.START);
         
@@ -133,6 +137,7 @@ public class NotificationActivity extends AppCompatActivity {
             public void onSuccess(User user) {
                 navName.setText(user.getUsername());
                 navEmail.setText(user.getEmail());
+                navUserRole.setText(user.getUserRole());
                 
                 Glide.with(getApplicationContext())
                         .load(user.getProfileUrl())
@@ -195,14 +200,10 @@ public class NotificationActivity extends AppCompatActivity {
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
                 
-            } else if (menuItem.getItemId() == R.id.nav_profile) {
-                Intent intent = new Intent(this, ProfileActivity.class);
+            } else if (menuItem.getItemId() == R.id.nav_about_us) {
+                Intent intent = new Intent(this, GuidelineActivity.class);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
-                
-            } else if (menuItem.getItemId() == R.id.nav_about_us) {
-                Toast.makeText(this, "ABOUT US", Toast.LENGTH_SHORT).show();
-                drawerLayout.closeDrawer(GravityCompat.START);
                 
             } else if (menuItem.getItemId() == R.id.nav_logout) {
                 Intent intent = new Intent(this, OnBoardingActivity.class);

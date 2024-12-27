@@ -2,21 +2,23 @@ package com.sontung.blood.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.sontung.blood.fragments.EventFragment;
 import com.sontung.blood.fragments.EventMapFragment;
 
-public class EventTabAdapter extends FragmentPagerAdapter {
-
-    public EventTabAdapter(@NonNull FragmentManager fm) {
-        super(fm);
+public class EventTabAdapter extends FragmentStateAdapter {
+    
+    public EventTabAdapter(@NonNull FragmentActivity fragmentActivity) {
+        super(fragmentActivity);
     }
 
     @NonNull
     @Override
-    public Fragment getItem(int position) {
+    public Fragment createFragment(int position) {
         if (position == 1) {
             return new EventMapFragment();
         }
@@ -24,7 +26,7 @@ public class EventTabAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return 2;
     }
 }

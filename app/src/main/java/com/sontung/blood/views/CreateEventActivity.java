@@ -22,13 +22,11 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.sontung.blood.R;
-import com.sontung.blood.adapter.CreateEventAdapter;
+import com.sontung.blood.adapter.MyEventTabAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityCreateEventBinding;
-import com.sontung.blood.databinding.ActivityHomeBinding;
 import com.sontung.blood.model.User;
 import com.sontung.blood.viewmodel.UserViewModel;
 
@@ -54,7 +52,7 @@ public class CreateEventActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_create_event);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         
-        CreateEventAdapter adapter = new CreateEventAdapter(this);
+        MyEventTabAdapter adapter = new MyEventTabAdapter(this);
         binding.pageContent.setAdapter(adapter);
         
         new TabLayoutMediator(binding.tabLayout, binding.pageContent, (tab, position) -> {
@@ -99,6 +97,7 @@ public class CreateEventActivity extends AppCompatActivity {
         View headerView = binding.navigationView.getHeaderView(0);
         TextView navName = headerView.findViewById(R.id.nav_name);
         TextView navEmail = headerView.findViewById(R.id.nav_email);
+        TextView navUserRole = headerView.findViewById(R.id.nav_user_role);
         ImageView navProfileImg = headerView.findViewById(R.id.profile_image);
         drawerLayout.closeDrawer(GravityCompat.START);
         
@@ -115,6 +114,7 @@ public class CreateEventActivity extends AppCompatActivity {
             public void onSuccess(User user) {
                 navName.setText(user.getUsername());
                 navEmail.setText(user.getEmail());
+                navUserRole.setText(user.getUserRole());
                 
                 Glide.with(getApplicationContext())
                         .load(user.getProfileUrl())
@@ -170,21 +170,17 @@ public class CreateEventActivity extends AppCompatActivity {
                 
             } else if (menuItem.getItemId() == R.id.nav_my_event) {
                 drawerLayout.closeDrawer(GravityCompat.START);
-                finish();
                 return true;
                 
             } else if (menuItem.getItemId() == R.id.nav_notification) {
-                Toast.makeText(this, "NOTIFICATION", Toast.LENGTH_SHORT).show();
-                drawerLayout.closeDrawer(GravityCompat.START);
-                
-            } else if (menuItem.getItemId() == R.id.nav_profile) {
-                Intent intent = new Intent(this, ProfileActivity.class);
+                Intent intent = new Intent(this, NotificationActivity.class);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_about_us) {
-                Toast.makeText(this, "ABOUT US", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, GuidelineActivity.class);
                 drawerLayout.closeDrawer(GravityCompat.START);
+                startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_logout) {
                 Intent intent = new Intent(this, OnBoardingActivity.class);

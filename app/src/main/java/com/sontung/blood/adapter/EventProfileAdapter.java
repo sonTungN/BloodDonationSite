@@ -21,12 +21,12 @@ import com.sontung.blood.views.EventDetailActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventSiteAdapter extends RecyclerView.Adapter<EventSiteAdapter.ViewHolder> {
+public class EventProfileAdapter extends RecyclerView.Adapter<EventProfileAdapter.ViewHolder> {
     private final Context context;
     private final List<Site> siteList;
     private final List<Site> storedSiteList;
     
-    public EventSiteAdapter(Context context, List<Site> siteList) {
+    public EventProfileAdapter(Context context, List<Site> siteList) {
         this.context = context;
         this.siteList = siteList;
         this.storedSiteList = new ArrayList<>(siteList);

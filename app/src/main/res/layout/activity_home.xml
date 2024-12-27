@@ -25,8 +25,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:background="@color/mainBackgroundColor"
-            tools:context=".views.HomeActivity">
+            tools:context=".views.HomeActivity"
+            android:background="@color/mainBackgroundColor">
 
             <include
                 android:id="@+id/toolbarId"
@@ -79,7 +79,6 @@
                             android:textColor="@color/pink"
                             android:layout_gravity="center"
                             tools:ignore="HardcodedText" />
-
                     </LinearLayout>
 
                     <LinearLayout
@@ -169,6 +168,32 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
+                        <RelativeLayout
+                            android:id="@+id/loading_registered_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:background="@color/mainBackgroundColor">
+
+                            <ProgressBar
+                                android:id="@+id/progress_bar_registered"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_centerInParent="true" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/progress_bar_registered"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="8dp"
+                                android:text="Loading Registered Events..."
+                                android:textColor="@android:color/black"
+                                style="@style/CardDesc1"
+                                tools:ignore="HardcodedText" />
+
+                        </RelativeLayout>
+
                     </LinearLayout>
 
                     <LinearLayout
@@ -190,6 +215,32 @@
                             android:id="@+id/recent_recycler_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
+
+                        <RelativeLayout
+                            android:id="@+id/loading_recent_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:background="@color/mainBackgroundColor">
+
+                            <ProgressBar
+                                android:id="@+id/progress_bar_recent"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_centerInParent="true"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/progress_bar_recent"
+                                android:layout_centerHorizontal="true"
+                                android:layout_marginTop="8dp"
+                                android:text="Loading Recent Events..."
+                                android:textColor="@android:color/black"
+                                style="@style/CardDesc1"
+                                tools:ignore="HardcodedText" />
+
+                        </RelativeLayout>
 
                         <androidx.appcompat.widget.AppCompatButton
                             android:id="@+id/discover_more_btn"

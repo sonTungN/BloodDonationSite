@@ -39,7 +39,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.navigation.NavigationView;
 import com.sontung.blood.R;
 import com.sontung.blood.adapter.DonorCardAdapter;
-import com.sontung.blood.adapter.MultipleImageAdapter;
+import com.sontung.blood.adapter.ImageSliderAdapter;
 import com.sontung.blood.adapter.VolunteerCardAdapter;
 import com.sontung.blood.callback.FirebaseCallback;
 import com.sontung.blood.databinding.ActivityEventDetailBinding;
@@ -543,7 +543,7 @@ public class EventDetailActivity extends AppCompatActivity {
                         }
                     });
                     
-                    MultipleImageAdapter adapter = new MultipleImageAdapter(site.getSiteImageUrl());
+                    ImageSliderAdapter adapter = new ImageSliderAdapter(site.getSiteImageUrl());
                     viewPager2.setAdapter(adapter);
                     indicator.attachTo(viewPager2);
 
@@ -698,6 +698,7 @@ public class EventDetailActivity extends AppCompatActivity {
         View headerView = binding.navigationView.getHeaderView(0);
         TextView navName = headerView.findViewById(R.id.nav_name);
         TextView navEmail = headerView.findViewById(R.id.nav_email);
+        TextView navUserRole = headerView.findViewById(R.id.nav_user_role);
         ImageView navProfileImg = headerView.findViewById(R.id.profile_image);
         drawerLayout.closeDrawer(GravityCompat.START);
         
@@ -718,6 +719,7 @@ public class EventDetailActivity extends AppCompatActivity {
             public void onSuccess(User user) {
                 navName.setText(user.getUsername());
                 navEmail.setText(user.getEmail());
+                navUserRole.setText(user.getUserRole());
                 
                 Glide.with(getApplicationContext())
                         .load(user.getProfileUrl())
@@ -777,17 +779,14 @@ public class EventDetailActivity extends AppCompatActivity {
                 startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_notification) {
-                Toast.makeText(this, "NOTIFICATION", Toast.LENGTH_SHORT).show();
-                drawerLayout.closeDrawer(GravityCompat.START);
-                
-            } else if (menuItem.getItemId() == R.id.nav_profile) {
-                Intent intent = new Intent(this, ProfileActivity.class);
+                Intent intent = new Intent(this, NotificationActivity.class);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_about_us) {
-                Toast.makeText(this, "ABOUT US", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(this, GuidelineActivity.class);
                 drawerLayout.closeDrawer(GravityCompat.START);
+                startActivity(intent);
                 
             } else if (menuItem.getItemId() == R.id.nav_logout) {
                 Intent intent = new Intent(this, OnBoardingActivity.class);

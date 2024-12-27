@@ -9,8 +9,8 @@ import com.sontung.blood.fragments.CreateEventFragment;
 import com.sontung.blood.fragments.EditEventFragment;
 import com.sontung.blood.fragments.SiteMemberFragment;
 
-public class CreateEventAdapter extends FragmentStateAdapter {
-    public CreateEventAdapter(@NonNull FragmentActivity fragmentActivity) {
+public class MyEventTabAdapter extends FragmentStateAdapter {
+    public MyEventTabAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
     }
     
